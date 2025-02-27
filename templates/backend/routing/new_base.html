@@ -1,0 +1,200 @@
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+
+<div class="container mt-3">
+    <!-- Botón para regresar al listado -->
+    {% if backlink %}
+        <a href="{{ backlink }}" class="btn btn-secondary">Cancelar</a>
+    {% else %}
+        <button onclick="window.history.back();" class="btn btn-secondary">Cancelar</button>
+    {% endif %}
+    <h2>Crear {{ classnameLabel }}: </h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}" >
+        {% if foreignrecord %}
+            <input type="hidden" id="{{foreignrecord.fieldName}}" name="{{foreignrecord.fieldName}}" value="{{foreignrecord.value}}">
+        {% endif %}
+        {% if backlink %}
+            <input type="hidden" id="backlink" name="backlink" value="backlink">
+        {% endif %}
+            <!-- tabs -->
+            {% if has_tabs %}
+                <ul class="nav nav-tabs" id="tab-new" role="tablist">
+                    {% for container_name, container_data in containers.items() %}
+                        {% if container_data.type == "tab" %}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if loop.index == 1 %}active{% endif %}" id="{{ container_name }}-tab" data-bs-toggle="tab" data-bs-target="#{{ container_name }}" type="button" role="tab" aria-controls="{{ container_name }}" aria-selected="true">{{ container_data.title }}</button>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <div class="tab-content mb-4" id="tab-new-tab-content">
+                    {% for container_name, container_data in containers.items() %}
+                        {% if container_data.type == "tab" %}
+                            <div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="{{ container_name }}" role="tabpanel" aria-labelledby="{{ container_name }}-tab">
+                                <!-- fieldset row -->
+                                <div class="{{ container_data.class }}">
+                                    {% if container_data.title and not container_data.connected_table %}<h3>{{ container_data.title }}</h3>{% endif %}
+                                    {% for key, value in container_data.fields.items() %}
+                                    {% if not value.hidden %}
+                                    {% if value.id != "id" and value.id != foreignrecord.fieldName %}
+                                    
+                                    <div class="mb-3 {{ value.class }}">
+                                        <label for="{{ value.id }}" class="form-label">{{ value.label }}</label>
+                                        {% if value.input == "checkbox"  and value.type == "Boolean"%}
+                                        <input class="form-check-input" type="checkbox" id="{{ value.id }}" name="{{ value.id }}" {% if value.defaultValue == "True" %} checked {% endif %} {% if value.required %} required {% endif %}>
+                                        {% elif value.input == "checkbox" and value.type != "Boolean" %}
+                                            {% for label, checkvalue in value.select_options.items() %}
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="{{ value.id }}-{{ loop.index }}" name="{{ value.id }}" value="{{ checkvalue }}"{% if value.required %} required {% endif %}>
+                                                <label class="form-check-label" for="{{ value.id }}-{{ loop.index }}">
+                                                    {{ label }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        {% elif value.input == "integer" or value.input == "float" or value.input == "number" %}
+                                        <input class="form-control" type="number" id="{{ value.id }}" name="{{ value.id }}" {% if
+                                            value.input=="float" %} step="0.01" {% else %} step="1" {% endif %} {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %}{% if value.required %} required {% endif %}>
+                                        {% elif value.input == "textarea" %}
+                                        <textarea class="form-control" id="{{ value.id }}" name="{{ value.id }}"
+                                            maxlength="{{ value.maxlength }}" {% if value.required %} required {% endif %}>{% if value.defaultValue %} {{value.defaultValue}} {% endif %}</textarea>
+                                        {% elif value.input == "select" or value.input == "connected_table" %}
+                                        <select class="form-control" id="{{ value.id }}" name="{{ value.id }}"{% if value.required %} required {% endif %}>
+                                            {% for label, value in value.select_options.items() %}
+                                            <option value="{{ value }}">
+                                                {{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        {% elif value.type == "creationDate" %}
+                                            
+                                        {% elif value.type == "modificationDate" %}
+                                            
+                                        {% elif value.input == "date" %}
+                                            <input  class="form-control" id="{{ value.id }}" name="{{ value.id }}" type="date" {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %} {% if value.required %} required {% endif %}/>
+                                        {% elif value.input == "image" %}
+                                        <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}"
+                                            accept=".png, .jpg, .jpeg, .gif" {% if value.required %} required {% endif %}>
+                                        <img id="preview" width="200">
+                                        <script>
+                                            document.getElementById('{{ value.id }}').onchange = function (evt) {
+                                                var output = document.getElementById('preview');
+                                                source = URL.createObjectURL(evt.target.files[0]);
+                                                if (source) {
+                                                    output.src = source;
+                                                }
+                                                output.onload = function () {
+                                                    URL.revokeObjectURL(output.src) // Liberar memoria
+                                                }
+                                            };
+                                        </script>
+                                        
+                                        {% elif value.input == "blob" %}
+                                        <!-- Input para subir una nueva imagen, solo se muestra si el usuario selecciona eliminar la imagen actual -->
+                                        <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}" {% if value.required %} required {% endif %}>
+                                        {% elif value.input == "email" %}
+                                        <input class="form-control" type="email" id="{{ value.id }}" name="{{ value.id }}"
+                                            maxlength="{{ value.maxlength }}" {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %}{% if value.required %} required {% endif %}>
+                                        {% else %}
+                                        <input class="form-control" type="text" id="{{ value.id }}" name="{{ value.id }}"
+                                            maxlength="{{ value.maxlength }}" {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %}{% if value.required %} required {% endif %}>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <!-- finaliza fieldset row -->
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+                    {% for container_name, container_data in containers.items() %}
+
+                    {% if container_data.type == "row" or not container_data.type %}
+                    <!-- fieldset row -->
+                    <div class="{{ container_data.class }}">
+                        {% if container_data.title and not container_data.connected_table %}<h3>{{ container_data.title }}</h3>{% endif %}
+                        {% for key, value in container_data.fields.items() %}
+                        {% if not value.hidden %}
+                        {% if value.id != "id" and value.id != foreignrecord.fieldName %}
+                        
+                        <div class="mb-3 {{ value.class }}">
+                            <label for="{{ value.id }}" class="form-label">{{ value.label }}</label>
+                            {% if value.input == "checkbox"  and value.type == "Boolean"%}
+                            <input class="form-check-input" type="checkbox" id="{{ value.id }}" name="{{ value.id }}" {% if value.defaultValue == "True" %} checked {% endif %} {% if value.required %} required {% endif %}>
+                            {% elif value.input == "checkbox" and value.type != "Boolean" %}
+                                {% for label, checkvalue in value.select_options.items() %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="{{ value.id }}-{{ loop.index }}" name="{{ value.id }}" value="{{ checkvalue }}"{% if value.required %} required {% endif %}>
+                                    <label class="form-check-label" for="{{ value.id }}-{{ loop.index }}">
+                                        {{ label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            {% elif value.input == "integer" or value.input == "float" or value.input == "number" %}
+                            <input class="form-control" type="number" id="{{ value.id }}" name="{{ value.id }}" {% if
+                                value.input=="float" %} step="0.01" {% else %} step="1" {% endif %} {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %}{% if value.required %} required {% endif %}>
+                            {% elif value.input == "textarea" %}
+                            <textarea class="form-control" id="{{ value.id }}" name="{{ value.id }}"
+                                maxlength="{{ value.maxlength }}" {% if value.required %} required {% endif %}>{% if value.defaultValue %} {{value.defaultValue}} {% endif %}</textarea>
+                            {% elif value.input == "select" or value.input == "connected_table" %}
+                            <select class="form-control" id="{{ value.id }}" name="{{ value.id }}"{% if value.required %} required {% endif %}>
+                                {% for label, value in value.select_options.items() %}
+                                <option value="{{ value }}">
+                                    {{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% elif value.type == "creationDate" %}
+                                
+                            {% elif value.type == "modificationDate" %}
+                                
+                            {% elif value.input == "date" %}
+                                <input  class="form-control" id="{{ value.id }}" name="{{ value.id }}" type="date" {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %} {% if value.required %} required {% endif %}/>
+                            {% elif value.input == "image" %}
+                            <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}"
+                                accept=".png, .jpg, .jpeg, .gif" {% if value.required %} required {% endif %}>
+                            <img id="preview" width="200">
+                            <script>
+                                document.getElementById('{{ value.id }}').onchange = function (evt) {
+                                    var output = document.getElementById('preview');
+                                    source = URL.createObjectURL(evt.target.files[0]);
+                                    if (source) {
+                                        output.src = source;
+                                    }
+                                    output.onload = function () {
+                                        URL.revokeObjectURL(output.src) // Liberar memoria
+                                    }
+                                };
+                            </script>
+                            
+                            {% elif value.input == "blob" %}
+                            <!-- Input para subir una nueva imagen, solo se muestra si el usuario selecciona eliminar la imagen actual -->
+                            <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}" {% if value.required %} required {% endif %}>
+                            {% elif value.input == "email" %}
+                            <input class="form-control" type="email" id="{{ value.id }}" name="{{ value.id }}"
+                                maxlength="{{ value.maxlength }}" {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %}{% if value.required %} required {% endif %}>
+                            {% else %}
+                            <input class="form-control" type="text" id="{{ value.id }}" name="{{ value.id }}"
+                                maxlength="{{ value.maxlength }}" {% if value.defaultValue %} value="{{value.defaultValue}}" {% endif %}{% if value.required %} required {% endif %}>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <!-- finaliza fieldset row -->
+                    {% endif %}
+                    {% endfor %}
+
+        <!-- Botón de envío -->
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <!-- Botón de cancelación -->
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancelar</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "backend/template.html" %}
+
+{% block content %}
+
+    <div class="container mt-3">
+        <h2>Exportar reporte: </h2>
+        <div class="container mb-4"></div>
+        <!-- Botón para crear una nueva institución -->
+        <a class="btn btn-success mb-3" id="download-btn">Descargar Reporte</a>
+        {%if table %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Tipo</th>
+                        <th>Agencia</th>
+                        <th>Nombre</th>
+                        <th>Productos</th>
+                        <th>Monto</th>
+                        <th>Fecha Reserva</th>
+                        <th>Detalles deposito</th>
+                        <th>Usuario</th>
+                        <th>Fecha Compra</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in table %}
+                <tr>            
+                    <td>{{record.id}}</td>
+                    <td>{{record.statusOrder}}</td>
+                    <td>
+                        {% if record.typeSource == "web" %} 
+                        Venta Web
+                        {% elif record.typeSource == "agency" %}
+                        Agencia
+                        {% elif record.typeSource == "direct" %}
+                        Venta directa
+                        {%endif%}
+                    </td>
+                    <td>
+                        {%if record.agency%}
+                        {{record.agency}}
+                        {%endif%}
+                    </td>
+                    <td>
+                        {{record.name}} {% if record.lastname %}{{record.lastname}}{%endif%}
+                    </td>
+                    <td>
+                        {% for item in record.orderlines %}
+                            {{item}} | 
+                        {%endfor%}
+                    </td>
+                    <td>
+                        {% if record.amount %}
+                        {{record.amount / 100}}
+                        {%endif%}
+                    </td>     
+                    <td>{{record.dateReservation.strftime('%d/%m/%Y')}}</td>      
+                    <td>{{record.deposit}}</td>      
+                    <td>{% if record.createdby %}{{record.createdby}}{%endif%}</td>     
+                    <td>{{ record.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>     
+                </tr>
+                {% endfor %}
+                <tfoot>
+                    <tr>
+                    </tr>
+                </tfoot>
+            </tbody>
+        </table>
+        {%else%}
+            No hay registros para esta búsqueda.
+        {%endif%}
+        </div>
+    </div>
+{% endblock %}

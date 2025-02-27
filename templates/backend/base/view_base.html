@@ -1,0 +1,63 @@
+{% extends "backend/template.html" %}
+
+{% block content %}
+
+
+<div class="container mt-3">
+    <!-- Botón para regresar al listado -->
+    {% if backlink %}
+        <a href="{{ backlink }}" class="btn btn-secondary">Regresar</a>
+    {% else %}
+        <button onclick="window.history.back();" class="btn btn-secondary">Regresar</button>
+    {% endif %}
+    <!-- Botón para editar -->
+    <a href="{{ url_for('.edit_record', record_id=institution.id, classid=classid, backlink=backlink) }}" class="btn btn-primary">Editar</a>
+    <!-- Botón para borrar -->
+    <form action="{{ url_for('.delete_record', record_id=institution.id, classid=classid) }}" method="post"
+        style="display: inline;"><input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger"
+            onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+    </form>
+
+    <h2>{{ classname }}: {{institution.id}}</h2>
+    <div class="card">
+        <div class="card-body">
+    <div class="row">
+        {% for container_name, container_data in containers.items() %}
+                <div class="{{ container_data.class }}">
+                    {% if container_data.title %}<h3>{{ container_data.title }}</h3>{% endif %}
+                    {% for key, value in container_data.fields.items() %}
+                    {% set field_value = institution|safe_getattr(value.id) %}
+                    <div class="{{ value.class }}">
+                        <p>
+                            <b>{{ value.label }}:</b>
+                            {% if value.input == "checkbox" and value.type == "Boolean" %}
+                                {% if field_value %} Sí {% else %} No {% endif %}
+                            {% elif value.input == "checkbox" and value.type != "Boolean" %}
+                                {% for option in value.options %}
+                                    {% if option.value in field_value %} <br>{{ option.label }} {% endif %}
+                                {% endfor %}
+                            {% elif value.input == "number" or value.input == "float" %}
+                            {{ field_value }}
+                            {% elif value.input == "textarea" %}
+                            {{ field_value }}
+                            {% elif value.input == "select" %}
+                            {% for option in value.options %}
+                            {% if option.value == field_value %} {{ option.label }} {% endif %}
+                            {% endfor %}
+                            {% elif value.input == "image" %}
+                            <img src="{{ url_for('static', filename='uploads/' ~ field_value) }}" width="200" />
+                            {% else %}
+                            {{ field_value }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

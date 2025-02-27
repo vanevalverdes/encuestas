@@ -1,0 +1,140 @@
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+<style>
+    .p-progress-bar-container {
+        margin: 20px 0;
+        background-color: #f3f3f3;
+        border-radius: 5px;
+        overflow: hidden;
+        height: 30px;
+    }
+
+    .p-progress-bar {
+        height: 100%;
+        background-color: #007bff;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 10px;
+        border-radius: 5px;
+        width: 0%;
+        transition: width 0.2s ease;
+    }
+
+    .progress-title {
+        font-weight: bold;
+    }
+
+    .progress-number {
+        font-size: 14px;
+    }
+</style>
+
+<div class="container mt-3">
+    <!-- Botón para regresar al listado -->
+    <button onclick="window.history.back();" class="btn btn-secondary">Cancelar</button>
+    <h2>Subir para procesar: </h2>
+<form id="uploadForm" method="post" enctype="multipart/form-data">
+    <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}">
+    <!-- fieldset tab -->
+    <div class="mb-3 pt-2">
+        <label for="topic" class="form-label">Tema</label>
+        <input class="form-control" type="text" id="topic" name="topic" value="escolar" maxlength="" required>
+    </div>
+    <!-- finaliza fieldset tab -->
+    <!-- fieldset tab -->
+    <div class="mb-3 pt-2">
+        <label for="email" class="form-label">Correo electrónico</label>
+        <input class="form-control" type="email" id="email" name="email" value="redaccion@elmundo.cr" maxlength="" required>
+    </div>
+    <!-- finaliza fieldset tab -->
+    <!-- fieldset tab -->
+    <div class="mb-3 pt-2">
+        <label for="transcript" class="form-label">Transcripción</label>
+        <textarea class="form-control" id="transcript" name="transcript" maxlength=""></textarea>
+    </div>
+    <!-- finaliza fieldset tab -->
+    <!-- fieldset tab -->
+    <div class="mb-3 pt-2">
+        <label for="file" class="form-label">Archivo</label>
+        <input class="form-control" type="file" id="file" name="file">
+    </div>
+    <!-- finaliza fieldset tab -->
+
+    <!-- Barra de progreso -->
+    <div class="p-progress-bar-container" style="display: none;">
+        <div class="p-progress-bar progress-animated" id="progressBar" style="width: 0%;">
+            <div class="progress-title">Uploading</div>
+            <span class="progress-number animated fadeIn" id="progressPercentage">0</span>
+        </div>
+    </div>
+
+    <script>
+        // Manejo del formulario y barra de progreso
+        const form = document.getElementById('uploadForm');
+        const progressBarContainer = document.querySelector('.p-progress-bar-container');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // Evita el envío tradicional del formulario
+
+            const file = document.getElementById('file');
+            if (!file.files.length) {
+                // Si no hay archivo, se envía el formulario normalmente
+                form.submit();
+                return;
+            }
+
+            // Si hay archivo, muestra la barra de progreso
+            progressBarContainer.style.display = 'block';
+
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', form.action, true);
+
+            // Evento para actualizar la barra de progreso
+            xhr.upload.addEventListener('progress', function (e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = `${percentComplete}%`;
+                    progressPercentage.textContent = `${percentComplete}%`;
+                }
+            });
+
+            // Evento para manejar la finalización de la carga
+            xhr.addEventListener('load', function () {
+                if (xhr.status === 200) {
+                    progressBar.style.width = '100%';
+                    progressPercentage.textContent = '100%';
+                    
+                    // Ahora que el archivo está cargado, enviamos el formulario completo
+                    form.submit(); // Enviar el formulario con todos los datos
+                } else {
+                    alert('Error uploading file.');
+                }
+            });
+
+            // Evento para manejar errores
+            xhr.addEventListener('error', function () {
+                alert('An error occurred while uploading the file.');
+            });
+
+            // Envío del archivo
+            xhr.send(formData);
+        });
+    </script>
+
+    <!-- Botón de envío -->
+    <button type="submit" class="btn btn-primary">Procesar</button>
+    <!-- Botón de cancelación -->
+    <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancelar</button>
+</form>
+
+</div>
+{% endblock %}

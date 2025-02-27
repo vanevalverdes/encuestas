@@ -1,0 +1,80 @@
+{% extends "backend/template.html" %}
+
+{% block title %}Institucion Nueva{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% for message in messages %}
+{{ message }}
+{% endfor %}
+{% endwith%}
+<div class="container mt-3">
+    <!-- Botón de cancelación -->
+    <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancelar</button>
+    <h2>Crear {{ classname }}: </h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    {% for container_name, container_data in containers.items() %}
+                    <div class="{{ container_data.class }}">
+                        {% if container_data.title %}<h3>{{ container_data.title }}</h3>{% endif %}
+                        {% for key, value in container_data.fields.items() %}
+                        {% if value.id != "id" %}
+                        <div class="mb-3 {{ value.class }}">
+                            <label for="{{ value.id }}" class="form-label">{{ value.label }}</label>
+                            {% if value.input == "checkbox" %}
+                            <input class="form-check-input" type="checkbox" id="{{ value.id }}" name="{{ value.id }}">
+                            {% elif value.input == "integer" or value.input == "float" %}
+                            <input class="form-control" type="number" id="{{ value.id }}" name="{{ value.id }}" {% if
+                                value.input=="float" %} step="0.01" {% else %} step="1" {% endif %}>
+                            {% elif value.input == "textarea" %}
+                            <textarea class="form-control" id="{{ value.id }}" name="{{ value.id }}"
+                                maxlength="{{ value.maxlength }}"></textarea>
+                            {% elif value.input == "select" %}
+                            <select class="form-control" id="{{ value.id }}" name="{{ value.id }}">
+                                {% for option in value.options %}
+                                <option value="{{ option.value }}">{{ option.label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% elif value.input == "image" %}
+                            <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}"
+                                accept=".png, .jpg, .jpeg, .gif">
+                            <img id="preview" width="200">
+                            <script>
+                                document.getElementById('{{ value.id }}').onchange = function (evt) {
+                                    var output = document.getElementById('preview');
+                                    output.src = URL.createObjectURL(evt.target.files[0]);
+                                    output.onload = function () {
+                                        URL.revokeObjectURL(output.src) // Liberar memoria
+                                    }
+                                };
+                            </script>
+                            {% elif value.input == "email" %}
+                            <input class="form-control" type="email" id="{{ value.id }}" name="{{ value.id }}"
+                                maxlength="{{ value.maxlength }}">
+                            {% else %}
+                            <input class="form-control" type="text" id="{{ value.id }}" name="{{ value.id }}"
+                                maxlength="{{ value.maxlength }}">
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    {% endfor %}
+                    <div class="my2">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input class="form-control" type="password" id="password" name="password">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Botón de envío -->
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <!-- Botón de cancelación -->
+        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancelar</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+# Información General
+
+##Estructura
+El proyecto está construído con Flask, y tiene una estructura que decidimos era la más indicada para separar el desarrollo.
+
+Tiene que tener instaladas las dependencias del requirements.txt en su entorno virtual. Para inicializar el proyecto tiene que ejecutar el archivo index.py:
+
+> python index.py
+
+Su estructura básica es:
+
+/proyecto
+    app.py
+    index.py
+    config.py
+    requirements.txt
+        /migrations
+        /models
+            /develop
+            /application
+                clazzlist.py
+        /routes
+            /develop
+            routing.py
+        /static
+            /uploads
+        /templates
+            /backend
+            /frontend
+        /utils
+    
+
+## Uso general
+1. La aplicación genera desde la vista de Clazzes las clases. Luego en la vista de Containers se debe generar mínimo un container para la clase, y desde la vista de Field, se generan los campos y se les asigna a los Container.
+
+2. Por convención, los nombres de clase serán en Mayúscula inicial. Los nombres de Field serán en minúscula.
+
+3. Una vez creada la estructura de campos, desde la vista Clazzes se ejecuta la acción "Crear Migration". Esta genera los archivos correspondientes en models.py y en routes.py, y crea una migración en la base de datos, que conecta con el mysql y lo actualiza.
+
+4. El siguiente paso es detener la ejecución del Flask. En el archivo app.py se debe importar el archivo de route recién creado, y conectar el blueprint correspondiente.
+
+5. Ejecutar de nuevo Flask y ya está actualizado el listado de clases en el menú superior.
+
+## Hoja de ruta
+(Listo!!!) 1. Conectar las vistas de Clazzes > Container > Fields para administrarlo desde una sola vista 
+2. Crear mecanismo para campos que hagan referencia a otras clases (uno a muchos, muchos a uno)
+3. Crear búsqueda por default
+4. Mejorar configuración de clases, para incluir campos de route, listado de campos de tabla
+5. Pensar en el Frontend
+6. Trabajar permisos por niveles de usuario
+7. Mejorar rendimiento. Por ejemplo, variable de sesión para listado de clases en menú, etc.
+
+
+## Otras observaciones
+
+Para configurar la BD de datos se utiliza SQLAlchemy:
+Los datos de configuracion se debe hacer un archivo config.py con este contenido
+class Config:
+    SQLALCHEMY_DATABASE_URI = 'mysql://bd_user:pass@bd_name'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_POOL_RECYCLE = 1800 
+    SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
+    SECRET_KEY = 'clave_secreta'
+    UPLOAD_FOLDER = 'static/uploads'
+
+
+Para hacer migraciones utilizamos:
+1. Si aun no se ha creado la carpeta de migraciones
+    flask db init
+2. Crear una migracion
+    flask db migrate -m "Added image_filename field to Institution"
+3. Aplicar la migracion
+    flask db upgrade
+

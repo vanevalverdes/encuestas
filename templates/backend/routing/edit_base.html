@@ -1,0 +1,89 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block content %}
+
+    <div class="container my-3">
+        <!-- Inicia Botonera -->
+        {% if backlink %}
+            {% if not isStatic %}
+            <a href="{{ backlink }}" class="btn btn-secondary">Regresar</a>
+            <!-- Botón de cancelación -->
+             {%endif%}
+            <a href="{{ url_for('.view_record', record_id=institution.id, classid=classid, backlink=backlink) }}" type="button" class="btn btn-secondary">Cancelar</a>
+            {% if not isStatic %}
+            <!-- Botón para borrar -->
+            <form action="{{ url_for('.delete_record', record_id=institution.id, classid=classid, backlink=backlink) }}" method="post" style="display: inline;">
+                <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+            </form>
+            {%endif%}
+        {% else %}
+            {% if not isStatic %}
+            <button onclick="window.history.back();" class="btn btn-secondary">Regresar</button>
+            {%endif%}
+            <a href="{{ url_for('.view_record', record_id=institution.id, classid=classid) }}" type="button" class="btn btn-secondary">Cancelar</a>
+            {% if not isStatic %}
+            <!-- Botón para borrar -->
+            <form action="{{ url_for('.delete_record', record_id=institution.id, classid=classid, backlink=backlink) }}" method="post" style="display: inline;">
+                <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+            </form>
+            {%endif%}
+        {% endif %}
+        <!-- Finaliza Botonera -->
+
+        <div class="row">
+            <h2 class="my-3">Editar {{ classname }}: {{ institution }}</h2>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            <!-- Inputs ocultos -->
+            <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" id="modifiedby_id" name="modifiedby_id" value="{{ current_user.id }}" >
+            {% if backlink %}
+                <input type="hidden" id="backlink" name="backlink" value="backlink">
+            {% endif %}
+
+            <!-- tabs -->
+            {% if has_tabs %}
+                <ul class="nav nav-tabs" id="tab-{{ institution.id }}" role="tablist">
+                    {% for container_name, container_data in containers.items() %}
+                        {% if container_data.type == "tab" %}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if loop.index == 1 %}active{% endif %}" id="{{ container_name }}-tab" data-bs-toggle="tab" data-bs-target="#{{ container_name }}" type="button" role="tab" aria-controls="{{ container_name }}" aria-selected="true">{{ container_data.title }}</button>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <div class="tab-content mb-4" id="tab-{{ institution.id }}-tab-content">
+                    {% for container_name, container_data in containers.items() %}
+                        {% if container_data.type == "tab" %}
+                            <div class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}" id="{{ container_name }}" role="tabpanel" aria-labelledby="{{ container_name }}-tab">
+                                {{ macros.editFields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for container_name, container_data in containers.items() %}
+                {% if container_data.type == "row" or not container_data.type %}
+                    <!-- fieldset row -->
+                    <div class="{% if container_data.class %}{{ container_data.class }} {% else %} row my-4 {% endif %}">
+                        <div class="">
+                            {% if container_data.title and not container_data.connected_table %}
+                                <h3>{{ container_data.title }}</h3>
+                            {% endif %}
+                            {{ macros.editFields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) }}
+                        </div>
+                    </div>
+                    <!-- finaliza fieldset row -->
+                {% endif %}
+            {% endfor %}
+
+        <!-- Botón de envío -->
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+    {% endblock %}

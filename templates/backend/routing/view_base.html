@@ -1,0 +1,93 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+{% block content %}
+
+
+<div class="container my-3">
+    <div class="d-flex align-items-center mb-3">
+        <!-- Botón para regresar al listado -->
+        {% if backlink and not isStatic %}
+            <a href="{{ backlink }}" class="btn btn-secondary me-1">Regresar</a>
+            {% else %}
+            <a href="{{ url_for('.list_record', classid=classid, page=1) }}" class="btn btn-secondary me-1">Regresar</a>
+        {% endif %}
+        
+        <!-- Botón para editar -->
+        <a href="{{ url_for('.edit_record', record_id=institution.id, classid=classid, backlink=backlink) }}" class="btn me-1 btn-primary">Editar</a>
+        <!-- Botón para borrar -->
+        {% if not isStatic %}
+        <form action="{{ url_for('.delete_record', record_id=institution.id, classid=classid, backlink=backlink) }}" method="post"
+            style="display: inline;"><input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-danger  me-1"
+                onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+        </form>
+        {% endif %}
+        {% if extraActions %}
+            {% for action in extraActions %}
+                {% if action.typeBtn == "single" %}
+                <a href="{{ action.url }}" class="btn btn-secondary me-1">{{action.title}}</a>
+                {% elif action.typeBtn == "dropdown" %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{action.title}}
+                    </button>
+                    <ul class="dropdown-menu">
+                    {% for option in action.options %}
+                    <li><a class="dropdown-item" href="{{option.url}}">{{option.option}}</a></li>
+                    {%endfor%}
+                    </ul>
+                </div>
+                {%endif%}
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="row">
+        <h2 class="my-3">{{institution}}</h2>
+    </div>
+    {% if has_tabs %}
+        <ul class="nav nav-tabs" id="tab-{{institution.id}}" role="tablist">
+        {% for container_name, container_data in containers.items() %}
+            {% if container_data.type == "tab" %}
+                <li class="nav-item" role="presentation">
+                <button class="nav-link {% if loop.index == 1 %}active{% endif %}" id="{{container_name}}-tab" data-bs-toggle="tab" data-bs-target="#{{container_name}}" type="button" role="tab" aria-controls="{{container_name}}" aria-selected="true">{{container_data.title}}</button>
+                </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+        <div class="tab-content mb-4" id="tab-{{institution.id}}-tab-content">
+        {% for container_name, container_data in containers.items() %}    
+            {% if container_data.type == "tab" %}
+                <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ container_name }}" role="tabpanel" aria-labelledby="{{ container_name }}-tab">
+                    {{ macros.fields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) }}
+                </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% endif %}
+    {% for container_name, container_data in containers.items() %}
+    {% if container_data.type == "row" or not container_data.type %}
+        <div class="{%if container_data.class %}{{ container_data.class }} {%else%} row my-4{%endif%}">
+                {% if container_data.title %}<h3>{{ container_data.title }}</h3>{% endif %}
+                {{ macros.fields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) }}
+        </div>
+    {% endif %}
+    {% endfor %}
+
+    <!-- Botón para regresar al listado -->
+    {% if backlink and not isStatic %}
+        <a href="{{ backlink }}" class="btn btn-secondary">Regresar</a>
+        {% else %}
+        <a href="{{ url_for('.list_record', classid=classid, page=1) }}" class="btn btn-secondary">Regresar</a>
+    {% endif %}
+    <!-- Botón para editar -->
+    <a href="{{ url_for('.edit_record', record_id=institution.id, classid=classid, backlink=backlink) }}" class="btn btn-primary">Editar</a>
+    <!-- Botón para borrar -->
+     {% if not isStatic %}
+    <form action="{{ url_for('.delete_record', record_id=institution.id, classid=classid, backlink=backlink) }}" method="post"
+        style="display: inline;"><input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger"
+            onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

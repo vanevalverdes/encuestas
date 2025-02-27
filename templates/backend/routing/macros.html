@@ -1,0 +1,473 @@
+{% macro editFields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) %}
+    {% for key, value in container_data.fields.items() %}
+    {% if not value.hidden %}
+        {% set field_value = institution|safe_getattr(value.id) %}
+        <!-- fieldset tab -->
+        <div class="mb-3  {% if value.class %} {{ value.class }} {% endif %} pt-2">
+            <label for="{{ value.id }}" class="form-label">{{ value.label }}</label>
+            {% if value.input == "checkbox" and value.type == "Boolean" %}
+            <input class="form-check-input" type="checkbox" id="{{ value.id }}" name="{{ value.id }}" {%
+                if field_value %} checked {% endif %} {% if value.required %} required {% endif %}>
+            {% elif value.input == "checkbox" and value.type != "Boolean" %}
+                {% for label, option in value.select_options.items() %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="{{ value.id }}-{{ loop.index }}" name="{{ value.id }}" value="{{ option }}" {% if option in field_value %} checked {% endif %} {% if value.required %} required {% endif %}>
+                    <label class="form-check-label" for="{{ value.id }}-{{ loop.index }}">
+                        {{ label }}
+                    </label>
+                </div>
+                {% endfor %}
+            {% elif value.input == "number" and value.type != "Money" or value.input == "float" and value.type != "Money" %}
+            <input class="form-control" {% if value.id=="id" %} disabled {% endif %} type="number"
+                id="{{ value.id }}" name="{{ value.id }}" value="{% if field_value %}{{ field_value }}{%  endif %}" {% if
+                value.input=="float" %} step="0.01" {% else %} step="1" {% endif %} {% if value.required %} required {% endif %}>
+            {% elif value.type == "Money" %}
+            <input class="form-control" {% if value.id=="id" %} disabled {% endif %} type="number"
+                id="{{ value.id }}" name="{{ value.id }}" value="{{ fieldsMoneyFields[value.id] }}" step="0.01" {% if value.required %} required {% endif %}>
+            {% elif value.input == "textarea" %}
+            <textarea class="form-control" id="{{ value.id }}" name="{{ value.id }}"
+                maxlength="{{ value.maxlength }}" {% if value.required %} required {% endif %}>{% if field_value %}{{ field_value }}{% endif%}</textarea>
+            {% elif value.type == "modifiedby" %}
+                {{ institution.modifiedby }}
+            {% elif value.type == "createdby" %}
+                {{ institution.createdby }}
+            {% elif value.type == "creationDate" %}
+                {{ institution.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+            {% elif value.type == "modificationDate" %}
+                {{ institution.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+            {% elif value.input == "date" %}
+                <input  class="form-control" id="{{ value.id }}" name="{{ value.id }}" type="date" value="{{ field_value }}" {% if value.required %} required {% endif %}/>
+            {% elif value.input == "select" or value.input == "connected_table" %}
+            <select class="form-control" id="{{ value.id }}" name="{{ value.id }}" {% if value.required %} required {% endif %}>
+                {% for label, value in value.select_options.items() %}
+                <option value="{{ value }}" {% if value==field_value %} selected {% endif %}>
+                    {{ label }}</option>
+                {% endfor %}
+            </select>
+            {% elif value.input == "image" %}
+            <img id="preview-{{ value.id }}"
+                src="{{ url_for('static', filename='uploads/' ~ field_value) }}" width="200" {% if value.required %} required {% endif %}>
+            <!-- Checkbox para decidir si eliminar la imagen actual -->
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="delete-{{ value.id }}"
+                    name="delete-{{ value.id }}">
+                <label class="form-check-label" for="delete-{{ value.id }}">
+                    Eliminar imagen actual
+                </label>
+            </div>
+            <!-- Input para subir una nueva imagen, solo se muestra si el usuario selecciona eliminar la imagen actual -->
+            <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}"
+                accept=".png, .jpg, .jpeg, .gif" style="display: none;" {% if value.required %} required {% endif %}>
+                <script>
+                    document.getElementById('{{ value.id }}').onchange = function (evt) {
+                        var output = document.getElementById('preview');
+                        source = URL.createObjectURL(evt.target.files[0]);
+                        if (source) {
+                            output.src = source;
+                        }
+                        output.onload = function () {
+                            URL.revokeObjectURL(output.src) // Liberar memoria
+                        }
+                    };
+                </script>
+            {% elif value.input == "blob" %}
+            {% if field_value %}
+            {% if field_value.endswith('.jpg') or field_value.endswith('.JPG') or field_value.endswith('.png') or field_value.endswith('.PNG') or field_value.endswith('.jpeg') or field_value.endswith('.JPEG') %}
+                <img id="preview-{{ value.id }}" src="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=institution.id) }}" width="200">
+            {%else%}
+            <b>{{field_value}}</b>
+            {%endif%}
+                <!-- Checkbox para decidir si eliminar la imagen actual -->
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="delete-{{ value.id }}"
+                    name="delete-{{ value.id }}">
+                    <label class="form-check-label" for="delete-{{ value.id }}">
+                        Eliminar archivo actual
+                    </label>
+                </div>
+                <!-- Input para subir una nueva imagen, solo se muestra si el usuario selecciona eliminar la imagen actual -->
+                <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}" style="display: none;" value="{{field_value}}" disabled {% if value.required %} required {% endif %}>
+            {% else %}
+                <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}"  {% if value.required %} required {% endif %}>
+            {% endif %}
+            <script>
+                document.getElementById('delete-{{ value.id }}').addEventListener('change', function (evt) {
+                    var fileInput = document.getElementById('{{ value.id }}');
+                    var preview = document.getElementById('preview-{{ value.id }}');
+                    
+                    if (evt.target.checked) {
+                        fileInput.style.display = 'block';
+                        fileInput.disabled = false; // Habilitar el input
+                        if (preview) {
+                            preview.style.display = 'none';
+                        }
+                    } else {
+                        fileInput.style.display = 'none';
+                        fileInput.disabled = true; // Deshabilitar el input
+                        if (preview) {
+                            preview.style.display = 'block';
+                        }
+                    }
+                });
+            
+                document.getElementById('file-{{ value.id }}').addEventListener('change', function (evt) {
+                    var output = document.getElementById('preview-{{ value.id }}');
+                    var source = URL.createObjectURL(evt.target.files[0]);
+                    if (source) {
+                        output.src = source;
+                        output.style.display = 'block';
+                    }
+                    output.onload = function () {
+                        URL.revokeObjectURL(output.src); // Liberar memoria
+                    }
+                });
+            </script>
+            {% elif value.input == "email" %}
+            <input class="form-control" type="email" id="{{ value.id }}" name="{{ value.id }}"
+                value="{% if field_value %}{{ field_value }}{%  endif %}" maxlength="{{ value.maxlength }}"{% if value.required %} required {% endif %}>
+            {% else %}
+            <input class="form-control" type="text" id="{{ value.id }}" name="{{ value.id }}"
+                value="{% if field_value %}{{ field_value }}{%  endif %}" maxlength="{{ value.maxlength }}"{% if value.required %} required {% endif %}>
+            {% endif %}
+        </div>
+        <!-- finaliza fieldset tab -->
+    {%endif%}
+    {% endfor %}
+
+{% endmacro %}
+{% macro fields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) %}
+<div class="py-4">
+    {% for key, value in container_data.fields.items() %}
+    {% if not value.hidden %}
+    {% set field_value = institution|safe_getattr(value.id) %}
+    <div class="{% if value.class %}{{ value.class }}{% endif %}">
+        <p class="text-break">
+            <b>{{ value.label }}:</b>
+            {% if value.input == "checkbox" and value.type == "Boolean" %}
+                {% if field_value %} Sí {% else %} No {% endif %}
+            {% elif value.input == "checkbox" and value.type != "Boolean" %}
+                {% for label, option in value.select_options.items() %}
+                    {% if option in field_value %} <br>{{ label }} {% endif %}
+                {% endfor %}
+            {% elif value.input == "number" and value.type != "Money" or value.input == "float" and value.type != "Money" %}
+                {% if field_value %} {{ field_value }} {% endif %}
+            {% elif value.type == "Money" %}
+                {{ fieldsMoneyFields[value.id] | money_format("","","True")}} 
+            {% elif value.type == "Date" %}
+                {{ field_value.strftime('%d/%m/%Y') }}
+            {% elif value.type == "creationDate" %}
+                {{ institution.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+            {% elif value.type == "createdby" %}
+                {{ institution.createdby }}
+            {% elif value.type == "modifiedby" %}
+                {{ institution.modifiedby }}
+            {% elif value.type == "modificationDate" %}
+                {{ institution.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+            {% elif value.input == "textarea" %}
+                {% if field_value and field_value != "None" %} {{ field_value }} {% endif %}
+            {% elif value.input == "select" %}
+                {% for label, option in value.select_options.items() %}
+                    {% if option == field_value %} {{ label }} {% endif %}
+                {% endfor %}
+            {% elif value.input == "connected_table" %}
+                {% for label, option in value.select_options.items() %}
+                    {% if option == field_value %} {{ label }} {% endif %}
+                {% endfor %}
+            {% elif value.input == "image" %}
+            <img src="{{ url_for('static', filename='uploads/' ~ field_value) }}" width="200" />
+            {% elif value.input == "blob" %}
+                {% if field_value %}
+                <a href="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=institution.id) }}" target="_blank">
+                    {% if field_value.endswith('.jpg') or field_value.endswith('.JPG') or field_value.endswith('.png') or field_value.endswith('.PNG') or field_value.endswith('.jpeg') or field_value.endswith('.JPEG') %}
+                        <img src="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=institution.id) }}" width="200">
+                    {% else %}
+                        Ver archivo
+                    {% endif %}
+                </a>
+                {% endif %}
+            {% else %}
+            {% if field_value and field_value != "None" %} {{ field_value }} {% endif %}
+            {% endif %}
+        </p>
+    </div>
+    {%endif%}
+    {% endfor %}
+
+    {% if container_data.connected_table %}
+        {% set table_id = container_data.connected_table %}
+        {% set connected_table = connectedTables[table_id] if table_id in connectedTables else None %}
+        
+        {% if connected_table %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        {% for label, field in connected_table.connected_table_fields.items() %}
+                            <th>{{ label }}</th>
+                        {% endfor %}
+                            <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in connected_table.records %}
+                    <tr>
+                        
+                            {% for label, field in connected_table.connected_table_fields.items() %}
+                            <td>
+                                {% if record[field] %}
+                                    {% if field in connected_table.moneyFieldConnected %}
+                                        {{ record[field] / 100.0 }}
+                                    {% else %}
+                                        {% if record[field] is string and (record[field].endswith('.jpg') or record[field].endswith('.JPG') or record[field].endswith('.png') or record[field].endswith('.PNG') or record[field].endswith('.jpeg') or record[field].endswith('.JPEG')) %}
+                                            <img src="{{ url_for('application.uploaded_file', filename=record[field], fieldname=field, classname=connected_table) }}" width="200">
+                                        {% elif field == '__repr__' %}
+                                            {{ record.__repr__() }}
+                                        {% else %}
+                                            {{ record[field] }}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif%}
+                            </td>
+                            {% endfor %}
+                            <td>
+                                <a href="{{ url_for('.view_record',classid=table_id, record_id=record.id, backlink=url_for('.view_record', record_id=institution.id, classid=classid)) }}" class="btn btn-primary">Ver</a>
+                            </td>
+                            
+                    </tr>
+                    {% endfor %}
+                    <tfoot>
+                        <tr>
+                            
+                            
+                        </tr>
+                    </tfoot>
+                </tbody>
+            </table>
+            <div>
+                <a href="{{ url_for('.create_record', classid=table_id, foreignrecord=connected_table.parent_field ~ ':' ~ institution.id, backlink=url_for('.view_record', record_id=institution.id, classid=classid)) }}" class="btn btn-success mb-3">Crear {{connected_table.class_label}}</a>
+            </div>
+        {% else %}
+            <p>No connected table found for ID {{ table_id }}</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro tableResults(table_fields,moneyFields,dateFields,classid,table) %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            {% for label, field in table_fields.items() %}
+                <th>{{ label }}</th>
+            {% endfor %}
+                <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in table %}
+        <tr>                 
+            {% for label, field in table_fields.items() %}
+            <td>
+                {% if record[field] %}
+                    {% if record[field] is string and (record[field].endswith('.jpg') or record[field].endswith('.JPG') or record[field].endswith('.png') or record[field].endswith('.PNG') or record[field].endswith('.jpeg') or record[field].endswith('.JPEG')) %}
+                        <img src="{{ url_for('application.uploaded_file', filename=record[field], fieldname=field, classname=classname) }}" width="200">
+                    {% elif field == '__repr__' %}
+                        {{ record.__repr__() }}
+                    {% else %}
+                        {% if field in moneyFields %}
+                            {% set amountLine = record[field] / 100.00 %}
+                            {% if amountLine %}
+                                {{amountLine | money_format("","","True")}} 
+                            {%endif%}
+                        {% elif field in dateFields %}
+                            {{ record[field].strftime('%d/%m/%Y')}}
+                        {% else %}
+                            {{ record[field] }}
+                        {%endif%}
+                    {% endif %}
+                {% endif %}
+            </td>
+            {% endfor %}
+            <td>
+                <a href="{{ url_for('.view_record',classid=classid, record_id=record.id, backlink=url_for('.list_record',classid=classid,page=1)) }}" class="btn btn-primary">Ver</a>
+            </td>
+        </tr>
+        {% endfor %}
+        <tfoot>
+            <tr>
+            </tr>
+        </tfoot>
+    </tbody>
+</table>
+{% endmacro %}
+
+{% macro tableResultsOrders(table_fields,moneyFields,dateFields,classid,table) %}
+</div>
+<div class="container-fluid">
+<table class="table table-striped" style="width: max-content;">
+    <thead>
+        <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Status</th>
+                <th>Tipo</th>
+                <th>Agencia</th>
+                <th>Nombre</th>
+                <th>Cant.</th>
+                <th>Entrada</th>
+                <th>Horario</th>
+                <th>Producto</th>
+                <th>Monto</th>
+                <th>Fecha Reserva</th>
+                <th>Detalle</th>
+                <th>Usuario</th>
+                <th>Fecha Compra</th>
+                <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in table %}
+        <tr>            
+            <td>
+                <a class="btn btn-info" style="background: none;border: none;color: #198754;padding: 0px 10px;" href="{{ url_for('.view_record',classid=classid, record_id=record.id, backlink=url_for('.list_record',classid=classid,page=1)) }}">
+                    <span style="font-size: 22px;">»</span>
+                </a>
+            </td>
+            <td>
+                {{record.id}}
+            </td>
+            <td>{{record.statusOrder}}</td>
+            <td>
+                {% if record.typeSource == "web" %} 
+                Venta Web
+                {% elif record.typeSource == "agency" %}
+                Agencia
+                {% elif record.typeSource == "direct" %}
+                Venta directa
+                {%endif%}
+            </td>
+            <td>
+                {%if record.agency%}
+                {{record.agency}}
+                {%endif%}
+            </td>
+            <td>
+                {{record.name}} {% if record.lastname %}{{record.lastname}}{%endif%}
+            </td>
+            <td>
+                {% for item in record.orderlines %}
+                {{item.quantity}}<br>
+                {%endfor%}
+            </td> 
+            <td>
+                {% for item in record.orderlines %}
+                    {% if item.subvariation%}
+                    {{item.subvariation.name}} <br>
+                    {%endif%}
+                {%endfor%}
+            </td>
+            <td>
+                {% for item in record.orderlines %}
+                {% if item.subvariation.variation%}
+                    {{item.subvariation.variation.name}} {{item.subvariation.variation.language}}<br>
+                {%endif%}
+                {%endfor%}
+            </td>
+            <td>
+                {% for item in record.orderlines %}
+                {% if item.subvariation.variation.product%}
+                    {{item.subvariation.variation.product.name}}<br>
+                {%endif%}
+                {%endfor%}
+            </td>
+            <td>
+                {% set amountLine = record.amount / 100.00 %}
+                {% if amountLine %}
+                {{amountLine | money_format("","$","True")}} 
+                {%endif%}
+            </td>     
+            <td>{{record.dateReservation.strftime('%d/%m/%Y')}}</td>     
+            <td>{{record.comment}}</td>     
+            <td>{% if record.createdby %}{{record.createdby}}{%endif%}</td>     
+            <td>{{ record.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>     
+            <td>
+                <a href="{{ url_for('.view_record',classid=classid, record_id=record.id, backlink=url_for('.list_record',classid=classid,page=1)) }}" class="btn btn-primary">Ver</a>
+                <form action="{{ url_for('.delete_record', record_id=record.id, classid=classid, backlink=url_for('.list_record',classid=classid,page=1)) }}" method="post"
+                    style="display: inline;"><input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        <tfoot>
+            <tr>
+            </tr>
+        </tfoot>
+    </tbody>
+</table>
+{% endmacro %}
+
+{% macro fieldForm(input,label,id,name,required,options,value)%}
+    <label for="{{id}}" style="font-size: larger;" class="form-label"><b>{{label}}</b></label>
+    {% if input == "boolean"%}
+    <input class="form-check-input" type="checkbox" id="{{id}}" name="{{name}}" {% if required %} required {% endif %}>
+    {% elif input == "checkbox" %}
+        {% for label, checkvalue in options.items() %}
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="{{id}}-{{ loop.index }}" name="{{name}}" value="{{ checkvalue }}"{% if required %} required {% endif %}>
+            <label class="form-check-label" for="{{id}}-{{ loop.index }}">
+                {{ label }}
+            </label>
+        </div>
+        {% endfor %}
+    {% elif input == "radio" %}
+        {% for label, checkvalue in options.items() %}
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="{{ id }}-{{ loop.index }}" name="{{ name }}" value="{{ checkvalue }}"{% if required %} required {% endif %}{% if checkvalue == value %} checked {% endif %}>
+            <label class="form-check-label" for="{{ id }}-{{ loop.index }}">
+                {{ label }}
+            </label>
+        </div>
+        {% endfor %}
+    {% elif input == "integer" or input == "float" or input == "number" %}
+    <input class="form-control" type="number" id="{{id}}" name="{{name}}" {% if input=="float" %} step="0.01" {% else %} step="1" {% endif %} {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
+    {% elif input == "textarea" %}
+    <textarea class="form-control" id="{{id}}" name="{{name}}" {% if required %} required {% endif %}>{% if value %} {{value}} {% endif %}</textarea>
+    {% elif input == "select" %}
+    <select class="form-control" id="{{id}}" name="{{name}}"{% if required %} required {% endif %}>
+        {% for label, value in options.items() %}
+        <option value="{{ value }}">
+            {{ label }}</option>
+        {% endfor %}
+    </select>
+        
+    {% elif input == "date" %}
+        <input  class="form-control" id="{{id}}" name="{{name}}" type="date" {% if value %} value="{{value}}" {% endif %} {% if required %} required {% endif %}/>
+    {% elif input == "image" %}
+    <input class="form-control" type="file" id="{{id}}" name="{{name}}"
+        accept=".png, .jpg, .jpeg, .gif" {% if required %} required {% endif %}>
+    <img id="preview" width="200">
+    <script>
+        document.getElementById('{{id}}').onchange = function (evt) {
+            var output = document.getElementById('preview');
+            source = URL.createObjectURL(evt.target.files[0]);
+            if (source) {
+                output.src = source;
+            }
+            output.onload = function () {
+                URL.revokeObjectURL(output.src) // Liberar memoria
+            }
+        };
+    </script>
+
+    {% elif input == "blob" %}
+    <!-- Input para subir una nueva imagen, solo se muestra si el usuario selecciona eliminar la imagen actual -->
+    <input class="form-control" type="file" id="{{id}}" name="{{name}}" {% if required %} required {% endif %}>
+    {% elif input == "email" %}
+    <input class="form-control" type="email" id="{{id}}" name="{{name}}"
+        maxlength="{{ value.maxlength }}" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
+    {% else %}
+    <input class="form-control" type="text" id="{{id}}" name="{{name}}"
+        maxlength="{{ value.maxlength }}" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
+    {% endif %}
+{% endmacro %}

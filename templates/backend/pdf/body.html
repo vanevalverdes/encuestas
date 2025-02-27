@@ -1,0 +1,117 @@
+{% import "frontend/macros.html" as macros with context %}
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    p {
+        font-family: Arial, Helvetica, sans-serif;
+        line-height: 22px;
+    }
+    p { padding: 14px 0;}
+    th {border-bottom: black 2px solid;}
+    th, td {padding: 15px;}
+    .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    .two-columns li {
+        width: 50%;
+        
+    }
+    .page-break {
+        page-break-before: always; /* o page-break-after: always; dependiendo de dónde quieras el salto */
+    }
+    td p {padding: 0;}
+</style>
+<table style="width: 100%;margin: 0px;">
+    <tr>
+        <td><img style="float: left; height: 90px;" src="{{logo_url}}" alt=""></td>
+        <td><img style="float: right; height: 90px;" src="{{image_url}}" alt=""></td>
+    </tr>
+</table>
+<table style="width: 100%;text-align: right;">
+    <tbody>
+        <tr>
+            <td style="text-align: left;">
+                <h3 style="margin-bottom: 0;">{{macros.translatePDF(language,"title")}}</h3>
+            </td>
+            <td style="border-bottom: black 2px solid;">
+                <p style="text-align: left;"><strong>Tour:</strong> {{order.id}}</p>
+            </td>
+            <td >
+                
+            </td>
+            <td style="border-bottom: black 2px solid;">
+                {% set exchange = order.exchangeRate /100.00 %}
+                <p><strong>{{macros.translatePDF(language,"rate")}}:</strong> ₡ {{exchange | money_format("","","True")}}</p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% if order.typeSource == "agency" %}
+    <h4>{{macros.langPDF(language,"Cliente","Client")}}: {{order.details}}  - {{macros.langPDF(language,"Agencia","Agency")}}: {{order.agency}}</h4>
+{% else%}
+    <h4>{{macros.langPDF(language,"Cliente","Client")}}: {{order.name}} {{order.lastname}}</h4>
+{%endif%}
+
+{{macros.translatePDF(language,"text")}}
+
+<h3>{{macros.langPDF(language,"Detalle Servicios","Details")}}</h3>
+
+<table style="width: 100%;text-align: center;">
+    <tr>
+        <th>{{macros.langPDF(language,"Producto","Product")}}</th>
+        <th></th>
+        <th></th>
+        <th>{{macros.langPDF(language,"Cantidad","Qty")}}</th>
+        <th>{{macros.langPDF(language,"Fecha","Date")}}</th>
+    </tr>
+    {% for line in order.orderlines %}
+    <tr>
+        <td style="text-align: left;">{{line.subvariation.variation.product.name}}</td>
+        <td style="text-align: left;">{{line.subvariation.variation.name}} {{line.subvariation.variation.language}}</td>
+        <td style="text-align: left;">{{line.subvariation.name}}</td>
+        <td>{{line.quantity}}</td>
+        <td>{{order.dateReservation.strftime('%d/%m/%Y') }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h3>Total {% if order.typeSource == "agency" %}- Con CST: {% if order.agency.isCST %}Sí{%else%}No{%endif%}{%endif%}</h3>
+<table>
+    <tr>
+        {% set amount = order.amount / 100.00 %}
+        <td style="border-bottom: black 2px solid;"><strong>Total USD:</strong> {{amount | money_format("","$","True")}}</td>
+        {% set amountCRC = order.amountCRC / 100.00 %}
+        <td style="border-bottom: black 2px solid;"><strong>Total CRC:</strong> ₡ {{amountCRC | money_format("","","True")}} </td>
+        <td></td>
+    </tr>
+</table>
+
+
+<h3>{{macros.langPDF(language,"Observaciones","Comments")}}</h3>
+<p>{{order.comment}}</p>
+
+<p>{{macros.translatePDF(language,"observation")}}</p>
+<div  class="page-break"></div>
+<table style="width: 100%;margin: 0px;">
+    <tr>
+        <td><img style="float: left; height: 90px;" src="{{logo_url}}" alt=""></td>
+        <td><img style="float: right; height: 90px;" src="{{image_url}}" alt=""></td>
+    </tr>
+</table>
+<h3>{{macros.langPDF(language,"Recomendaciones para sus clientes","Recommendations for Our Visitors")}}</h3>
+
+{{ productInstructions | safe}}
+
+<p style="padding: 0;line-height: 12px;">{{macros.langPDF(language,"Cordialmente,","Sincerely,")}}</p>
+<p style="padding: 0;line-height: 12px;"><strong>{{macros.langPDF(language,"Reserva Biológica Bosque Nuboso Monteverde","Monteverde Cloud Forest Biological Reserve")}}</strong></p>
+
+<small>
+    <p  style="padding: 0;line-height: 18px;">Monteverde Cloud Forest Biological Reserve <br>
+    <a href="http://www.cloudforestmonteverde.com/">www.cloudforestmonteverde.com</a> &nbsp;&nbsp;Email: <a href="mailto:reservaciones2@cct.or.cr">reservaciones2@cct.or.cr</a><br>
+    Tel: (+506) 2645-5112</p>
+</small>

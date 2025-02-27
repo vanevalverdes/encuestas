@@ -1,0 +1,105 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block content %}
+
+    <div class="container mt-3">
+        <h2>Resultados para {{ classnameLabel }}: </h2>
+        {% if searchFields %}
+        <div class="mb-4">
+            <div class="card">
+                <div class="card-body">
+                    {% set args = request.args.copy() %}
+                    <form action="{{ url_for('.list_record', classid=classid,page=1, backlink=url_for('.list_record',classid=classid,page=1)) }}">
+                        {% for label, value in searchFields.items() %}
+                            <div class="row my-2">
+                                <div class="col-auto">
+                                    <label for="{{value.name}}" class="form-label">{{label}}</label>
+                                </div>
+                                <div class="col-auto">
+                                
+                                {% if value.input == "date" %}
+                                    {% set start_value_name = "start-" + value.name %}
+                                    {% set until_value_name = "until-" + value.name %}
+                                    <input class="form-control" type="{{ value.input }}" name="start-{{value.name}}" {% if args.get(start_value_name) %} value="{{ args.get(start_value_name) }}" {% endif %}>
+                                </div>
+                                <div class="col-auto">
+                                    <input class="form-control" type="{{value.input}}" name="until-{{value.name}}" {% if args.get(start_value_name) %} value="{{ args.get(until_value_name) }}" {% endif %}>
+                                {% elif value.input == "select" %}
+                                    {% set input_name = value.name %}
+                                    <select class="form-control"  name="{{value.name}}" >
+                                        <option value=""></option>
+                                        {%for label, value in value.options.items()%}
+                                            <option value="{{value}}" {% if args.get(input_name) == value %} selected {% endif%}>{{label}}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif value.name == "createdBy" %}
+                                    {% set input_name = value.name %}
+                                    <select class="form-control" name="{{value.name}}" >
+                                        <option value=""></option>
+                                        {%for user in users%}
+                                            <option value="{{user.id}}" {% if args.get(input_name) == user.id %} selected {% endif%}>{{user.email}}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% elif value.input == "text" %}
+                                    {% set input_name = "str-" + value.name %}
+                                    <input class="form-control" type="{{value.input}}" name="str-{{value.name}}" {% if args.get(input_name) %} value="{{ args.get(input_name) }}" {% endif %}>
+                                {%else%}
+                                    {% set input_name = value.name %}
+                                    <input class="form-control" type="{{value.input}}" name="{{value.name}}" {% if args.get(input_name) %} value="{{ args.get(input_name) }}" {% endif %}>
+                                {%endif%}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <!-- Botón para crear una nueva institución -->
+        <a href="{{ url_for('.create_record', classid=classid, backlink=url_for('.list_record',classid=classid,page=1)) }}" class="btn btn-success mb-3">Crear {{ classnameLabel }}</a>
+        {% if classname == "Order" %}
+        <a href="http://store.cloudforestmonteverde.com/admin/{{ classid }}/export/?{{request.query_string.decode('UTF-8')}}" class="btn btn-success mb-3">Generar Reporte</a>
+        {%endif%}
+        {%if table %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if table.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for(request.endpoint, classid=classid, page=table.prev_num, **request.args.to_dict()) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for p in table.iter_pages() %}
+                    {% if p %}
+                        {% if p == table.page %}
+                            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for(request.endpoint, classid=classid,  page=p, **request.args.to_dict()) }}">{{ p }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if table.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for(request.endpoint, classid=classid,  page=table.next_num, **request.args.to_dict()) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+            {% if classid == 3 %}
+                {{ macros.tableResultsOrders(table_fields,moneyFields,dateFields,classid,table) }}
+            {% else %}
+                {{ macros.tableResults(table_fields,moneyFields,dateFields,classid,table) }}
+            {%endif%}
+        {%else%}
+            No hay registros para esta búsqueda.
+        {%endif%}
+        </div>
+    </div>
+{% endblock %}
