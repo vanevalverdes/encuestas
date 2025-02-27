@@ -422,5 +422,5 @@ def report():
         "userCreation":userCreation
     }
     #session.putVariable("stats",stats)
-    return stats
-    #return render_template("backend/stats.html",stats=stats)
+    #return stats
+    return render_template("backend/stats.html",stats=stats)
