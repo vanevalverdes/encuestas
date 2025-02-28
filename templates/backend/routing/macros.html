@@ -471,3 +471,122 @@
         maxlength="{{ value.maxlength }}" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
     {% endif %}
 {% endmacro %}
+{% macro barchartbyuser(title,fieldname,stats)%}
+<div class="row">
+    <div class="col-sm-12">
+        <!-- Provincia -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{title}}</h5>
+
+                {% set ns = namespace(values=[], subLabels=[]) %}   
+                {% for key, value in stats[fieldname].items() %}
+                {% if loop.index == 1 %}
+                {% for sub_key, sub_value in value[6].items() %}
+                    {% set _ = ns.values.append(sub_key) %}
+                {% endfor %}
+                {%endif%}
+                {% endfor %}
+                {% set labelsArray = ns.values %}
+
+                {% for key, value in stats[fieldname].items() %}
+                {% set ns = namespace(values=[], subLabels=[]) %}   
+                {% for sub_key, sub_value in value[6].items() %}
+                    {% set _ = ns.values.append(sub_value[2]) %}
+                {% endfor %}
+                {% set dataArray = ns.values %}
+                <script>
+                    datasetDict = {
+                        label: "{{ key }}",
+                        data: {{dataArray}},
+                        borderWidth: 1
+                    }
+                    datasetsArray.push(datasetDict)
+                </script>
+                {% endfor %}
+                    <div>
+                    <canvas id="div-barchartbyuser-{{fieldname}}"></canvas>
+                    </div>
+                    <script>
+                    var ctx = document.getElementById('div-barchartbyuser-{{fieldname}}');
+                    
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        labels: {{labelsArray | tojson }},
+                        datasets: datasetsArray
+                        },
+                        options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
+                            }
+                        }
+                        }
+                    });
+                    </script>
+                    <script>
+                        datasetDict = ""
+                        datasetsArray = []
+                    </script>
+            </div>
+        </div>
+    </div>
+</div>
+{%endmacro%}
+{% macro barchart(title,fieldname,stats)%}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{title}}</h5>
+
+                {% set ns = namespace(values=[], subLabels=[]) %}   
+                {% for key, value in stats[fieldname].items() %}
+                {% set _ = ns.values.append(key) %}
+                {% endfor %}
+                {% set labelsArray = ns.values %}
+
+                {% set ns = namespace(values=[], subLabels=[]) %}   
+                {% for key, value in stats[fieldname].items() %}
+                    {% set _ = ns.values.append(value[2]) %}
+                {% endfor %}
+                {% set dataArray = ns.values %}
+                <script>
+                    datasetDict = {
+                        label: "{{title}}",
+                        data: {{dataArray}},
+                        borderWidth: 1
+                    }
+                    datasetsArray.push(datasetDict)
+                </script>
+                    <div>
+                    <canvas id="div-barchart-{{fieldname}}"></canvas>
+                    </div>
+                    <script>
+                    var ctx = document.getElementById('div-barchart-{{fieldname}}');
+                    
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        labels: {{labelsArray | tojson }},
+                        datasets: datasetsArray
+                        },
+                        options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
+                            }
+                        }
+                        }
+                    });
+                    </script>
+                    <script>
+                        datasetDict = ""
+                        datasetsArray = []
+                    </script>
+            </div>
+        </div>
+    </div>
+</div>
+{%endmacro%}

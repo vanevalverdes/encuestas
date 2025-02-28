@@ -13,7 +13,9 @@
     <div class="nav nav-tabs nav justify-content-center" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Absolutos</button>
         <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Porcentajes</button>
+        <button class="nav-link" id="nav-general-chart-tab" data-bs-toggle="tab" data-bs-target="#nav-general-chart" type="button" role="tab" aria-controls="nav-general-chart" aria-selected="false">Gráficos (porcentajes)</button>
         <button class="nav-link" id="nav-user-tab" data-bs-toggle="tab" data-bs-target="#nav-user" type="button" role="tab" aria-controls="nav-user" aria-selected="false">Detalle X Encuestador</button>
+        <button class="nav-link" id="nav-user-chart-tab" data-bs-toggle="tab" data-bs-target="#nav-user-chart" type="button" role="tab" aria-controls="nav-user-chart" aria-selected="false">Gráficos X Encuestador</button>
     </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -1577,6 +1579,37 @@
             </div>
         </section>
     </div>
+    <div class="tab-pane fade" id="nav-general-chart" role="tabpanel" aria-labelledby="nav-general-chart-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                {{ macros.barchart("4. Cuál es el partido político de su preferencia?","party",stats)}}
+                {{ macros.barchart("5. Cuál es el partido político de su preferencia?","partyAndChaves",stats)}}
+                {{ macros.barchart("Conoce A Rodrigo Chaves","conoceRodrigoChaves",stats)}}
+                {{ macros.barchart("Opinión Rodrigo Chaves","opinionRodrigoChaves",stats)}}
+                {{ macros.barchart("Conoce Mauricio Batalla","conoceMauricioBatalla",stats)}}
+                {{ macros.barchart("Opinión Mauricio Batalla","opinionMauricioBatalla",stats)}}
+                {{ macros.barchart("Conoce Laura Fernandez","conoceLauraFernandez",stats)}}
+                {{ macros.barchart("Opinión Laura Fernandez","opinionLauraFernandez",stats)}}
+                {{ macros.barchart("Conoce Alvaro Ramos","conoceAlvaroRamos",stats)}}
+                {{ macros.barchart("Opinión Alvaro Ramos","opinionAlvaroRamos",stats)}}
+                {{ macros.barchart("Conoce Gilberth Jimenez","conoceGilbertJimenez",stats)}}
+                {{ macros.barchart("Opinión Gilberth Jimenez","opinionGilbertJimenez",stats)}}
+                {{ macros.barchart("Conoce Carolina Delgado","conoceCarolinaDelgado",stats)}}
+                {{ macros.barchart("Opinión Carolina Delgado","opinionCarolinaDelgado",stats)}}
+                {{ macros.barchart("Conoce Marvin Taylor","conoceMarvinTaylor",stats)}}
+                {{ macros.barchart("Opinión Marvin Taylor","opinionMarvinTaylor",stats)}}
+                {{ macros.barchart("Conoce Rolando Araya","conoceRolandoArayaMonge",stats)}}
+                {{ macros.barchart("Opinión Rolando Araya","opinionRolandoArayaMonge",stats)}}
+                {{ macros.barchart("Usted apoyaría un partido del presidente Rodrigo Chaves?","chavesParty",stats)}}
+                {{ macros.barchart("De la siguientes personas a quién apoyaría como candidato de un partido de Rodrigo Chaves?","chavesCandidate",stats)}}
+                {{ macros.barchart("Votaría usted en la convención del Partido Liberación Nacional?","plnElections",stats)}}
+                {{ macros.barchart("Candidato PLN","plnCandidate",stats)}}
+                {{ macros.barchart("De la siguiente papeleta por quien votaría usted en las próximas elecciones?","generalElections",stats)}}
+                {{ macros.barchart("Apoya usted la gestión del presidente Rodrigo Chaves?","chavesSupport",stats)}}
+                {{ macros.barchart("Del 1 al 10 que calificación le daría usted a la labor del presidente Rodrigo Chaves?","chavesScale",stats)}}
+            </div>
+        </section>
+    </div>
     <div class="tab-pane fade" id="nav-user" role="tabpanel" aria-labelledby="nav-user-tab" tabindex="0">
         <section class="py-5">
             <div class="container mt-3">
@@ -2332,7 +2365,7 @@
                                 <table class="table table-responsive">
                                     <thead>
                                         <th></th>
-                                        {% for key, value in stats.plnElections.items() %}
+                                        {% for key, value in stats.plnCandidate.items() %}
                                         {% if loop.index == 1 %}
                                         {% for sub_key, sub_value in value[6].items() %}
                                             <th>{{ sub_key }}</th>
@@ -2458,6 +2491,38 @@
             </div>
         </section>
     </div>
+    <div class="tab-pane fade" id="nav-user-chart" role="tabpanel" aria-labelledby="nav-user-chart-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                {{ macros.barchartbyuser("4. Cuál es el partido político de su preferencia?","party",stats)}}
+                {{ macros.barchartbyuser("5. Cuál es el partido político de su preferencia?","partyAndChaves",stats)}}
+                {{ macros.barchartbyuser("Conoce A Rodrigo Chaves","conoceRodrigoChaves",stats)}}
+                {{ macros.barchartbyuser("Opinión Rodrigo Chaves","opinionRodrigoChaves",stats)}}
+                {{ macros.barchartbyuser("Conoce Mauricio Batalla","conoceMauricioBatalla",stats)}}
+                {{ macros.barchartbyuser("Opinión Mauricio Batalla","opinionMauricioBatalla",stats)}}
+                {{ macros.barchartbyuser("Conoce Laura Fernandez","conoceLauraFernandez",stats)}}
+                {{ macros.barchartbyuser("Opinión Laura Fernandez","opinionLauraFernandez",stats)}}
+                {{ macros.barchartbyuser("Conoce Alvaro Ramos","conoceAlvaroRamos",stats)}}
+                {{ macros.barchartbyuser("Opinión Alvaro Ramos","opinionAlvaroRamos",stats)}}
+                {{ macros.barchartbyuser("Conoce Gilberth Jimenez","conoceGilbertJimenez",stats)}}
+                {{ macros.barchartbyuser("Opinión Gilberth Jimenez","opinionGilbertJimenez",stats)}}
+                {{ macros.barchartbyuser("Conoce Carolina Delgado","conoceCarolinaDelgado",stats)}}
+                {{ macros.barchartbyuser("Opinión Carolina Delgado","opinionCarolinaDelgado",stats)}}
+                {{ macros.barchartbyuser("Conoce Marvin Taylor","conoceMarvinTaylor",stats)}}
+                {{ macros.barchartbyuser("Opinión Marvin Taylor","opinionMarvinTaylor",stats)}}
+                {{ macros.barchartbyuser("Conoce Rolando Araya","conoceRolandoArayaMonge",stats)}}
+                {{ macros.barchartbyuser("Opinión Rolando Araya","opinionRolandoArayaMonge",stats)}}
+                {{ macros.barchartbyuser("Usted apoyaría un partido del presidente Rodrigo Chaves?","chavesParty",stats)}}
+                {{ macros.barchartbyuser("De la siguientes personas a quién apoyaría como candidato de un partido de Rodrigo Chaves?","chavesCandidate",stats)}}
+                {{ macros.barchartbyuser("Votaría usted en la convención del Partido Liberación Nacional?","plnElections",stats)}}
+                {{ macros.barchartbyuser("Candidato PLN","plnCandidate",stats)}}
+                {{ macros.barchartbyuser("De la siguiente papeleta por quien votaría usted en las próximas elecciones?","generalElections",stats)}}
+                {{ macros.barchartbyuser("Apoya usted la gestión del presidente Rodrigo Chaves?","chavesSupport",stats)}}
+                {{ macros.barchartbyuser("Del 1 al 10 que calificación le daría usted a la labor del presidente Rodrigo Chaves?","chavesScale",stats)}}
+            </div>
+        </section>
+    </div>
+
 </div>
   
 
