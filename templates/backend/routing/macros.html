@@ -590,3 +590,59 @@
     </div>
 </div>
 {%endmacro%}
+{% macro barchartpercent(title,fieldname,stats)%}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{title}}</h5>
+
+                {% set ns = namespace(values=[], subLabels=[]) %}   
+                {% for key, value in stats[fieldname].items() %}
+                {% set _ = ns.values.append(key) %}
+                {% endfor %}
+                {% set labelsArray = ns.values %}
+
+                {% set ns = namespace(values=[], subLabels=[]) %}   
+                {% for key, value in stats[fieldname].items() %}
+                    {% set _ = ns.values.append(value[5]) %}
+                {% endfor %}
+                {% set dataArray = ns.values %}
+                <script>
+                    datasetDict = {
+                        label: "{{title}}",
+                        data: {{dataArray}},
+                        borderWidth: 1
+                    }
+                    datasetsArray.push(datasetDict)
+                </script>
+                    <div>
+                    <canvas id="div-barchartpercent-{{fieldname}}"></canvas>
+                    </div>
+                    <script>
+                    var ctx = document.getElementById('div-barchartpercent-{{fieldname}}');
+                    
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        labels: {{labelsArray | tojson }},
+                        datasets: datasetsArray
+                        },
+                        options: {
+                        scales: {
+                            y: {
+                            beginAtZero: true
+                            }
+                        }
+                        }
+                    });
+                    </script>
+                    <script>
+                        datasetDict = ""
+                        datasetsArray = []
+                    </script>
+            </div>
+        </div>
+    </div>
+</div>
+{%endmacro%}
