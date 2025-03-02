@@ -256,6 +256,21 @@ def reportbyuser():
     
     return render_template("backend/statsbyuser.html",stats=stats)
 
+@blueprintname.route(f'/report-test/')
+@traceError
+@login_required
+def reportTest():
+    from utils.methods.stats import field_count, field_count_user
+    fieldname = "party"
+    field = "a. Partido Liberación Nacional"
+    user = "14"
+    array = [
+        field_count_user(fieldname, field, user, "A. Masculino"),
+        field_count_user(fieldname, field, user, "B. Femenino"),
+        field_count_user(fieldname, field, user)
+    ]
+    return array
+
 @blueprintname.route(f'/report/')
 @traceError
 @login_required

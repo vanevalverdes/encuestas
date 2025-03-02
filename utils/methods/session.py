@@ -223,14 +223,17 @@ class Query:
         # Filtrar por el campo utilizando la función del operador
         self.query = self.query.filter(op_func(getattr(self.model_class, fieldname), value))
         return self
-
+    
     def filterByToday(self):
         from datetime import datetime, timezone
         from sqlalchemy.sql import func
+
         today = datetime.now(timezone.utc).date() 
-        query = self.query
         model = self.model_class
-        self.query = query.filter(func.date(model.created_at) == today).all()
+
+        # Aplicar el filtro sin ejecutar la consulta
+        self.query = self.query.filter(func.date(model.created_at) == today)
+
         return self
 
     def getTableQuery(self):
