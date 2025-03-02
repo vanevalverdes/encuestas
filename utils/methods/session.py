@@ -230,8 +230,8 @@ class Query:
         today = datetime.now(timezone.utc).date() 
         query = self.query
         model = self.model_class
-        surveys_today = query.filter(func.date(model.created_at) == today).all()
-        return surveys_today
+        self.query = query.filter(func.date(model.created_at) == today).all()
+        return self
 
     def getTableQuery(self):
         return self.query
