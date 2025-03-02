@@ -11,7 +11,7 @@ def field_count_user(field, value, user, gender=None):
     query = session.newQuery("survey")
     query.addFilter(field, "==", value)
     query.addFilter("createdby_id", "==", user)
-    query.filterByToday()
+    #query.filterByToday()
     if gender:
         query.addFilter("gender", "==", gender)
     return query.count()
