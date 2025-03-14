@@ -69,7 +69,7 @@
                                 </table>
                             </div>
                         </div>
-                    <div class="col-sm-8">
+
                         <!-- Usuario -->
                         <div class="card">
                             <div class="card-body">
@@ -95,9 +95,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         <!-- Partido -->
                         <div class="card">
                             <div class="card-body">
@@ -129,32 +127,6 @@
         <section class="py-5">
             <div class="container mt-3">
                 <div class="row">
-                    <div class="col-sm-6">
-                        <!-- chavesParty -->
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Usted apoyaría un partido del presidente Rodrigo Chaves?</h5>
-                                <table class="table table-responsive">
-                                    <thead>
-                                        <th></th>
-                                        <th>H</th>
-                                        <th>M</th>
-                                        <th>Total</th>
-                                    </thead>
-                                    <tbody>
-                                        {% for key, value in stats.chavesParty.items() %}
-                                        <tr>
-                                            <td><b>{{ key }}</b></td>
-                                            <td>{{ value[0] }}</td>
-                                            <td>{{ value[1] }}</td>
-                                            <td>{{ value[2] }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>            
-                    </div>
                     <div class="col-sm-6">
                         <!-- plnElections -->
                         <div class="card">
@@ -260,6 +232,30 @@
                                 </table>
                             </div>
                         </div>
+                        <!-- chavesParty -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Usted apoyaría un partido del presidente Rodrigo Chaves?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.chavesParty.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>  
                     </div>
                 </div>
             </div>
@@ -310,8 +306,6 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-8">
                         <!-- Usuario -->
                         <div class="card">
                             <div class="card-body">
@@ -337,9 +331,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         <!-- Partido -->
                         <div class="card">
                             <div class="card-body">
@@ -371,32 +363,6 @@
         <section class="py-5">
             <div class="container mt-3">
                 <div class="row">
-                    <div class="col-sm-6">
-                        <!-- chavesParty -->
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Usted apoyaría un partido del presidente Rodrigo Chaves?</h5>
-                                <table class="table table-responsive">
-                                    <thead>
-                                        <th></th>
-                                        <th>H</th>
-                                        <th>M</th>
-                                        <th>Total</th>
-                                    </thead>
-                                    <tbody>
-                                        {% for key, value in stats.chavesParty.items() %}
-                                        <tr>
-                                            <td><b>{{ key }}</b></td>
-                                            <td>{{ value[3] }}</td>
-                                            <td>{{ value[4] }}</td>
-                                            <td>{{ value[5] }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>            
-                    </div>
                     <div class="col-sm-6">
                         <!-- plnElections -->
                         <div class="card">
@@ -478,6 +444,30 @@
                         </div>
                     </div>
                     <div class="col-sm-6">
+                        <!-- chavesParty -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Usted apoyaría un partido del presidente Rodrigo Chaves?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.chavesParty.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>   
                         <!-- chavesSupport -->
                         <div class="card">
                             <div class="card-body">

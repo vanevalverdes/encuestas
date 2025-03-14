@@ -1,7 +1,7 @@
 from pathlib import Path
 base_dir = str(Path(__file__).parent.resolve())
 
-develop = True
+develop = False
 
 if develop:
     # Ruta completa al ejecutable flask

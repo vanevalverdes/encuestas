@@ -1,8 +1,0 @@
----
-deployment:
-  tasks:
-    - export FLASK_APP=index.py
-    - echo "Activando el entorno virtual..."
-    - /home/encuestas25opol/public_html/application/venv/bin/pip install -r requirements.txt
-    - echo "Reiniciando la aplicación..."
-    - touch passenger_wsgi.py
