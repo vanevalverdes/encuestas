@@ -313,7 +313,6 @@ def generateReport(clazzname):
         stats = {
             "age":age,
             "gender":gender,
-            "state":state,
             "party":party,
             "chavesParty":chavesParty,
             "plnElections":plnElections,
