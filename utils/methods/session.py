@@ -203,6 +203,7 @@ class Query:
         return self.model_class
     
     def addFilter(self, fieldname, operator, value):
+        from sqlalchemy import or_
         # Definir un diccionario de operadores
         operators = {
             "==": lambda f, v: f == v,
@@ -211,7 +212,8 @@ class Query:
             ">": lambda f, v: f > v,
             "<=": lambda f, v: f <= v,
             ">=": lambda f, v: f >= v,
-            "like": lambda f, v: f.ilike(f"%{v}%")
+            "like": lambda f, v: f.ilike(f"%{v}%"),
+            "or": lambda f, v: or_(*[f == item for item in v]) 
         }
 
         # Obtener la función del operador adecuado
@@ -223,7 +225,7 @@ class Query:
         # Filtrar por el campo utilizando la función del operador
         self.query = self.query.filter(op_func(getattr(self.model_class, fieldname), value))
         return self
-    
+       
     def filterByToday(self):
         from datetime import datetime, timezone
         from sqlalchemy.sql import func

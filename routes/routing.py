@@ -225,14 +225,14 @@ def export_record(classid):
 
 #################################################################################
 
-@blueprintname.route(f'/survey/', methods=["GET","POST"])
+@blueprintname.route(f'/survey/<int:record_id>/', methods=["GET","POST"])
 @traceError
 @login_required
-def survey():
+def survey(record_id):
     class_names = application.list_class_names()
-    classname = application.get_class_name(1)
-    classnameLabel = application.get_class_name_label(1)
-    containers = get_clazz_fields(1)
+    classname = application.get_class_name(record_id)
+    classnameLabel = application.get_class_name_label(record_id)
+    containers = get_clazz_fields(record_id)
 
     #print(containers)
     if request.method == "GET":
@@ -271,171 +271,11 @@ def reportTest():
     ]
     return array
 
-@blueprintname.route(f'/report/')
+@blueprintname.route(f'/report/<int:record_id>/')
 @traceError
 @login_required
-def report():
-    from utils.methods.stats import field_count, countbygender
-    ### Age groups
-    age_groups = [
-    "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
-    "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
-    "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
-    "m. + 80"
-    ]
-    age = countbygender("age",age_groups)
-
-    ### gender groups
-    masc = field_count("gender", "A. Masculino")
-    fem = field_count("gender", "B. Femenino")
-    tot = masc + fem
-    gender = {
-            "Hombres":masc,
-            "Mujeres":fem,
-            "Total":tot
-    }
-
-    ### State groups
-    state_groups = ["1. San José","2. Alajuela","3. Cartago","4. Heredia","5. Guanacaste","6. Puntarenas","7. Limón"]
-    state = countbygender("state",state_groups)
-    
-    ### User groups
-    userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"]
-    userCreation = countbygender("createdby_id",userCreation_groups)
-
-    ### party groups
-    party_groups = ["a. Partido Liberación Nacional","b. Partido Unidad Social Cristiana","c. Partido Nueva República","d. Partido Progreso Social Democrático","e. Frente Amplio","f. Partido Liberal Progresista","g. PAC","h. PNG","i. Pueblo Soberano","j. Unidos Podemos","k. Otro","l. Ninguno","m. NS/NR"]
-    party = countbygender("party",party_groups)
-
-    ### PartyAndChaves groups
-    partyandchaves_groups = ["a. Partido Liberación Nacional","b. Partido Unidad Social Cristiana","c. Partido Nueva República","d. Partido Progreso Social Democrático","e. Frente Amplio","f. Partido Liberal Progresista","g. PAC","h. PNG","i. Pueblo Soberano","j. Unidos Podemos","k. Partido de Chaves","l. Otro","m. Ninguno","n. NS/NR"]
-    partyAndChaves = countbygender("partyAndChaves",partyandchaves_groups)
-
-    ### Conoce Chaves groups
-    conoceRodrigoChaves_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceRodrigoChaves = countbygender("conoceRodrigoChaves",conoceRodrigoChaves_groups)
-
-    ### Opinión Chaves groups
-    opinionRodrigoChaves_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionRodrigoChaves = countbygender("opinionRodrigoChaves",opinionRodrigoChaves_groups)
-
-    ### Conoce conoceMauricioBatalla groups
-    conoceMauricioBatalla_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceMauricioBatalla = countbygender("conoceMauricioBatalla",conoceMauricioBatalla_groups)
-
-    ### Opinión opinionMauricioBatalla groups
-    opinionMauricioBatalla_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionMauricioBatalla = countbygender("opinionMauricioBatalla",opinionMauricioBatalla_groups)
-
-    ### Conoce conoceLauraFernandez groups
-    conoceLauraFernandez_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceLauraFernandez = countbygender("conoceLauraFernandez",conoceLauraFernandez_groups)
-
-    ### Opinión opinionLauraFernandez groups
-    opinionLauraFernandez_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionLauraFernandez = countbygender("opinionLauraFernandez",opinionLauraFernandez_groups)
-
-    ### Conoce conoceAlvaroRamos groups
-    conoceAlvaroRamos_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceAlvaroRamos = countbygender("conoceAlvaroRamos",conoceAlvaroRamos_groups)
-
-    ### Opinión opinionAlvaroRamos groups
-    opinionAlvaroRamos_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionAlvaroRamos = countbygender("opinionAlvaroRamos",opinionAlvaroRamos_groups)
-
-    ### Conoce conoceGilbertJimenez groups
-    conoceGilbertJimenez_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceGilbertJimenez = countbygender("conoceGilbertJimenez",conoceGilbertJimenez_groups)
-
-    ### Opinión opinionGilbertJimenez groups
-    opinionGilbertJimenez_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionGilbertJimenez = countbygender("opinionGilbertJimenez",opinionGilbertJimenez_groups)
-
-    ### Conoce conoceCarolinaDelgado groups
-    conoceCarolinaDelgado_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceCarolinaDelgado = countbygender("conoceCarolinaDelgado",conoceCarolinaDelgado_groups)
-
-    ### Opinión opinionCarolinaDelgado groups
-    opinionCarolinaDelgado_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionCarolinaDelgado = countbygender("opinionCarolinaDelgado",opinionCarolinaDelgado_groups)
-
-    ### Conoce conoceMarvinTaylor groups
-    conoceMarvinTaylor_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceMarvinTaylor = countbygender("conoceMarvinTaylor",conoceMarvinTaylor_groups)
-
-    ### Opinión opinionMarvinTaylor groups
-    opinionMarvinTaylor_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionMarvinTaylor = countbygender("opinionMarvinTaylor",opinionMarvinTaylor_groups)
-
-    ### Conoce conoceRolandoArayaMonge groups
-    conoceRolandoArayaMonge_groups = ["a. Sí","b. No","c. NS/NR"]
-    conoceRolandoArayaMonge = countbygender("conoceRolandoArayaMonge",conoceRolandoArayaMonge_groups)
-
-    ### Opinión opinionRolandoArayaMonge groups
-    opinionRolandoArayaMonge_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-    opinionRolandoArayaMonge = countbygender("opinionRolandoArayaMonge",opinionRolandoArayaMonge_groups)
-
-    ############ Apoyos Políticos ############
-
-    ### Partido Presidente
-    chavesParty_groups = ["a. Sí","b. No","c. NS/NR"]
-    chavesParty = countbygender("chavesParty",chavesParty_groups)
-
-    ### chavesCandidate groups
-    chavesCandidate_groups = ["a. Mauricio Batalla","b. Laura Fernandez","c. Otro","d. NS/NR"]
-    chavesCandidate = countbygender("chavesCandidate",chavesCandidate_groups)
-    
-    ### plnElections
-    plnElections_groups = ["a. Sí","b. No","c. NS/NR"]
-    plnElections = countbygender("plnElections",plnElections_groups)
-
-    ### plnCandidate groups
-    plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","e. NS/NR"]
-    plnCandidate = countbygender("plnCandidate",plnCandidate_groups)
-
-    ### generalElections
-    generalElections_groups = ["Mauricio Batalla","Laura Fernandez","Álvaro Ramos","Fabricio Alvarado","Eliécer Feinzaig","Gilbert Jiménez","Carolina Delgado","Claudia Dobles","Sofia Guillen","Juan Carlos Hidalgo","Rolando Araya Monge","Luis Amador","Marvin Taylor","Natalia Diaz","Claudio Alpizar","Fernando Zamora","Ninguno","NS/NR"]
-    generalElections = countbygender("generalElections",generalElections_groups)
-
-    ### chavesSupport
-    chavesSupport_groups = ["a. Sí","b. No","c. NS/NR"]
-    chavesSupport = countbygender("chavesSupport",chavesSupport_groups)
-
-    ### chavesScale
-    chavesScale_groups = ["1","2","3","4","5","6","7","8","9","10"]
-    chavesScale = countbygender("chavesScale",chavesScale_groups)
-
-    stats = {
-        "age":age,
-        "gender":gender,
-        "state":state,
-        "party":party,
-        "partyAndChaves":partyAndChaves,
-        "conoceRodrigoChaves":conoceRodrigoChaves,
-        "opinionRodrigoChaves":opinionRodrigoChaves,
-        "conoceMauricioBatalla":conoceMauricioBatalla,
-        "opinionMauricioBatalla":opinionMauricioBatalla,
-        "conoceLauraFernandez":conoceLauraFernandez,
-        "opinionLauraFernandez":opinionLauraFernandez,
-        "conoceAlvaroRamos":conoceAlvaroRamos,
-        "opinionAlvaroRamos":opinionAlvaroRamos,
-        "conoceGilbertJimenez":conoceGilbertJimenez,
-        "opinionGilbertJimenez":opinionGilbertJimenez,
-        "conoceCarolinaDelgado":conoceCarolinaDelgado,
-        "opinionCarolinaDelgado":opinionCarolinaDelgado,
-        "conoceMarvinTaylor":conoceMarvinTaylor,
-        "opinionMarvinTaylor":opinionMarvinTaylor,
-        "conoceRolandoArayaMonge":conoceRolandoArayaMonge,
-        "opinionRolandoArayaMonge":opinionRolandoArayaMonge,
-        "chavesParty":chavesParty,
-        "chavesCandidate":chavesCandidate,
-        "plnElections":plnElections,
-        "plnCandidate":plnCandidate,
-        "generalElections":generalElections,
-        "chavesSupport":chavesSupport,
-        "chavesScale":chavesScale,
-        "userCreation":userCreation
-    }
-    #session.putVariable("stats",stats)
-    #return stats
+def report(record_id):
+    from utils.methods.stats import generateReport
+    classname = application.get_class_name(record_id)
+    stats = generateReport(classname)
     return render_template("backend/stats.html",stats=stats)

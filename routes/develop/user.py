@@ -90,7 +90,7 @@ def list_record():
         #    "supervisor04@opolconsultores.com",
         #    "supervisor05@opolconsultores.com"
         #]
-        #password = "artemisa2025*"
+        #password = "marzo0325*"
         #hashed_password = generate_password_hash(password)
         #print(hashed_password)
         #for item in list:
@@ -102,7 +102,7 @@ def list_record():
         #    setattr(new, "_password_hash", hashed_password)
         #    db.session.add(new)
         #db.session.commit()
-        ##institutions = Record.query.all() 
+        #institutions = Record.query.all() 
         #institutions = Record.query.filter(Record.usergroup_id != 1000).all()
         #for item in institutions:
         #    setattr(item, "_password_hash", hashed_password)

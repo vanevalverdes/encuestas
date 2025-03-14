@@ -12,7 +12,7 @@ from models.production import clazzlist
 
 # Importa las Rutas de clases
 from routes import routing
-
+from routes import webhook
 
 
 # Define Login Manager 
@@ -28,6 +28,7 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
     csrf = CSRFProtect(app)
+    csrf.exempt(webhook.blueprintname)
     login_manager.init_app(app)
 
     # Importa los Blueprint al app
