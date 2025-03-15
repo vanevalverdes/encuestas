@@ -12,6 +12,7 @@ class Surveymarch(db.Model):
     plnCandidate = db.Column(db.String(255))
     generalElections = db.Column(db.String(255))
     chavesSupport = db.Column(db.String(255))
+    contact = db.Column(db.String(255))
     createdby_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     modifiedby_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdby = db.relationship('User', backref='created_surveysmarch', foreign_keys=[createdby_id])
