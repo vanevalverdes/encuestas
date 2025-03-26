@@ -1,6 +1,7 @@
 import os
 import keyword
 from utils.methods import application, session
+from config import databaseType
 
 def is_safe_name(name):
     """ Verifica si el nombre es seguro para usar como nombre de variable o clase """
@@ -109,6 +110,11 @@ def generate_model_class(fields, class_name, file_name, directory, plural):
     class_definition += f"    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))\n"
     class_definition += f"    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))\n"
     
+    collation = "\n    __table_args__ = {\n"
+    collation += """        "mysql_charset": "utf8mb4",\n"""
+    collation += """        "mysql_collate": "utf8mb4_unicode_ci",\n"""
+    collation += """    }\n"""
+    
     with open(file_path, 'w') as f:
         f.write("# -*- coding: utf-8 -*-\n")
         f.write("from utils.db import db\n")
@@ -116,6 +122,8 @@ def generate_model_class(fields, class_name, file_name, directory, plural):
         f.write(class_definition)
         if(clazzRepresentation):
             f.write(clazzRepresentation)
+        if databaseType == "mysql":
+            f.write(collation)
 
     message = f"Class {class_name} has been written to {file_path}"
 

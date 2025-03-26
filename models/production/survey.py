@@ -41,3 +41,8 @@ class Survey(db.Model):
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     def __repr__(self) -> str:
         return f" {self.id if self.id is not None else ''} - Usuario: {self.createdby if self.createdby is not None else ''}"
+
+    __table_args__ = {
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci",
+    }

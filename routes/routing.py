@@ -271,6 +271,44 @@ def reportTest():
     ]
     return array
 
+@blueprintname.route(f'/report-pln/')
+@traceError
+@login_required
+def report_pln():
+    query = session.newQuery("SurveyMarch")
+    print(query.count())
+    
+    ### plnCandidate groups
+    plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","e. NS/NR", "f. Ninguno"]
+    query.addFilter("plnElections", "==","a. Sí")
+    total = query.count()
+    for i, item in enumerate(plnCandidate_groups):
+        query = session.newQuery("SurveyMarch")
+        query.addFilter("plnElections", "==","a. Sí")
+        query.addFilter("plnCandidate","==",item)
+        abs = query.count()
+        porc = round((float(abs) / float(total) * 100.0), 2)
+        print(f"{item}: absolutos {abs}    Porcentajes {porc}")
+
+    return "hola"
+
+@blueprintname.route(f'/read-rss/')
+@traceError
+@login_required
+def read_rss():
+    import feedparser
+
+    # URL del feed RSS (reemplaza con la URL real)
+    rss_url = "https://apis.france24.com/products/get_product/6457d4c4-1752-11ef-a596-005056a9b3e3?token_application=el_mundo_f24_cr"  # Coloca aquí la URL real del RSS
+
+    # Parsear el RSS
+    feed = feedparser.parse(rss_url)
+    for entry in feed.entries:
+        print(entry)
+    
+    value = feed
+    return value
+    
 @blueprintname.route(f'/report/<int:record_id>/')
 @traceError
 @login_required

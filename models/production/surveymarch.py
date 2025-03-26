@@ -21,3 +21,8 @@ class Surveymarch(db.Model):
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     def __repr__(self) -> str:
         return f" ID {self.id if self.id is not None else ''} - Usuario: {self.createdby_id if self.createdby_id is not None else ''} - Fecha {self. created_at if self. created_at is not None else ''}"
+
+    __table_args__ = {
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci",
+    }

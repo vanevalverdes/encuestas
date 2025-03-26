@@ -1,7 +1,14 @@
 from pathlib import Path
+import os
+
+develop = True
+databaseType = "mysql"
+applicationName = "Opol Sistema"
+adminMail = "vane@nibletecnologia.com"
+
+
 base_dir = str(Path(__file__).parent.resolve())
 
-develop = False
 
 if develop:
     # Ruta completa al ejecutable flask
@@ -23,7 +30,6 @@ else:
 
 # Ruta del sitio
 
-import os
 class Config:
     if develop:
         # En caso de usar SQLite

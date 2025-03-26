@@ -62,7 +62,7 @@ def uploaded_file(filename):
     return "", 403  # Retornar 403 Forbidden si no está autorizado
 
 
-@blueprintname.route('/admin/reset_password/', methods=["GET", "POST"])
+@blueprintname.route('/admin/reset-password/', methods=["GET", "POST"])
 def reset_password_request():
     if request.method == "POST":
         serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
@@ -81,7 +81,7 @@ def reset_password_request():
         return redirect(url_for('.reset_password_request'))
     return render_template("frontend/reset_password_request.html")
 
-@blueprintname.route('/admin/reset_password/<token>', methods=["GET", "POST"])
+@blueprintname.route('/admin/reset-password/<token>', methods=["GET", "POST"])
 def reset_password(token):
     try:
         serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])

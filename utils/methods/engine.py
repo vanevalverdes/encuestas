@@ -1,4 +1,5 @@
-from config import url as mainUrl
+from config import url as mainUrl, applicationName, adminMail
+
 def traceError(f):
     from functools import wraps
     import traceback
@@ -8,9 +9,15 @@ def traceError(f):
             return f(*args, **kwargs)
         except Exception as e:
             print("Error: ", str(e))
-            print(traceback.format_exc())
-            return str(e), 500
+            error_message = traceback.format_exc()
+            print(error_message)
+            with open("error.log", "a") as error_file:
+                error_file.write(error_message + "\n")
+            mailMessage = "<p>Ocurrió un error:<br>{{error_message_variable}}</p>"
+            send_email_from_db(adminMail,f"Error en la Aplicación {applicationName}",mailMessage,error_message_variable=error_message)
+            return "Ha ocurrido un error en esta página", 500
     return decorated_function
+
 
 def strToDate(date_str, format='%Y-%m-%d'):
     from datetime import datetime
@@ -69,22 +76,56 @@ def createQR(id, token):
     return img_path
 
 def send_email(to, subject, template, **kwargs):
+    import smtplib
+    import traceback
     from flask_mail import Message
     from flask import render_template
     from index import app, mail
-    with app.app_context():
-        msg = Message(subject, recipients=[to])
-        msg.html = render_template(template, **kwargs)
-        mail.send(msg)
 
+    with app.app_context():
+        try:
+            msg = Message(subject, recipients=[to])
+            msg.html = render_template(template, **kwargs)
+            mail.send(msg)
+            print(f"Correo enviado a {to}")
+
+        except smtplib.SMTPRecipientsRefused as e:
+            error_message = f"[ERROR] Correo rebotado: {to} - {e}\n"
+            print(error_message)
+
+        except Exception as e:
+            error_message = f"[ERROR] Fallo al enviar correo a {to}: {e}\n{traceback.format_exc()}"
+            print(error_message)
+
+            # Guardar el error en un archivo de log
+            with open("email_errors.log", "a") as error_file:
+                error_file.write(error_message + "\n")
+                
 def send_email_from_db(to, subject, template, **kwargs):
+    import smtplib
     from flask_mail import Message
+    import traceback
     from flask import render_template, render_template_string
     from index import app, mail
+
     with app.app_context():
-        msg = Message(subject, recipients=[to])
-        msg.html = render_template_string(template, **kwargs)
-        mail.send(msg)
+        try:
+            msg = Message(subject, recipients=[to])
+            msg.html = render_template_string(template, **kwargs)
+            mail.send(msg)
+            print(f"Correo enviado a {to}")
+
+        except smtplib.SMTPRecipientsRefused as e:
+            error_message = f"[ERROR] Correo rebotado: {to} - {e}\n"
+            print(error_message)
+
+        except Exception as e:
+            error_message = f"[ERROR] Fallo al enviar correo a {to}: {e}\n{traceback.format_exc()}"
+            print(error_message)
+
+        # Guardar error en un archivo de log
+            with open("email_errors.log", "a") as error_file:
+                error_file.write(error_message + "\n")
 
 def send_reset_email(email, link):
     from flask_mail import Message
