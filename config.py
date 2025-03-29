@@ -1,7 +1,7 @@
 from pathlib import Path
 import os
 
-develop = True
+develop = False
 databaseType = "mysql"
 applicationName = "Opol Sistema"
 adminMail = "vane@nibletecnologia.com"
