@@ -292,28 +292,11 @@ def report_pln():
 
     return "hola"
 
-@blueprintname.route(f'/read-rss/')
-@traceError
-@login_required
-def read_rss():
-    import feedparser
-
-    # URL del feed RSS (reemplaza con la URL real)
-    rss_url = "https://apis.france24.com/products/get_product/6457d4c4-1752-11ef-a596-005056a9b3e3?token_application=el_mundo_f24_cr"  # Coloca aquí la URL real del RSS
-
-    # Parsear el RSS
-    feed = feedparser.parse(rss_url)
-    for entry in feed.entries:
-        print(entry)
-    
-    value = feed
-    return value
-    
 @blueprintname.route(f'/report/<int:record_id>/')
 @traceError
 @login_required
 def report(record_id):
     from utils.methods.stats import generateReport
     classname = application.get_class_name(record_id)
-    stats = generateReport(classname)
+    stats = generateReport(classname,record_id)
     return render_template("backend/stats.html",stats=stats)

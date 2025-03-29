@@ -11,7 +11,7 @@
  </style>
 <div class="container mt-3">
 
-    <h2 class="my-3">Encuesta EC032025-B - Encuestador {{ current_user.id }}</h2>
+    <h2 class="my-3">Encuesta EC032025 - Encuestador {{ current_user.id }}</h2>
     <form method="post">
         <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}" >
@@ -61,10 +61,11 @@
                     "h. PNG":"h. PNG",
                     "i. Pueblo Soberano":"i. Pueblo Soberano",
                     "j. Partido Unidos Podemos":"j. Partido Unidos Podemos",
-                    "k. Partido de Rodrigo Chaves":"k. Partido de Rodrigo Chaves",
-                    "l. Otro":"l. Otro",
-                    "m. Ninguno":"m. Ninguno",
-                    "n. NS/NR":"n. NS/NR"
+                    "k. Partido Motiva":"k. Partido Motiva",
+                    "l. Partido de Rodrigo Chaves":"l. Partido de Rodrigo Chaves",
+                    "m. Otro":"m. Otro",
+                    "n. Ninguno":"n. Ninguno",
+                    "o. NS/NR":"o. NS/NR"
                  } %}
                  {{ macros.fieldForm("radio","3. Cuál es el partido político de su preferencia?","party","party","True",options,"")}}
             </div>
@@ -82,74 +83,37 @@
                         "b. No":"b. No",
                         "c. NS/NR":"c. NS/NR"
                     } %}
-                    {{ macros.fieldForm("radio","Votaría usted en la convención del Partido Liberación Nacional?","plnElections","plnElections","True",options,"")}}
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                        // Obtener los radio buttons del primer grupo
-                        const radios = document.querySelectorAll('input[name="plnElections"]');
-                        const opinionDiv = document.getElementById("div-plnCandidate"); // Usar ID en vez de clase
-                        const opinionInputs = opinionDiv.querySelectorAll("input");
-
-                        function toggleOpinionDiv() {
-                            const selectedValue = document.querySelector('input[name="plnElections"]:checked')?.value;
-                            
-                            if (selectedValue === "a. Sí") {
-                                opinionDiv.style.display = "block";
-                                opinionInputs.forEach(input => input.removeAttribute("disabled"));
-                            } else {
-                                opinionDiv.style.display = "none";
-                                opinionInputs.forEach(input => {
-                                    input.setAttribute("disabled", "true");
-                                    input.checked = false; // Deseleccionar opciones cuando se oculta
-                                });
-                            }
-                        }
-
-                        // Asignar el evento a cada radio button
-                        radios.forEach(radio => {
-                            radio.addEventListener("change", toggleOpinionDiv);
-                        });
-
-                        // Ocultar por defecto al cargar la página
-                        toggleOpinionDiv();
-                    });
-                    </script>
-                </div>
-                <div id="div-plnCandidate" style="display: none;" class="mb-3 border border-grey p-3">
-                    <div class="mb-3 p-3">
-                        <!-- fieldForm(input,label,id,name,type,required,options,value) -->
-                        {% set options = {
-                            "1":"1",
-                            "2":"2",
-                            "3":"3",
-                            "4":"4",
-                            "5":"5",
-                            "6":"6",
-                            "7":"7",
-                            "8":"8",
-                            "9":"9",
-                            "10":"10"
-                        } %}
-                        {{ macros.fieldForm("radio","Del 1 al 10, Qué tan probable es que vote en la convención del PLN?","plnScale","plnScale","True",options,"")}}
-                    </div>
-                    <div class="mb-3 p-3">
-                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
-                    {% set options = {
-                        "a. Gilbert Jiménez":"a. Gilbert Jiménez",
-                        "b. Carolina Delgado":"b. Carolina Delgado",
-                        "c. Alvaro Ramos":"c. Alvaro Ramos",
-                        "d. Marvin Taylor":"d. Marvin Taylor",
-                        "e. Ninguno":"e. Ninguno",
-                        "f. NS/NR":"f. NS/NR"
-                    } %}
-                    {{ macros.fieldForm("radio","Solo los que contestan sí en la #5. Por Quién votaría?","plnCandidate","plnCandidate","True",options,"")}}
-                    </div>
+                    {{ macros.fieldForm("radio","4. Usted apoyaría un partido del presidente Rodrigo Chaves?","chavesParty","chavesParty","True",options,"")}}
                 </div>
             </div>
             <div class="my-5">
                 <div class="mb-3 border border-grey p-3">
                     <!-- fieldForm(input,label,id,name,type,required,options,value) -->
                     {% set options = {
+                        "a. Sí":"a. Sí",
+                        "b. No":"b. No",
+                        "c. NS/NR":"c. NS/NR"
+                    } %}
+                    {{ macros.fieldForm("radio","5. Votaría usted en la convención del Partido Liberación Nacional?","plnElections","plnElections","True",options,"")}}
+                </div>
+                <div id="div-plnCandidate" class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set options = {
+                        "a. Gilbert Jiménez":"a. Gilbert Jiménez",
+                        "b. Carolina Delgado":"b. Carolina Delgado",
+                        "c. Alvaro Ramos":"c. Alvaro Ramos",
+                        "d. Marvin Taylor":"d. Marvin Taylor",
+                        "e. NS/NR":"e. NS/NR",
+                        "f. Ninguno":"f. Ninguno"
+                    } %}
+                    {{ macros.fieldForm("radio","6. Si usted votara en la convención del Partido Liberación Nacional por quién lo haría? (Papeleta)","plnCandidate","plnCandidate","True",options,"")}}
+                </div>
+            </div>
+            <div class="my-5">
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set options = {
+                        "Mauricio Batalla":"Mauricio Batalla",
                         "Laura Fernandez":"Laura Fernandez",
                         "Álvaro Ramos":"Álvaro Ramos",
                         "Fabricio Alvarado":"Fabricio Alvarado",
