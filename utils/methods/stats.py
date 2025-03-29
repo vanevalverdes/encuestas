@@ -63,6 +63,7 @@ def countbygender(clazz,fieldname,values):
 def generateReport(clazzname,record_id):
     from utils.methods.stats import field_count, countbygender
     print(clazzname)
+    """
     if record_id == 1:
         ### Age groups
         age_groups = [
@@ -324,99 +325,100 @@ def generateReport(clazzname,record_id):
         #session.putVariable("stats",stats)
         return stats
     elif record_id == 3:
-        ### Age groups
-        age_groups = [
-        "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
-        "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
-        "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
-        "m. + 80"
+    """
+    ### Age groups
+    age_groups = [
+    "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
+    "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
+    "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
+    "m. + 80"
+    ]
+    age = countbygender(clazzname,"age",age_groups)
+
+    ### gender groups
+    masc = field_count(clazzname,"gender", "A. Masculino")
+    fem = field_count(clazzname,"gender", "B. Femenino")
+    tot = masc + fem
+    gender = {
+            "Hombres":masc,
+            "Mujeres":fem,
+            "Total":tot
+    }
+    ### User groups
+    userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"]
+    userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+
+    ### party groups
+    party_groups = [
+        "a. Partido Liberación Nacional",
+        "b. Partido Unidad Social Cristiana",
+        "c. Partido Nueva República",
+        "d. Partido Progreso Social Democrático",
+        "e. Frente Amplio",
+        "f. Partido Liberal Progresista",
+        "g. PAC",
+        "h. PNG",
+        "i. Pueblo Soberano",
+        "j. Partido Unidos Podemos",
+        "k. Partido de Rodrigo Chaves",
+        "l. Otro",
+        "m. Ninguno",
+        "n. NS/NR"
         ]
-        age = countbygender(clazzname,"age",age_groups)
+    party = countbygender(clazzname,"party",party_groups)
 
-        ### gender groups
-        masc = field_count(clazzname,"gender", "A. Masculino")
-        fem = field_count(clazzname,"gender", "B. Femenino")
-        tot = masc + fem
-        gender = {
-                "Hombres":masc,
-                "Mujeres":fem,
-                "Total":tot
-        }
-        ### User groups
-        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"]
-        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+    ############ Apoyos Políticos ############
+    
+    ### plnElections
+    plnElections_groups = ["a. Sí","b. No","c. NS/NR"]
+    plnElections = countbygender(clazzname,"plnElections",plnElections_groups)
 
-        ### party groups
-        party_groups = [
-            "a. Partido Liberación Nacional",
-            "b. Partido Unidad Social Cristiana",
-            "c. Partido Nueva República",
-            "d. Partido Progreso Social Democrático",
-            "e. Frente Amplio",
-            "f. Partido Liberal Progresista",
-            "g. PAC",
-            "h. PNG",
-            "i. Pueblo Soberano",
-            "j. Partido Unidos Podemos",
-            "k. Partido de Rodrigo Chaves",
-            "l. Otro",
-            "m. Ninguno",
-            "n. NS/NR"
-            ]
-        party = countbygender(clazzname,"party",party_groups)
+    ### chavesScale
+    plnScale_groups = ["1","2","3","4","5","6","7","8","9","10"]
+    plnScale = countbygender(clazzname,"plnScale",plnScale_groups)
 
-        ############ Apoyos Políticos ############
-        
-        ### plnElections
-        plnElections_groups = ["a. Sí","b. No","c. NS/NR"]
-        plnElections = countbygender(clazzname,"plnElections",plnElections_groups)
+    ### plnCandidate groups
+    plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","e. NS/NR","f. Ninguno"]
+    plnCandidate = countbygender(clazzname,"plnCandidate",plnCandidate_groups)
 
-        ### chavesScale
-        plnScale_groups = ["1","2","3","4","5","6","7","8","9","10"]
-        plnScale = countbygender(clazzname,"plnScale",plnScale_groups)
+    ### generalElections
+    generalElections_groups = [
+        "Laura Fernandez",
+        "Álvaro Ramos",
+        "Fabricio Alvarado",
+        "Eliécer Feinzaig",
+        "Gilbert Jiménez",
+        "Carolina Delgado",
+        "Claudia Dobles",
+        "Sofia Guillen",
+        "Juan Carlos Hidalgo",
+        "Rolando Araya Monge",
+        "Luis Amador",
+        "Marvin Taylor",
+        "Natalia Diaz",
+        "Claudio Alpizar",
+        "Fernando Zamora",
+        "Ninguno",
+        "NS/NR"
+        ]
+    generalElections = countbygender(clazzname,"generalElections",generalElections_groups)
 
-        ### plnCandidate groups
-        plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","e. NS/NR","f. Ninguno"]
-        plnCandidate = countbygender(clazzname,"plnCandidate",plnCandidate_groups)
-
-        ### generalElections
-        generalElections_groups = [
-            "Laura Fernandez",
-            "Álvaro Ramos",
-            "Fabricio Alvarado",
-            "Eliécer Feinzaig",
-            "Gilbert Jiménez",
-            "Carolina Delgado",
-            "Claudia Dobles",
-            "Sofia Guillen",
-            "Juan Carlos Hidalgo",
-            "Rolando Araya Monge",
-            "Luis Amador",
-            "Marvin Taylor",
-            "Natalia Diaz",
-            "Claudio Alpizar",
-            "Fernando Zamora",
-            "Ninguno",
-            "NS/NR"
-            ]
-        generalElections = countbygender(clazzname,"generalElections",generalElections_groups)
-
-        ### chavesSupport
-        chavesSupport_groups = ["a. Sí","b. No","c. NS/NR"]
-        chavesSupport = countbygender(clazzname,"chavesSupport",chavesSupport_groups)
+    ### chavesSupport
+    chavesSupport_groups = ["a. Sí","b. No","c. NS/NR"]
+    chavesSupport = countbygender(clazzname,"chavesSupport",chavesSupport_groups)
 
 
-        stats = {
-            "age":age,
-            "gender":gender,
-            "party":party,
-            "plnElections":plnElections,
-            "plnScale":plnScale,
-            "plnCandidate":plnCandidate,
-            "generalElections":generalElections,
-            "chavesSupport":chavesSupport,
-            "userCreation":userCreation
-        }
-        #session.putVariable("stats",stats)
-        print(stats)
-        return stats
+    stats = {
+        "age":age,
+        "gender":gender,
+        "party":party,
+        "plnElections":plnElections,
+        "plnScale":plnScale,
+        "plnCandidate":plnCandidate,
+        "generalElections":generalElections,
+        "chavesSupport":chavesSupport,
+        "userCreation":userCreation
+    }
+    #session.putVariable("stats",stats)
+    print(stats)
+    return stats
