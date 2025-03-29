@@ -292,12 +292,11 @@ def report_pln():
 
     return "hola"
 
-@blueprintname.route(f'/report/<int:record_id>/')
+@blueprintname.route(f'/report/')
 @traceError
 @login_required
-def report(record_id):
+def report():
     from utils.methods.stats import generateReport
-    classname = application.get_class_name(record_id)
-    stats = generateReport(classname,record_id)
+    stats = generateReport()
     return stats
     #return render_template("backend/stats.html",stats=stats)

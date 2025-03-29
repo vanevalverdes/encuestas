@@ -60,9 +60,9 @@ def countbygender(clazz,fieldname,values):
     return counts
 
 
-def generateReport(clazzname,record_id):
+def generateReport():
     from utils.methods.stats import field_count, countbygender
-    print(clazzname)
+    clazzname = "surveymarchtwo"
     """
     if record_id == 1:
         ### Age groups
