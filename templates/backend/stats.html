@@ -36,7 +36,7 @@
                                 <table class="table table-responsive">
                                     <tbody>
                                         <tr>
-                                        {% for key, value in stats.age.items() %}
+                                        {% fo in stats.age.items() %}
                                             <td><b>{{ key }}</b><br>
                                             {{ value[2] }}</td>
                                         {% endfor %}
@@ -454,56 +454,6 @@
                                     </thead>
                                     <tbody>
                                         {% for key, value in stats.generalElections.items() %}
-                                        <tr>
-                                            <td><b>{{ key }}</b></td>
-                                            <td>{{ value[3] }}</td>
-                                            <td>{{ value[4] }}</td>
-                                            <td>{{ value[5] }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <!-- chavesParty -->
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Usted apoyaría un partido del presidente Rodrigo Chaves?</h5>
-                                <table class="table table-responsive">
-                                    <thead>
-                                        <th></th>
-                                        <th>H</th>
-                                        <th>M</th>
-                                        <th>Total</th>
-                                    </thead>
-                                    <tbody>
-                                        {% for key, value in stats.chavesParty.items() %}
-                                        <tr>
-                                            <td><b>{{ key }}</b></td>
-                                            <td>{{ value[3] }}</td>
-                                            <td>{{ value[4] }}</td>
-                                            <td>{{ value[5] }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>   
-                        <!-- chavesSupport -->
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Apoya usted la gestión del presidente Rodrigo Chaves?</h5>
-                                <table class="table table-responsive">
-                                    <thead>
-                                        <th></th>
-                                        <th>H</th>
-                                        <th>M</th>
-                                        <th>Total</th>
-                                    </thead>
-                                    <tbody>
-                                        {% for key, value in stats.chavesSupport.items() %}
                                         <tr>
                                             <td><b>{{ key }}</b></td>
                                             <td>{{ value[3] }}</td>
