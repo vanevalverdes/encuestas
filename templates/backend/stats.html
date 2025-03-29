@@ -36,7 +36,7 @@
                                 <table class="table table-responsive">
                                     <tbody>
                                         <tr>
-                                        {% for in stats.age.items() %}
+                                        {% for key, value in stats.age.items() %}
                                             <td><b>{{ key }}</b><br>
                                             {{ value[2] }}</td>
                                         {% endfor %}
