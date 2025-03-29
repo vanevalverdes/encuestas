@@ -299,4 +299,9 @@ def report(record_id):
     from utils.methods.stats import generateReport
     classname = application.get_class_name(record_id)
     stats = generateReport(classname,record_id)
-    return render_template("backend/stats.html",stats=stats)
+    if record_id == 1:
+        return render_template("backend/stats-febrero.html",stats=stats)
+    elif record_id == 2:
+        return render_template("backend/stats-marzo.html",stats=stats)
+    elif record_id == 3:
+        return render_template("backend/stats.html",stats=stats)
