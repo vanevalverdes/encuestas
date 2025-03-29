@@ -34,19 +34,19 @@
             {% endif %}
             {% if current_user.usergroup.id == 2%}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.report', record_id=2) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.report', record_id=3) }}" id="">
                   Ver Reporte
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=2) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=3) }}" id="">
                   Ir a Formulario de Encuesta
               </a>
             </li>
             {% endif %}
             {% if current_user.usergroup.id == 3%}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=2) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=3) }}" id="">
                   Ir a Formulario de Encuesta
               </a>
             </li>
