@@ -296,7 +296,9 @@ def report_pln():
 @traceError
 @login_required
 def report(record_id):
+    import json
     from utils.methods.stats import generateReport
     classname = application.get_class_name(record_id)
     stats = generateReport(classname,record_id)
-    return render_template("backend/stats.html",stats=stats)
+    return json(stats)
+    #return render_template("backend/stats.html",stats=stats)
