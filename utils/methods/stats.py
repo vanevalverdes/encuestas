@@ -376,7 +376,7 @@ def generateReport(clazzname,record_id):
         plnScale = countbygender(clazzname,"plnScale",plnScale_groups)
 
         ### plnCandidate groups
-        plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","e. NS/NR","f. Ninguno"]
+        plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","e. Ninguno","f. NS/NR"]
         plnCandidate = countbygender(clazzname,"plnCandidate",plnCandidate_groups)
 
         ### generalElections
