@@ -275,22 +275,27 @@ def reportTest():
 @traceError
 @login_required
 def report_pln():
-    query = session.newQuery("SurveyMarch")
+    query = session.newQuery("SurveyMarchTwo")
     print(query.count())
     
     ### plnCandidate groups
-    plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","e. NS/NR", "f. Ninguno"]
-    query.addFilter("plnElections", "==","a. Sí")
+    plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","f. NS/NR", "e. Ninguno"]
+    query.addFilter("plnScale", "==","10")
     total = query.count()
+    print(total)
+    response = {}
     for i, item in enumerate(plnCandidate_groups):
-        query = session.newQuery("SurveyMarch")
-        query.addFilter("plnElections", "==","a. Sí")
+        query = session.newQuery("SurveyMarchTwo")
+        query.addFilter("plnScale", "==","10")
         query.addFilter("plnCandidate","==",item)
         abs = query.count()
         porc = round((float(abs) / float(total) * 100.0), 2)
-        print(f"{item}: absolutos {abs}    Porcentajes {porc}")
+        data = {}
+        data["absolutos"] = abs
+        data["porcentajes"] = porc
+        response[item] = data
 
-    return "hola"
+    return response
 
 @blueprintname.route(f'/report/<int:record_id>/')
 @traceError
