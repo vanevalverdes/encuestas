@@ -92,11 +92,7 @@
                 {% endif %}
             </ul>
         </nav>
-            {% if classid == 3 %}
-                {{ macros.tableResultsOrders(table_fields,moneyFields,dateFields,classid,table) }}
-            {% else %}
                 {{ macros.tableResults(table_fields,moneyFields,dateFields,classid,table) }}
-            {%endif%}
         {%else%}
             No hay registros para esta búsqueda.
         {%endif%}

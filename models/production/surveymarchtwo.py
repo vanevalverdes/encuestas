@@ -13,6 +13,7 @@ class Surveymarchtwo(db.Model):
     generalElections = db.Column(db.String(255))
     chavesSupport = db.Column(db.String(255))
     contact = db.Column(db.String(255))
+    state = db.Column(db.String(255))
     createdby_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     modifiedby_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdby = db.relationship('User', backref='created_None', foreign_keys=[createdby_id])
