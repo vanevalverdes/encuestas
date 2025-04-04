@@ -412,6 +412,7 @@ def generateReport(clazzname,record_id):
         stats = {
             "age":age,
             "gender":gender,
+            "state":state,
             "party":party,
             "plnElections":plnElections,
             "plnScale":plnScale,
