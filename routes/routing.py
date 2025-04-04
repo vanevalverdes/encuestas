@@ -309,4 +309,5 @@ def report(record_id):
     elif record_id == 2:
         return render_template("backend/stats-marzo.html",stats=stats)
     elif record_id == 3:
-        return render_template("backend/stats.html",stats=stats)
+        return stats
+        #return render_template("backend/stats.html",stats=stats)
