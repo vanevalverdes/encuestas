@@ -24,6 +24,19 @@
             <div class="mb-3 border border-grey p-3">
                 <!-- fieldForm(input,label,id,name,type,required,options,value) -->
                  {% set options = {
+                    "1. San José":"1. San José",
+                    "2. Alajuela":"2. Alajuela",
+                    "3. Cartago":"3. Cartago",
+                    "4. Heredia":"4. Heredia",
+                    "5. Guanacaste":"5. Guanacaste",
+                    "6. Puntarenas":"6. Puntarenas",
+                    "7. Limón":"7. Limón"
+                 } %}
+                 {{ macros.fieldForm("radio","Provincia","state","state","True",options,"")}}
+            </div>
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
                     "a. 18 -20":"a. 18 -20",
                     "b. 21 - 24":"b. 21 - 24",
                     "c. 25 - 29":"c. 25 - 29",
