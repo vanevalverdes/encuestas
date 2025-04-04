@@ -342,6 +342,9 @@ def generateReport(clazzname,record_id):
                 "Mujeres":fem,
                 "Total":tot
         }
+        ### State groups
+        state_groups = ["1. San José","2. Alajuela","3. Cartago","4. Heredia","5. Guanacaste","6. Puntarenas","7. Limón"]
+        state = countbygender(clazzname,"state",state_groups)
         ### User groups
         userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
         userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
