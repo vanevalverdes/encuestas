@@ -46,7 +46,7 @@ def countbygender(clazz,fieldname,values):
         item.extend([hombresPorc, mujeresPorc, fieldPorc])
     
     # Añade datos por usuario
-    userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"]
+    userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
     for field, values in counts.items():
         usersValues = {}
         for user in userCreation_groups:
