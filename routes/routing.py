@@ -248,6 +248,30 @@ def survey(record_id):
         flash('Se guardó correctamente la encuesta. Puedes ingresar una nueva.', 'success')
         return render_template("backend/survey.html",success=True)
     
+@blueprintname.route(f'/boca-urna-pln/', methods=["GET","POST"])
+@traceError
+@login_required
+def pln_day():
+    record_id = 4
+    class_names = application.list_class_names()
+    classname = application.get_class_name(record_id)
+    classnameLabel = application.get_class_name_label(record_id)
+    containers = get_clazz_fields(record_id)
+
+    #print(containers)
+    if request.method == "GET":
+        return render_template("backend/pln-day.html")
+    elif request.method == "POST":
+            
+        modelClass = session.getClazz(classname)
+        # Uso de la clase importada
+        Record = modelClass()
+        session.saveForm(Record,containers)
+        db.session.add(Record)
+        db.session.commit()
+        flash('Se guardó correctamente la encuesta. Puedes ingresar una nueva.', 'success')
+        return render_template("backend/pln-day.html",success=True)
+    
 @blueprintname.route(f'/report-by-user/')
 @traceError
 @login_required
@@ -280,13 +304,13 @@ def report_pln():
     
     ### plnCandidate groups
     plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","f. NS/NR", "e. Ninguno"]
-    query.addFilter("plnScale", "or",["8","9","10"])
+    query.addFilter("plnScale", "or",["9","10"])
     total = query.count()
     print(total)
     response = {}
     for i, item in enumerate(plnCandidate_groups):
         query = session.newQuery("SurveyMarchTwo")
-        query.addFilter("plnScale", "or",["8","9","10"])
+        query.addFilter("plnScale", "or",["9","10"])
         query.addFilter("plnCandidate","==",item)
         abs = query.count()
         porc = round((float(abs) / float(total) * 100.0), 2)
@@ -309,5 +333,8 @@ def report(record_id):
     elif record_id == 2:
         return render_template("backend/stats-marzo.html",stats=stats)
     elif record_id == 3:
+        #return stats
+        return render_template("backend/stats-marzo-dos.html",stats=stats)
+    elif record_id == 4:
         #return stats
         return render_template("backend/stats.html",stats=stats)

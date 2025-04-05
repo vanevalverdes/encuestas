@@ -56,7 +56,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_POOL_RECYCLE = 1800 
     SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
-    SECRET_KEY = 'lghaasdñas5654132asda35r.'
+    SECRET_KEY = 'lghaasdñas5654132aa35r.'
     UPLOAD_FOLDER = 'static/uploads'
     MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MB
 

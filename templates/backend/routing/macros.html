@@ -540,3 +540,68 @@
     </div>
 </div>
 {%endmacro%}
+{% macro barchartjson(title,fieldname,labels,data)%}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{title}}</h5>
+                <canvas id="div-barchart-{{fieldname}}"></canvas>
+
+                <script>
+                     data = {{data | tojson }};
+
+                    ctx = document.getElementById('div-barchart-{{fieldname}}').getContext('2d');
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                        /* labels: Object.keys(data),*/
+                        labels: {{labels | tojson }},
+                        datasets: [{
+                            label: '{{title}}',
+                            data: Object.values(data),
+                            backgroundColor: '#2e2d6c',
+                            borderColor: '#2e2d6c',
+                            borderWidth: 1
+                        }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Porcentaje (%)'
+                                }
+                                }
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: '{{title}}'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                        return context.dataset.label + ': ' + context.raw + '%';
+                                        }
+                                    }
+                                },
+                                datalabels: {
+                                    color: 'white', 
+                                    font: {
+                                        weight: 'bold',
+                                        size: 14 
+                                    }
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels]
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+{%endmacro%}

@@ -3,19 +3,54 @@ from config import url as mainUrl, applicationName, adminMail
 def traceError(f):
     from functools import wraps
     import traceback
+    from flask import request, render_template_string
+    from flask_login import current_user
+    from datetime import datetime
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
         except Exception as e:
-            print("Error: ", str(e))
             error_message = traceback.format_exc()
+            error_url = request.url
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            # Mostrar error en consola
+            print("⚠️ Error en la aplicación:")
+            print(f"URL: {error_url}")
             print(error_message)
+
+            # Guardar error en archivo de log
             with open("error.log", "a") as error_file:
-                error_file.write(error_message + "\n")
-            mailMessage = "<p>Ocurrió un error:<br>{{error_message_variable}}</p>"
-            send_email_from_db(adminMail,f"Error en la Aplicación {applicationName}",mailMessage,error_message_variable=error_message)
-            return "Ha ocurrido un error en esta página", 500
+                error_file.write(f"[{timestamp}] Error en URL: {error_url}\n{error_message}\n\n")
+
+            # Enviar correo al administrador
+            mail_message = f"""
+            <h2>Error en la aplicación</h2>
+            <p><strong>Fecha y hora:</strong> {timestamp}</p>
+            <p><strong>URL:</strong> {error_url}</p>
+            <pre style="background:#f8f8f8;padding:10px;border:1px solid #ddd;">{error_message}</pre>
+            """
+
+            send_email_from_db(
+                adminMail,
+                f"[{applicationName}] Error en la aplicación",
+                mail_message
+            )
+
+            # Verificar si el usuario está autenticado y es admin (usergroup == 1)
+            if hasattr(current_user, "usergroup_id") and current_user.usergroup_id == 1:
+                error_template = """
+                <h2>Ha ocurrido un error inesperado</h2>
+                <p><strong>URL:</strong> {{ url }}</p>
+                <pre style="background:#f0f0f0;padding:10px;border:1px solid #ccc;">{{ error }}</pre>
+                <p>Este detalle solo es visible para administradores.</p>
+                """
+                return render_template_string(error_template, url=error_url, error=str(e)), 500
+
+            # Para usuarios normales, solo mensaje genérico
+            return "Ha ocurrido un error. Por favor, contacta al administrador.", 500
+
     return decorated_function
 
 

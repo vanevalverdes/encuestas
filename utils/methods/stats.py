@@ -424,3 +424,76 @@ def generateReport(clazzname,record_id):
         #session.putVariable("stats",stats)
         print(stats)
         return stats
+    elif record_id == 4:
+        from utils.methods import session
+        query = session.newQuery(clazzname)
+        stats = {}
+
+        alvaroramos = query.getSum("alvaroramos")
+        carolinadelgado = query.getSum("carolinadelgado")
+        gilberthjimenez = query.getSum("gilberthjimenez")
+        marvintaylor = query.getSum("marvintaylor")
+        nulled = query.getSum("nulled")
+        blank = query.getSum("blank")
+        total = alvaroramos + carolinadelgado + gilberthjimenez + marvintaylor + nulled + blank
+        if total > 0:
+            alvaroramos = round((float(alvaroramos) / float(total) * 100.0), 2)
+            carolinadelgado = round((float(carolinadelgado) / float(total) * 100.0), 2)
+            gilberthjimenez = round((float(gilberthjimenez) / float(total) * 100.0), 2)
+            marvintaylor = round((float(marvintaylor) / float(total) * 100.0), 2)
+            nulled = round((float(nulled) / float(total) * 100.0), 2)
+            blank = round((float(blank) / float(total) * 100.0), 2)
+        else:
+            alvaroramos = 0
+            carolinadelgado = 0
+            gilberthjimenez = 0
+            marvintaylor = 0
+            nulled = 0
+            blank = 0
+
+        stats["total"] = {
+            "alvaroramos":alvaroramos,
+            "carolinadelgado":carolinadelgado,
+            "gilberthjimenez":gilberthjimenez,
+            "marvintaylor":marvintaylor,
+            "nulled":nulled,
+            "blank":blank
+        }
+
+        state_groups = ["1. San José","2. Alajuela","3. Cartago","4. Heredia","5. Guanacaste","6. Puntarenas","7. Limón"]
+        for state in state_groups:
+            query = session.newQuery(clazzname)
+            query = query.addFilter("state", "==", state)
+            alvaroramos_state = query.getSum("alvaroramos")
+            carolinadelgado_state = query.getSum("carolinadelgado")
+            gilberthjimenez_state = query.getSum("gilberthjimenez")
+            marvintaylor_state = query.getSum("marvintaylor")
+            nulled_state = query.getSum("nulled")
+            blank_state = query.getSum("blank")
+            total = alvaroramos_state + carolinadelgado_state + gilberthjimenez_state + marvintaylor_state + nulled_state + blank_state
+            if total > 0:
+                alvaroramos_state = round((float(alvaroramos_state) / float(total) * 100.0), 2)
+                carolinadelgado_state = round((float(carolinadelgado_state) / float(total) * 100.0), 2)
+                gilberthjimenez_state = round((float(gilberthjimenez_state) / float(total) * 100.0), 2)
+                marvintaylor_state = round((float(marvintaylor_state) / float(total) * 100.0), 2)
+                nulled_state = round((float(nulled_state) / float(total) * 100.0), 2)
+                blank_state = round((float(blank_state) / float(total) * 100.0), 2)
+            else:
+                alvaroramos_state = 0
+                carolinadelgado_state = 0
+                gilberthjimenez_state = 0
+                marvintaylor_state = 0
+                nulled_state = 0
+                blank_state = 0
+            stats[state] = {
+                "alvaroramos":alvaroramos_state,
+                "carolinadelgado":carolinadelgado_state,
+                "gilberthjimenez":gilberthjimenez_state,
+                "marvintaylor":marvintaylor_state,
+                "nulled":nulled_state,
+                "blank":blank_state
+            }
+
+        #session.putVariable("stats",stats)
+        print(stats)
+        return stats

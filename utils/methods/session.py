@@ -226,6 +226,18 @@ class Query:
         self.query = self.query.filter(op_func(getattr(self.model_class, fieldname), value))
         return self
        
+    def getSum(self, fieldname):
+        from sqlalchemy import func
+        # Obtener la suma del campo especificado
+        result = self.query.with_entities(func.sum(getattr(self.model_class, fieldname))).scalar()
+        return result or 0
+
+    def getSumBy(self, fieldname, groupby):
+        from sqlalchemy import func
+        # Obtener la suma del campo especificado agrupado por otro campo
+        result = self.query.with_entities(func.sum(getattr(self.model_class, fieldname)), getattr(self.model_class, groupby)).group_by(getattr(self.model_class, groupby)).all()
+        return result or 0
+
     def filterByToday(self):
         from datetime import datetime, timezone
         from sqlalchemy.sql import func
