@@ -19,9 +19,21 @@
 <nav class="pt-5">
     <div class="nav nav-tabs nav justify-content-center" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Nacional</button>
+        <button class="nav-link active" id="nav-provincia-tab" data-bs-toggle="tab" data-bs-target="#nav-provincia" type="button" role="tab" aria-controls="nav-provincia" aria-selected="true">Provincias</button>
     </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                {% set labels = ["Álvaro Ramos",
+                                "Carolina Delgado",
+                                "Gilberth Jiménez",
+                                "Marvin Taylor",
+                                "Nulos",
+                                "Blancos"] %}
+                {{ macros.barchartjson("Alajuela","alajuela",labels,stats["total"]) }}
+    </div>
     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
         <section class="py-5">
             <div class="container mt-3">
