@@ -6,10 +6,15 @@ def traceError(f):
     from flask import request, render_template_string
     from flask_login import current_user
     from datetime import datetime
+    from werkzeug.exceptions import Unauthorized  # Importamos esta excepción
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
+        except Unauthorized:
+            # Este error se lanza cuando el usuario no está logueado y la vista requiere login
+            return "Necesitas iniciar sesión para acceder a esta página.", 401
         except Exception as e:
             error_message = traceback.format_exc()
             error_url = request.url
@@ -52,7 +57,6 @@ def traceError(f):
             return "Ha ocurrido un error. Por favor, contacta al administrador.", 500
 
     return decorated_function
-
 
 def strToDate(date_str, format='%Y-%m-%d'):
     from datetime import datetime
