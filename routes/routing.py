@@ -336,5 +336,6 @@ def report(record_id):
         #return stats
         return render_template("backend/stats-marzo-dos.html",stats=stats)
     elif record_id == 4:
+        now = engine.now().strftime("%Y-%m-%d %H:%M:%S")
         #return stats
-        return render_template("backend/stats.html",stats=stats)
+        return render_template("backend/stats.html",stats=stats,last_loaded_time=now)
