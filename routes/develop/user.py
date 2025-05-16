@@ -90,7 +90,7 @@ def list_record():
         #    "supervisor04@opolconsultores.com",
         #    "supervisor05@opolconsultores.com"
         #]
-        #password = "boca25urna*"
+        #password = "supervisor25mayo*"
         #hashed_password = generate_password_hash(password)
         #print(hashed_password)
         #for item in list:
@@ -102,11 +102,13 @@ def list_record():
         #    setattr(new, "_password_hash", hashed_password)
         #    db.session.add(new)
         #db.session.commit()
+        password = "encuesta25mayo*"
+        hashed_password = generate_password_hash(password)
         #institutions = Record.query.all() 
         institutions = Record.query.filter(Record.usergroup_id != 1).all()
-        #for item in institutions:
-        #    setattr(item, "_password_hash", hashed_password)
-        #    db.session.commit()
+        for item in institutions:
+            setattr(item, "_password_hash", hashed_password)
+            db.session.commit()
         return render_template('backend/base/list_user.html', institutions=institutions,classname=classname, class_names=class_names)
     return redirect(url_for('application.index'))
 

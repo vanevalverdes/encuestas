@@ -1,0 +1,216 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+ <style>
+    .form-check {
+  margin-bottom: 0.5rem;
+}
+ </style>
+<div class="container mt-3">
+
+    <h2 class="my-3">Encuesta EC032025-B - Encuestador {{ current_user.id }}</h2>
+    <form method="post">
+        <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}" >
+        <!-- fieldset row -->
+        <!-- Datos demográficos -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>Datos demográficos</h4>
+            </div>
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "1. San José":"1. San José",
+                    "2. Alajuela":"2. Alajuela",
+                    "3. Cartago":"3. Cartago",
+                    "4. Heredia":"4. Heredia",
+                    "5. Guanacaste":"5. Guanacaste",
+                    "6. Puntarenas":"6. Puntarenas",
+                    "7. Limón":"7. Limón"
+                 } %}
+                 {{ macros.fieldForm("radio","Provincia","state","state","True",options,"")}}
+            </div>
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "a. 18 -20":"a. 18 -20",
+                    "b. 21 - 24":"b. 21 - 24",
+                    "c. 25 - 29":"c. 25 - 29",
+                    "d. 30 - 34":"d. 30 - 34",
+                    "e. 35 - 39":"e. 35 - 39",
+                    "f. 40 - 44":"f. 40 - 44",
+                    "g. 45 - 49":"g. 45 - 49",
+                    "h. 50 - 54":"h. 50 - 54",
+                    "i. 55 - 59":"i. 55 - 59",
+                    "j. 60 - 64":"j. 60 - 64",
+                    "k. 65 - 69":"k. 65 - 69",
+                    "l. 70 - 79":"l. 70 - 79",
+                    "m. + 80":"m. + 80"
+                 } %}
+                 {{ macros.fieldForm("radio","1. Edad","age","age","True",options,"")}}
+            </div>
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "A. Masculino":"A. Masculino",
+                    "B. Femenino":"B. Femenino"
+                 } %}
+                 {{ macros.fieldForm("radio","2. Género","gender","gender","True",options,"")}}
+            </div>
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "a. Partido Liberación Nacional":"a. Partido Liberación Nacional",
+                    "b. Partido Unidad Social Cristiana":"b. Partido Unidad Social Cristiana",
+                    "c. Partido Nueva República":"c. Partido Nueva República",
+                    "d. Partido Progreso Social Democrático":"d. Partido Progreso Social Democrático",
+                    "e. Frente Amplio":"e. Frente Amplio",
+                    "f. Partido Liberal Progresista":"f. Partido Liberal Progresista",
+                    "g. PAC":"g. PAC",
+                    "h. PNG":"h. PNG",
+                    "i. Pueblo Soberano":"i. Pueblo Soberano",
+                    "j. Partido Unidos Podemos":"j. Partido Unidos Podemos",
+                    "k. Partido de Rodrigo Chaves":"k. Partido de Rodrigo Chaves",
+                    "l. Otro":"l. Otro",
+                    "m. Ninguno":"m. Ninguno",
+                    "n. NS/NR":"n. NS/NR"
+                 } %}
+                 {{ macros.fieldForm("radio","3. Cuál es el partido político de su preferencia?","party","party","True",options,"")}}
+            </div>
+        </div>
+        <!-- Apoyos Políticos -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>Apoyos políticos</h4>
+            </div>
+            <div class="my-5">
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set options = {
+                        "a. Sí":"a. Sí",
+                        "b. No":"b. No",
+                        "c. NS/NR":"c. NS/NR"
+                    } %}
+                    {{ macros.fieldForm("radio","Votaría usted en la convención del Partido Liberación Nacional?","plnElections","plnElections","True",options,"")}}
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                        // Obtener los radio buttons del primer grupo
+                        const radios = document.querySelectorAll('input[name="plnElections"]');
+                        const opinionDiv = document.getElementById("div-plnCandidate"); // Usar ID en vez de clase
+                        const opinionInputs = opinionDiv.querySelectorAll("input");
+
+                        function toggleOpinionDiv() {
+                            const selectedValue = document.querySelector('input[name="plnElections"]:checked')?.value;
+                            
+                            if (selectedValue === "a. Sí") {
+                                opinionDiv.style.display = "block";
+                                opinionInputs.forEach(input => input.removeAttribute("disabled"));
+                            } else {
+                                opinionDiv.style.display = "none";
+                                opinionInputs.forEach(input => {
+                                    input.setAttribute("disabled", "true");
+                                    input.checked = false; // Deseleccionar opciones cuando se oculta
+                                });
+                            }
+                        }
+
+                        // Asignar el evento a cada radio button
+                        radios.forEach(radio => {
+                            radio.addEventListener("change", toggleOpinionDiv);
+                        });
+
+                        // Ocultar por defecto al cargar la página
+                        toggleOpinionDiv();
+                    });
+                    </script>
+                </div>
+                <div id="div-plnCandidate" style="display: none;" class="mb-3 border border-grey p-3">
+                    <div class="mb-3 p-3">
+                        <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                        {% set options = {
+                            "1":"1",
+                            "2":"2",
+                            "3":"3",
+                            "4":"4",
+                            "5":"5",
+                            "6":"6",
+                            "7":"7",
+                            "8":"8",
+                            "9":"9",
+                            "10":"10"
+                        } %}
+                        {{ macros.fieldForm("radio","Del 1 al 10, Qué tan probable es que vote en la convención del PLN?","plnScale","plnScale","True",options,"")}}
+                    </div>
+                    <div class="mb-3 p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set options = {
+                        "a. Gilbert Jiménez":"a. Gilbert Jiménez",
+                        "b. Carolina Delgado":"b. Carolina Delgado",
+                        "c. Alvaro Ramos":"c. Alvaro Ramos",
+                        "d. Marvin Taylor":"d. Marvin Taylor",
+                        "e. Ninguno":"e. Ninguno",
+                        "f. NS/NR":"f. NS/NR"
+                    } %}
+                    {{ macros.fieldForm("radio","Solo los que contestan sí en la #5. Por Quién votaría?","plnCandidate","plnCandidate","True",options,"")}}
+                    </div>
+                </div>
+            </div>
+            <div class="my-5">
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set options = {
+                        "Laura Fernandez":"Laura Fernandez",
+                        "Álvaro Ramos":"Álvaro Ramos",
+                        "Fabricio Alvarado":"Fabricio Alvarado",
+                        "Eliécer Feinzaig":"Eliécer Feinzaig",
+                        "Gilbert Jiménez":"Gilbert Jiménez",
+                        "Carolina Delgado":"Carolina Delgado",
+                        "Claudia Dobles":"Claudia Dobles",
+                        "Sofia Guillen":"Sofia Guillen",
+                        "Juan Carlos Hidalgo":"Juan Carlos Hidalgo",
+                        "Rolando Araya Monge":"Rolando Araya Monge",
+                        "Luis Amador":"Luis Amador",
+                        "Marvin Taylor":"Marvin Taylor",
+                        "Natalia Diaz":"Natalia Diaz",
+                        "Claudio Alpizar":"Claudio Alpizar",
+                        "Fernando Zamora":"Fernando Zamora",
+                        "Ninguno":"Ninguno",
+                        "NS/NR":"NS/NR"
+                    } %}
+                    {{ macros.fieldForm("radio","7. De la siguiente papeleta por quien votaría usted en las próximas elecciones? ","generalElections","generalElections","True",options,"")}}
+                </div>
+            </div>
+            <div class="my-5">
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set options = {
+                        "a. Sí":"a. Sí",
+                        "b. No":"b. No",
+                        "c. NS/NR":"c. NS/NR"
+                    } %}
+                    {{ macros.fieldForm("radio","Apoya usted la gestión del presidente Rodrigo Chaves?","chavesSupport","chavesSupport","True",options,"")}}
+                </div>
+            </div>
+        </div>
+        <!-- Contacto -->
+        <div class="my-2">
+
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                {% set options = "" %}
+                 {{ macros.fieldForm("text","Contacto","contact","contact","True",options,"")}}
+            </div>
+
+        </div>
+        <!-- finaliza fieldset row -->
+
+        <!-- Botón de envío -->
+        <button type="submit" class="btn btn-primary my-5 btn-lg">Guardar</button>
+
+    </form>
+</div>
+{% endblock %}

@@ -304,13 +304,13 @@ def report_pln():
     
     ### plnCandidate groups
     plnCandidate_groups = ["a. Gilbert Jiménez","b. Carolina Delgado","c. Alvaro Ramos","d. Marvin Taylor","f. NS/NR", "e. Ninguno"]
-    query.addFilter("plnScale", "or",["9","10"])
+    query.addFilter("plnScale", "or",["8","9","10"])
     total = query.count()
     print(total)
     response = {}
     for i, item in enumerate(plnCandidate_groups):
         query = session.newQuery("SurveyMarchTwo")
-        query.addFilter("plnScale", "or",["9","10"])
+        query.addFilter("plnScale", "or",["8","9","10"])
         query.addFilter("plnCandidate","==",item)
         abs = query.count()
         porc = round((float(abs) / float(total) * 100.0), 2)

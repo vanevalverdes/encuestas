@@ -34,19 +34,19 @@
             {% endif %}
             {% if current_user.usergroup.id == 2%}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.report', record_id=4) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.report', record_id=5) }}" id="">
                   Ver Reporte
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.pln_day') }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=5) }}" id="">
                   Ir a Formulario de Encuesta
               </a>
             </li>
             {% endif %}
             {% if current_user.usergroup.id == 3%}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.pln_day') }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=5) }}" id="">
                   Ir a Formulario de Encuesta
               </a>
             </li>
@@ -86,5 +86,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     {% block bottomScripts %}{% endblock %}
+
   </body>
 </html>

@@ -555,8 +555,8 @@
                     chart = new Chart(ctx, {
                         type: 'bar',
                         data: {
-                        /* labels: Object.keys(data),*/
-                        labels: {{labels | tojson }},
+                        labels: Object.keys(data),
+                        /* labels: {{labels | tojson }},*/
                         datasets: [{
                             label: '{{title}}',
                             data: Object.values(data),

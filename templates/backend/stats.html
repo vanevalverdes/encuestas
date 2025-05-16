@@ -34,8 +34,8 @@
             <div class="container mt-3">
                 {% set labels = ["Álvaro Ramos",
                                 "Carolina Delgado",
-                                "Gilberth Jiménez",
                                 "Marvin Taylor",
+                                "Gilberth Jiménez",
                                 "Nulos",
                                 "Blancos"] %}
                 {{ macros.barchartjson("Resultados Nacionales","nacional",labels,stats["total"]) }}
@@ -46,10 +46,10 @@
         <section class="py-5">
             <div class="container mt-3">
                 {% set labels = ["Álvaro Ramos",
-                                "Carolina Delgado",
-                                "Gilberth Jiménez",
-                                "Marvin Taylor",
-                                "Nulos",
+                "Nulos",
+                "Marvin Taylor",
+                "Gilberth Jiménez",
+                "Carolina Delgado",
                                 "Blancos"] %}
                 {{ macros.barchartjson("Alajuela","alajuela",labels,stats["2. Alajuela"]) }}
                 {{ macros.barchartjson("Cartago","cartago",labels,stats["3. Cartago"]) }}
