@@ -254,7 +254,9 @@ class Query:
         return self.query
     
     def getTable(self):
-        return self.query.all()
+        # Devuelve una instancia de table con los registros filtrados
+        records = self.query.all()
+        return table(self.model_class.__name__, records)
     
     def pagination(self, page, per_page=50):
         paginated = self.query.paginate(page=page, per_page=per_page, error_out=False)
@@ -290,21 +292,18 @@ class Query:
         return self.query.count()
     
 class table:
-    def __init__(self, classname):
-        # Importar dinámicamente la clase correcta
+    def __init__(self, classname, records=None):
         module_path = f'models.production.{classname.lower()}'
-        model_module = __import__(module_path, fromlist=[classname.lower()])
+        model_module = __import__(module_path, fromlist=[classname.capitalize()])
         modelClass = getattr(model_module, classname.capitalize())
         self.model_class = modelClass
+        self._records = records  # Puede ser None o una lista de registros
     
     def set(self):
         return self.model_class
            
     def getFilteredTable(self, fieldname, operator, value):
-        # Obtener la clase de la instancia
         clazz = self.model_class
-
-        # Definir un diccionario de operadores
         operators = {
             "==": lambda f, v: f == v,
             "!=": lambda f, v: f != v,
@@ -313,17 +312,19 @@ class table:
             "<=": lambda f, v: f <= v,
             ">=": lambda f, v: f >= v
         }
-
-        # Obtener la función del operador adecuado
         op_func = operators.get(operator)
-
         if op_func is None:
             raise ValueError(f"Operador no soportado: {operator}")
 
-        # Filtrar por el campo utilizando la función del operador
-        filtered_records = clazz.query.filter(op_func(getattr(clazz, fieldname), value)).all()
-        return filtered_records
-    
+        # Si ya hay registros filtrados, filtra en memoria
+        if self._records is not None:
+            filtered = [r for r in self._records if op_func(getattr(r, fieldname), value)]
+            return table(clazz.__name__, filtered)
+        else:
+            # Si no, consulta a la base de datos
+            filtered_records = clazz.query.filter(op_func(getattr(clazz, fieldname), value)).all()
+            return table(clazz.__name__, filtered_records)
+
     def groupBy(self, fieldname):
         from itertools import groupby
         from operator import attrgetter
@@ -361,15 +362,24 @@ class table:
         :param sort: 'asc' para ordenar en orden ascendente (por defecto), 'desc' para ordenar en orden descendente.
         :return: Lista de registros ordenados.
         """
-        # Obtener todos los registros de la tabla
-        table = self.model_class.query.all()
-        if sort == 'desc':
-            # Ordenar los registros en orden descendente por 'id'
-            records_sorted = sorted(table, key=lambda x: x.id, reverse=True)
+        if self._records is not None:
+            if sort == 'desc':
+                # Ordenar los registros en orden descendente por 'id'
+                records_sorted = sorted(self._records, key=lambda x: x.id, reverse=True)
+            else:
+                # Ordenar los registros en orden ascendente por 'id'
+                records_sorted = sorted(self._records, key=lambda x: x.id)
+            return records_sorted
         else:
-            # Ordenar los registros en orden ascendente por 'id'
-            records_sorted = sorted(table, key=lambda x: x.id)
-        return records_sorted
+            # Obtener todos los registros de la tabla
+            table = self.model_class.query.all()
+            if sort == 'desc':
+                # Ordenar los registros en orden descendente por 'id'
+                records_sorted = sorted(table, key=lambda x: x.id, reverse=True)
+            else:
+                # Ordenar los registros en orden ascendente por 'id'
+                records_sorted = sorted(table, key=lambda x: x.id)
+            return records_sorted
     
     def getEmptyTable(self):
         # Crear una instancia vacía de la clase

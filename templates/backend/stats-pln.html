@@ -1,0 +1,67 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+<small>Última actualización: {{ last_loaded_time }}</small>
+<script>
+    setTimeout(function() {
+        location.reload(); // Recarga la página cada 5 minutos
+    }, 300000); // 300000 ms = 5 minutos
+</script>
+<style>
+    .card {
+        margin-bottom: 20px;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+    let datasetDict
+    let datasetsArray = []
+</script>
+<nav class="pt-5">
+    <div class="nav nav-tabs nav justify-content-center" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Nacional</button>
+        <button class="nav-link " id="nav-provincia-tab" data-bs-toggle="tab" data-bs-target="#nav-provincia" type="button" role="tab" aria-controls="nav-provincia" aria-selected="true">Provincias</button>
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                {% set labels = ["Álvaro Ramos",
+                                "Carolina Delgado",
+                                "Marvin Taylor",
+                                "Gilberth Jiménez",
+                                "Nulos",
+                                "Blancos"] %}
+                {{ macros.barchartjson("Resultados Nacionales","nacional",labels,stats["total"]) }}
+            </div>
+        </section>  
+    </div>
+    <div class="tab-pane fade" id="nav-provincia" role="tabpanel" aria-labelledby="nav-provincia-tab" tabindex="1">
+        <section class="py-5">
+            <div class="container mt-3">
+                {% set labels = ["Álvaro Ramos",
+                "Nulos",
+                "Marvin Taylor",
+                "Gilberth Jiménez",
+                "Carolina Delgado",
+                                "Blancos"] %}
+                {{ macros.barchartjson("Alajuela","alajuela",labels,stats["2. Alajuela"]) }}
+                {{ macros.barchartjson("Cartago","cartago",labels,stats["3. Cartago"]) }}
+                {{ macros.barchartjson("Guanacaste","guanacaste",labels,stats["5. Guanacaste"]) }}
+                {{ macros.barchartjson("Heredia","heredia",labels,stats["4. Heredia"]) }}
+                {{ macros.barchartjson("Limón","limon",labels,stats["7. Limón"]) }}
+                {{ macros.barchartjson("Puntarenas","puntarenas",labels,stats["6. Puntarenas"]) }}
+                {{ macros.barchartjson("San José","sanjose",labels,stats["1. San José"]) }}
+            </div>
+        </section>
+    </div>
+</div>
+  
+
+{% endblock %}

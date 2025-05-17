@@ -497,3 +497,106 @@ def generateReport(clazzname,record_id):
         #session.putVariable("stats",stats)
         print(stats)
         return stats
+    elif record_id == 5:
+        from utils.methods import session
+        query = None
+
+        ### Age groups
+        age_groups = [
+        "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
+        "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
+        "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
+        "m. + 80"
+        ]
+        age = countbygender(clazzname,"age",age_groups)
+
+        ### gender groups
+        masc = field_count(clazzname,"gender", "A. Masculino")
+        fem = field_count(clazzname,"gender", "B. Femenino")
+        tot = masc + fem
+        gender = {
+                "Hombres":masc,
+                "Mujeres":fem,
+                "Total":tot
+        }
+
+        ### State groups
+        state_groups = ["1. San José","2. Alajuela","3. Cartago","4. Heredia","5. Guanacaste","6. Puntarenas","7. Limón"]
+        state = countbygender(clazzname,"state",state_groups)
+
+        ### User groups
+        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
+        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+
+        ### party groups
+        party_groups = [
+            "a. Partido Liberación Nacional",
+            "b. Partido Unidad Social Cristiana",
+            "c. Partido Nueva República",
+            "d. Partido Progreso Social Democrático",
+            "e. Frente Amplio",
+            "f. Partido Liberal Progresista",
+            "g. PAC",
+            "h. PNG",
+            "i. Pueblo Soberano",
+            "j. Partido Unidos Podemos",
+            "k. Partido de Rodrigo Chaves",
+            "l. Otro",
+            "m. Ninguno",
+            "n. NS/NR"
+            ]
+        party = countbygender(clazzname,"party",party_groups)
+
+        ### generalElections
+        generalElections_groups = [
+                        "Laura Fernandez",
+                        "Claudia Dobles",
+                        "Luis Amador",
+                        "Eliécer Feinzaig",
+                        "Natalia Díaz ",
+                        "Sofia Guillen",
+                        "Alvaro Ramos",
+                        "Juan Carlos Hidalgo",
+                        "Fabricio Alvarado",
+                        "Rolando Araya",
+                        "Francisco Gamboa",
+                        "Carlos Valenciano Kamer",
+                        "Douglas Soto",
+                        "Claudio Alpízar",
+                        "Fernando Zamora",
+                        "Ninguno",
+                        "NS/NR"
+                    ]
+        generalElections = countbygender(clazzname,"generalElections",generalElections_groups)
+
+        ### generalElectionsSecond
+        secondNationalElections_groups = [
+                        "Laura Fernandez",
+                        "Claudia Dobles",
+                        "Luis Amador",
+                        "Natalia Díaz ",
+                        "Alvaro Ramos",
+                        "Juan Carlos Hidalgo",
+                        "Fabricio Alvarado",
+                        "Rolando Araya",
+                        "Ninguno",
+                        "NS/NR"
+                    ]
+        secondNationalElections = countbygender(clazzname,"secondNationalElections",secondNationalElections_groups)
+
+        ### chavesSupport
+        chavesSupport_groups = ["a. Sí","b. No","c. NS/NR"]
+        chavesSupport = countbygender(clazzname,"chavesSupport",chavesSupport_groups)
+
+        stats = {
+            "age":age,
+            "gender":gender,
+            "userCreation":userCreation,
+            "state":state,
+            "party":party,
+            "generalElections":generalElections,
+            "secondNationalElections":secondNationalElections,
+            "chavesSupport":chavesSupport
+        }
+        print(stats)
+        return stats
