@@ -59,6 +59,35 @@ def countbygender(clazz,fieldname,values):
         values.append(usersValues)
     return counts
 
+def simpleStat(dict,clazzname,fieldname,values):
+    groups = values
+    fieldStat = countbygender(clazzname,fieldname,groups)
+    dict[fieldname] = fieldStat
+    return True
+
+def multipleOpinionStat(dict,clazzname,values):
+        statsVariables = {}
+        for key, value in values.items():
+            ### Conoce conoceMauricioBatalla groups
+            groups = ["a. Sí","b. No","c. NS/NR"]
+            conoce = countbygender(clazzname,value[0],groups)
+            statsVariables[value[0]] = conoce
+
+            ### Opinión opinionMauricioBatalla groups
+            opinion_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
+            opinion = countbygender(clazzname,value[1],opinion_groups)
+            statsVariables[value[1]] = opinion
+        dict.update(statsVariables)
+
+        return True
+
+def multipleStat(dict,clazzname,values):
+        statsVariables = {}
+
+        for key, value in values.items():
+            result = countbygender(clazzname,key,value[1])
+            statsVariables[key] = result
+        dict.update(statsVariables)
 
 def generateReport(clazzname,record_id):
     from utils.methods.stats import field_count, countbygender
@@ -499,7 +528,9 @@ def generateReport(clazzname,record_id):
         return stats
     elif record_id == 5:
         from utils.methods import session
-        query = None
+
+        stats = {}
+
 
         ### Age groups
         age_groups = [
@@ -509,6 +540,7 @@ def generateReport(clazzname,record_id):
         "m. + 80"
         ]
         age = countbygender(clazzname,"age",age_groups)
+        stats["age"] = age
 
         ### gender groups
         masc = field_count(clazzname,"gender", "A. Masculino")
@@ -519,14 +551,17 @@ def generateReport(clazzname,record_id):
                 "Mujeres":fem,
                 "Total":tot
         }
+        stats["gender"] = gender
 
         ### State groups
         state_groups = ["1. San José","2. Alajuela","3. Cartago","4. Heredia","5. Guanacaste","6. Puntarenas","7. Limón"]
         state = countbygender(clazzname,"state",state_groups)
+        stats["state"] = state
 
         ### User groups
         userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
         userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+        stats["userCreation"] = userCreation
 
         ### party groups
         party_groups = [
@@ -546,7 +581,136 @@ def generateReport(clazzname,record_id):
             "n. NS/NR"
             ]
         party = countbygender(clazzname,"party",party_groups)
+        stats["party"] = party
 
+        ### laboral groups
+        laboral_groups = [
+            "a. Contrato Permanente",
+            "b. Contrato Temporal",
+            "c. Independiente",
+            "d. Desempleado",
+            "e. Pensionado",
+            "f. Estudiante",
+            "g. Ama de casa",
+            "h. Trabajador informal",
+            "Otro",
+            "NS/NR"
+            ]
+        laboralCondition = countbygender(clazzname,"laboralCondition",laboral_groups)
+        stats["laboralCondition"] = laboralCondition
+
+        ### studies groups
+        studies_groups = [
+            "a. Primaria Incompleta",
+            "b. Primaria Completa",
+            "c. Secundaria Incompleta",
+            "d. Secundaria Completa",
+            "e. Universitaria Incompleta",
+            "f. Universitaria Completa",
+            "g. Técnica Incompleta",
+            "h. Técnica Completa",
+            "Otro",
+            "NS/NR"
+            ]
+        studies = countbygender(clazzname,"studies",studies_groups)
+        stats["studies"] = studies
+
+        ### religion groups
+        religion_groups = [
+            "a. Católico",
+            "b. Evangélico",
+            "c. Testigo de Jehová",
+            "d. Judío",
+            "e. Musulmán",
+            "f. Budista",
+            "g. Ortodoxo",
+            "h. Ateo",
+            "i. Agnóstico",
+            "Ninguna",
+            "Otra",
+            "NS/NR"
+            ]
+        religion = countbygender(clazzname,"religion",religion_groups)
+        stats["religion"] = religion
+
+        ### problems_groups groups
+        problems_groups = [
+            "Seguridad ciudadana",
+            "Migración",
+            "Educación",
+            "Salud",
+            "Costo de vida",
+            "Desempleo",
+            "Corrupción",
+            "Estado de infraestructura vial",
+            "Otro",
+            "NS/NR"
+            ]
+        nationalProblems = countbygender(clazzname,"nationalProblems",problems_groups)
+        stats["nationalProblems"] = nationalProblems
+
+        ### roadCR groups
+        roadCR = [
+                        "a. Buen camino",
+                        "b. Mal Camino",
+                        "c. NS/NR"
+            ]
+        roadCR = countbygender(clazzname,"roadCR",roadCR)
+        stats["roadCR"] = roadCR
+
+        ### optimist groups
+        optimist = [
+                        "a. Optimista",
+                        "b. Pesimista",
+                        "c. NS/NR"
+            ]
+        optimist = countbygender(clazzname,"optimist",optimist)
+        stats["optimist"] = optimist
+
+        multipleOpinionStat(stats, clazzname,{"Natalia Diaz":["nataliaConoce","nataliaOpinion"],
+                "Alvaro Ramos":["conoceAlvaro","opinionAlvaro"],
+                "Laura Fernandez":["conoceLaura","opinionLaura"],
+                "Claudia Dobles":["conoceClaudia","opinionClaudia"],
+                "Fabricio Alvarado":["conoceFabricio","opinionFabricio"],
+                "Carlos Valenciano":["conoceCarlos","opinionCarlos"],
+                "Ariel Robles":["conoceAriel","opinionAriel"],
+                "Luis Amador":["conoceLuis","opinionLuis"],
+                "Juan Carlos Hidalgo":["conoceJuan","opinionJuan"],
+                "Eli Feinzaig":["conoceEli","opinionEli"],
+                "Rolando Araya":["conoceRolando","opinionRolando"],
+                "Jose Maria Villalta":["conoceJose","opinionJose"]})
+        
+        variables =  {
+                    "chavesSupport":["¿Apoya la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                    "chavesScale":["Del 0 al 10, ¿Cuánto apoya la gestión de Rodrigo Chaves?",["0","1","2","3","4","5","6","7","8","9","10"]],
+                    "govermentSupport":["¿Apoya la gestion del gobierno?",["a. Sí","b. No","c. NS/NR"]],
+                    "asambleaOpinion":["¿Cómo calificaría la labor de la Asamblea Legislativa?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "poderOpinion":["¿Cómo calificaría la labor del Poder Judicial?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "cajaOpinion":["¿Cómo calificaría la labor de la CCSS?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "mediosOpinion":["¿Cómo calificaría la labor de los medios de comunicación?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "universidadesOpinion":["¿Cómo calificaría la labor de las Universidades Públicas?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "oijOpinion":["¿Cómo calificaría la labor del OIJ?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "fuerzaOpinion":["¿Cómo calificaría la labor de la Fuerza Pública?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "contraloriaOpinion":["¿Cómo calificaría la labor de la Contraloría General de la República?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]],
+                    "ayaOpinion":["¿Cómo calificaría la labor del AyA?",["a. Muy buena","b. Buena","c. Regular","d. Mala","e. Muy mala","f. NS/NR"]]
+        }
+        statsVariables = {}
+
+        for key, value in variables.items():
+            result = countbygender(clazzname,key,value[1])
+            statsVariables[key] = result
+        stats.update(statsVariables)
+
+        ### womanPresident
+        womanPresident_groups = [
+                    "Igual",
+                    "Mejor",
+                    "Peor",
+                    "NS/NR"
+                    ]
+        womanPresident = countbygender(clazzname,"womanPresident",womanPresident_groups)
+        stats["womanPresident"] = womanPresident
+        
         ### generalElections
         generalElections_groups = [
                         "Laura Fernandez",
@@ -568,6 +732,7 @@ def generateReport(clazzname,record_id):
                         "NS/NR"
                     ]
         generalElections = countbygender(clazzname,"generalElections",generalElections_groups)
+        stats["generalElections"] = generalElections
 
         ### generalElectionsSecond
         secondNationalElections_groups = [
@@ -583,20 +748,125 @@ def generateReport(clazzname,record_id):
                         "NS/NR"
                     ]
         secondNationalElections = countbygender(clazzname,"secondNationalElections",secondNationalElections_groups)
+        stats["secondNationalElections"] = secondNationalElections
+
 
         ### chavesSupport
         chavesSupport_groups = ["a. Sí","b. No","c. NS/NR"]
         chavesSupport = countbygender(clazzname,"chavesSupport",chavesSupport_groups)
+        stats["chavesSupport"] = chavesSupport
 
-        stats = {
-            "age":age,
-            "gender":gender,
-            "userCreation":userCreation,
-            "state":state,
-            "party":party,
-            "generalElections":generalElections,
-            "secondNationalElections":secondNationalElections,
-            "chavesSupport":chavesSupport
-        }
+        simpleStat(stats, clazzname,"lastElections",["a. Sí","b. No","c. NS/NR"])
+
+        simpleStat(stats, clazzname,"lastCandidate",["Carmen Quesada Santamaría",
+                                                    "Christian Rivera Paniagua",
+                                                    "Eduardo Cruickshank Smith",
+                                                    "Eliécer Feinzaig Mintz",
+                                                    "Fabricio Alvarado Muñoz",
+                                                    "Federico Malavassi Calvo",
+                                                    "Greivin Moya Carpio",
+                                                    "Jhonn Vega Masís",
+                                                    "José María Figueres Olsen",
+                                                    "José María Villalta Flórez-Estrada",
+                                                    "Lineth Saborío Chaverri",
+                                                    "Luis Alberto Cordero Arias",
+                                                    "Maricela Morales Mora",
+                                                    "Martín Chinchilla Castro",
+                                                    "Natalia Díaz Quintana",
+                                                    "Óscar Andrés López Arias",
+                                                    "Óscar Campos Chavarría",
+                                                    "Rodrigo Chaves Robles",
+                                                    "Rodolfo Hernández Gómez",
+                                                    "Rodolfo Piza Rocafort",
+                                                    "Rolando Araya Monge",
+                                                    "Roulan Jiménez Chavarría",
+                                                    "Sergio Mena Díaz",
+                                                    "Walter Muñoz Céspedes",
+                                                    "Welmer Ramos González",
+                                                    "Nullo",
+                                                    "En blanco",
+                                                    "NS/NR"])
+        
+        simpleStat(stats, clazzname,"voteScale",["0","1","2","3","4","5","6","7","8","9","10"])
+
+        multipleStat(stats, clazzname,{"personOrParty":["¿Está de acuerdo con la siguiente frase? Hoy votaría más por una persona que por un partido",["a. Sí","b. No","c. NS/NR"]],
+                                                    "nextGoverment":["¿Con cuál de las siguientes opciones se identifica: Me gustaría que el próximo gobierno sea...",["a. Igual al gobierno de Chaves", "b. Totalmente diferente al gobierno de Chaves", "c.Parecido, pero con otra forma de comunicar", "d. Ninguna de las anteriores", "e. NS/NR"]],
+                                                    "chavesCandidate":["¿Votaría por cualquier candidato que diga Cháves?",["a. Sí","b. No","c. NS/NR"]]})
+        
+        multipleStat(stats, clazzname,{"security":["Seguridad ciudadana",["a. Cumplió","b. No cumplió","c. NS/NR"]],
+                    "migration":["Migración",["a. Cumplió","b. No cumplió","c. NS/NR"]],
+                    "education":["Educación",["a. Cumplió","b. No cumplió","c. NS/NR"]],
+                    "health":["Salud",["a. Cumplió","b. No cumplió","c. NS/NR"]],
+                    "cost":["Costo de vida",["a. Cumplió","b. No cumplió","c. NS/NR"]],
+                    "jobs":["Empleo",["a. Cumplió","b. No cumplió","c. NS/NR"]],
+                    "corrupt":["Combate a Corrupción",["a. Cumplió","b. No cumplió","c. NS/NR"]]})
+        
+        multipleStat(stats, clazzname,{
+                    "trabajoCarceles":["Trabajo obligatorio en las cárceles",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "migrationDeport":["Migración regulada con deportación inmediata de extranjeros que comentan crímenes en CR, después de cumplir su condena",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "finalcialEducation":["Educación financiera y habilidades blandas desde primaria",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "independentWorkers":["Estado más flexible para trabajadores independientes",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "abort":["Aborto libre, en caso de violación",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "childJudge":["Niños juzgados como adultos en casos de homicidio",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "sexualGuides":["Uso de las Guías sexuales en la educación",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "mine":["Que Costa Rica explore y aproveche sus recursos mineros para generar ingresos y empleo (siempre que se haga bajo normas ambientales estrictas)",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "secularState":["Costa Rica debería ser un Estado laico (es decir, sin una religión oficial. Actualmente la religión católica es reconocida como la religión del Estado)",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "weed":["Que las personas adultas puedan consumir marihuana de forma legal y regulada en Costa Rica (actualmente eso está permitido en otros países)",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]],
+                    "sellInstitutions":["Que el Estado venda algunas instituciones o empresas públicas para reducir la deuda o financiar proyectos prioritarios",["a. Completamente de Acuerdo", "b. De Acuerdo", "c. En Desacuerdo", "d. Completamente en Desacuerdo", "e. NS/NR"]]
+                })
+        
+        simpleStat(stats, clazzname,"phrases",["Costa Rica necesita mano firme",
+                                        "Costa Rica necesita un gobierno que escuche",
+                                        "Costa Rica necesita orden y empatía",
+                                        "Costa Rica necesita que la dejen trabajar",
+                                        "Costa Rica necesita recuperar el valor de la familia",
+                                        "Ninguna",
+                                        "NS/NR"])
+        
+        simpleStat(stats, clazzname,"aboutNatalia",["a. Sí",
+                                        "b. No",
+                                        "c. NS/NR"])
+        
+        simpleStat(stats, clazzname,"aboutNataliaScale",["a. La conoce bien",
+                                        "b. La ha escuchado mencionar, pero no la conoce bien",
+                                        "c. No la conoce"])
+                                                       
+        simpleStat(stats, clazzname,"whereAboutNatalia",["a. Televisión",
+                                                    "b. Redes sociales",
+                                                    "c. Radio",
+                                                    "d. Periódico",
+                                                    "e. Evento público",
+                                                    "f. Conversación con amigos o familiares",
+                                                    "g. Otro",
+                                                    "No la ha visto o escuchado recientemente",
+                                                    "NS/NR"])
+
+        simpleStat(stats, clazzname,"presidentAboutNatalia",["a. Sí",
+                                                    "b. No",
+                                                    "c. NS/NR"])
+        simpleStat(stats, clazzname,"crimeCandidates",["Natalia Díaz",
+                                                    "Álvaro Ramos",
+                                                    "Laura Fernández",
+                                                    "Fabricio Alvarado",
+                                                    "Claudia Dobles",
+                                                    "Carlos Valenciano",
+                                                    "Ariel Robles",
+                                                    "Luis Amador",
+                                                    "Rolando Araya",
+                                                    "Juan Carlos Hidalgo",
+                                                    "Otro",
+                                                    "Ninguno",
+                                                    "NS/NR"])
+        
+        simpleStat(stats, clazzname,"supportReasons",["Que proponga soluciones firmes a la inseguridad",
+                                                    "Que no esté ligado a partidos tradicionales",
+                                                    "Que tenga experiencia en gobierno",
+                                                    "Que defienda al trabajador independiente y al emprendedor",
+                                                    "Que represente una nueva generación",
+                                                    "Que sea del partido del presidente",
+                                                    "Otra",
+                                                    "NS/NR"])
+
+
         print(stats)
         return stats

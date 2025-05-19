@@ -1,0 +1,643 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        margin-bottom: 20px;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let datasetDict
+    let datasetsArray = []
+</script>
+<nav class="pt-5">
+    <div class="nav nav-tabs nav justify-content-center" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Absolutos</button>
+        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Porcentajes</button>
+        <button class="nav-link" id="nav-general-chart-tab" data-bs-toggle="tab" data-bs-target="#nav-general-chart" type="button" role="tab" aria-controls="nav-general-chart" aria-selected="false">Gráficos (porcentajes)</button>
+        <button class="nav-link" id="nav-user-tab" data-bs-toggle="tab" data-bs-target="#nav-user" type="button" role="tab" aria-controls="nav-user" aria-selected="false">Detalle X Encuestador</button>
+        <button class="nav-link" id="nav-user-chart-tab" data-bs-toggle="tab" data-bs-target="#nav-user-chart" type="button" role="tab" aria-controls="nav-user-chart" aria-selected="false">Gráficos X Encuestador</button>
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- Edad -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Edad</h5>
+                                <table class="table table-responsive">
+                                    <tbody>
+                                        <tr>
+                                        {% for key, value in stats.age.items() %}
+                                            <td><b>{{ key }}</b><br>
+                                            {{ value[2] }}</td>
+                                        {% endfor %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <!-- Genero -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Género</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th>Género</th>
+                                        <th>Cant</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.gender.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Usuario -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Usuario</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.userCreation.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <!-- Provincia -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Provincia</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.state.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Partido -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">4. Cuál es el partido político de su preferencia?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.party.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-5">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">De la siguiente papeleta por quien votaría usted en las próximas elecciones? </h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.generalElections.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">De la siguiente papeleta por quien votaría usted en las próximas elecciones? #2 </h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.secondNationalElections.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <!-- chavesSupport -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Apoya usted la gestión del presidente Rodrigo Chaves?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.chavesSupport.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- Edad -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Edad</h5>
+                                <table class="table table-responsive">
+                                    <tbody>
+                                        <tr>
+                                        {% for key, value in stats.age.items() %}
+                                            <td><b>{{ key }}</b><br>
+                                            {{ value[5] }}</td>
+                                        {% endfor %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <!-- Genero -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Género</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th>Género</th>
+                                        <th>Cant</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.gender.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Usuario -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Usuario</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.userCreation.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <!-- Provincia -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Provincia</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.state.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Partido -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">4. Cuál es el partido político de su preferencia?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.party.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-5">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">De la siguiente papeleta por quien votaría usted en las próximas elecciones? </h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.generalElections.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">De la siguiente papeleta por quien votaría usted en las próximas elecciones? #2 </h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.secondNationalElections.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <!-- chavesSupport -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Apoya usted la gestión del presidente Rodrigo Chaves?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.chavesSupport.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="tab-pane fade" id="nav-general-chart" role="tabpanel" aria-labelledby="nav-general-chart-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                {{ macros.barchartpercent("Cuál es el partido político de su preferencia?","party",stats)}}
+                {{ macros.barchartpercent("De la siguiente papeleta por quien votaría usted en las próximas elecciones?","generalElections",stats)}}
+                {{ macros.barchartpercent("De la siguiente papeleta por quien votaría usted en las próximas elecciones?","secondNationalElections",stats)}}
+                {{ macros.barchartpercent("Apoya usted la gestión del presidente Rodrigo Chaves?","chavesSupport",stats)}}
+            </div>
+        </section>
+    </div>
+    <div class="tab-pane fade" id="nav-user" role="tabpanel" aria-labelledby="nav-user-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- Provincia -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Provincia</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        {% for key, value in stats.state.items() %}
+                                        {% if loop.index == 1 %}
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <th>{{ sub_key }}</th>
+                                        {% endfor %}
+                                        {%endif%}
+                                        {% endfor %}
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.state.items() %}
+                                        <tr>
+                                        <td><b>{{ key }}</b></td>
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <td>
+                                            {{ sub_value[2] }}
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <!-- Partido -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">4. Cuál es el partido político de su preferencia?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        {% for key, value in stats.party.items() %}
+                                        {% if loop.index == 1 %}
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <th>{{ sub_key }}</th>
+                                        {% endfor %}
+                                        {%endif%}
+                                        {% endfor %}
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.party.items() %}
+                                        <tr>
+                                        <td><b>{{ key }}</b></td>
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <td>
+                                            {{ sub_value[2] }}
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-5">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">De la siguiente papeleta por quien votaría usted en las próximas elecciones? </h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        {% for key, value in stats.generalElections.items() %}
+                                        {% if loop.index == 1 %}
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <th>{{ sub_key }}</th>
+                                        {% endfor %}
+                                        {%endif%}
+                                        {% endfor %}
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.generalElections.items() %}
+                                        <tr>
+                                        <td><b>{{ key }}</b></td>
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <td>
+                                            {{ sub_value[2] }}
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">De la siguiente papeleta por quien votaría usted en las próximas elecciones? #2</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        {% for key, value in stats.secondNationalElections.items() %}
+                                        {% if loop.index == 1 %}
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <th>{{ sub_key }}</th>
+                                        {% endfor %}
+                                        {%endif%}
+                                        {% endfor %}
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.secondNationalElections.items() %}
+                                        <tr>
+                                        <td><b>{{ key }}</b></td>
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <td>
+                                            {{ sub_value[2] }}
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <!-- chavesSupport -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Apoya usted la gestión del presidente Rodrigo Chaves?</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        {% for key, value in stats.chavesSupport.items() %}
+                                        {% if loop.index == 1 %}
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <th>{{ sub_key }}</th>
+                                        {% endfor %}
+                                        {%endif%}
+                                        {% endfor %}
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.chavesSupport.items() %}
+                                        <tr>
+                                        <td><b>{{ key }}</b></td>
+                                        {% for sub_key, sub_value in value[6].items() %}
+                                            <td>
+                                            {{ sub_value[2] }}
+                                            </td>
+                                        {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="tab-pane fade" id="nav-user-chart" role="tabpanel" aria-labelledby="nav-user-chart-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                {{ macros.barchartbyuser("Cuál es el partido político de su preferencia?","party",stats)}}
+                {{ macros.barchartbyuser("De la siguiente papeleta por quien votaría usted en las próximas elecciones?","generalElections",stats)}}
+                {{ macros.barchartbyuser("De la siguiente papeleta por quien votaría usted en las próximas elecciones? #2","secondNationalElections",stats)}}
+                {{ macros.barchartbyuser("Apoya usted la gestión del presidente Rodrigo Chaves?","chavesSupport",stats)}}
+            </div>
+        </section>
+    </div>
+
+</div>
+  
+
+{% endblock %}
