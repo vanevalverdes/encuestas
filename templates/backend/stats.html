@@ -152,7 +152,7 @@
         <section class="py-5">
             <div class="container mt-3">
                 {% for key, value in stats.items() %}
-                {{ macros.barchartpercent(key,key,stats)}}
+                {{ macros.barchartpercent(labels[key],key,stats)}}
                 {% endfor %}
             </div>
         </section>
