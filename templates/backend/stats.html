@@ -15,96 +15,19 @@
     let datasetsArray = []
 </script>
 {% set labels = {
+    "county":"Distrito",
     "gender":"Género",
     "age":"Edad",
-    "state":"Provincia",
-    "studies":"Nivel de estudios",
-    "laboralCondition":"Condición laboral",
-    "nationalProblems":"Principal Problema nacional",
-    "roadCR":"Costa Rica va por buen camino",
-    "optimist":"Se siente Optimista sobre el futuro del país",
-    "religion":"Religión",
-    "nataliaConoce":"Conoce a Natalia Díaz",
-    "nataliaOpinion":"Opinión sobre Natalia Díaz",
-    "conoceAlvaro":"Conoce a Álvaro Ramos",
-    "opinionAlvaro":"Opinión sobre Álvaro Ramos",
-    "conoceLaura":"Conoce a Laura Fernandez",
-    "opinionLaura":"Opinión sobre Laura Fernandez",
-    "conoceClaudia":"Conoce a Claudia Dobles",
-    "opinionClaudia":"Opinión sobre Claudia Dobles",
-    "conoceFabricio":"Conoce a Fabricio Alvarado",
-    "opinionFabricio":"Opinión sobre Fabricio Alvarado",
-    "conoceCarlos":"Conoce a Carlos Valenciano Kamer",
-    "opinionCarlos":"Opinión sobre Carlos Valenciano Kamer",
-    "conoceAriel":"Conoce a Ariel Robles",
-    "opinionAriel":"Opinión sobre Ariel Robles",
-    "conoceLuis":"Conoce a Luis Amador",
-    "opinionLuis":"Opinión sobre Luis Amador",
-    "conoceJuan":"Conoce a Juan Carlos Hidalgo",
-    "conoceEli":"Conoce a Eli Feinzaig",
-    "opinionEli":"Opinión sobre Eli Feinzaig",
-    "conoceRolando":"Conoce a Rolando Araya",
-    "opinionRolando":"Opinión sobre Rolando Araya",
-    "conoceJose":"Conoce a José María Villalta",
-    "opinionJose":"Opinión sobre José María Villalta",
-    "chavesSupport":"Apoya la gestión de Rodrigo Chaves",
-    "govermentSupport":"Apoya la gestión del gobierno actual",
-    "chavesScale":"Del 1 al 10, ¿qué tan de acuerdo está con la gestión de Rodrigo Chaves?",
-    "asambleaOpinion":"Aprueba la labor de la Asamblea Legislativa",
-    "poderOpinion":"Aprueba la labor del Poder Judicial",
-    "cajaOpinion":"Aprueba la labor de la Caja Costarricense de Seguro Social",
-    "mediosOpinion":"Aprueba la labor de los medios de comunicación",
-    "universidadesOpinion":"Aprueba la labor de las universidades públicas",
-    "oijOpinion":"Aprueba la labor del OIJ",
-    "fuerzaOpinion":"Aprueba la labor de la Fuerza Pública",
-    "contraloriaOpinion":"Aprueba la labor de la Contraloría General de la República",
-    "ayaOpinion":"Aprueba la labor del AyA",
-    "womanPresident":"Una mujer presidenta será mejor que un hombre presidente",
-    "lastElections":"Votó en las Ultimas elecciones nacionales",
-    "lastCandidate":"En las últimas elecciones nacionales Votó por",
-    "voteScale":"Del 1 al 10, ¿qué tan decidido está de votar en las prózimas elecciones?",
-    "generalElections":"Próximas elecciones generales, papeleta #1",
-    "secondNationalElections":"Próximas elecciones nacionales, papeleta #2",
     "party":"Partido con el que se identifica",
-    "personOrParty":"Diría que votaría más por una persona o por un partido",
-    "nextGoverment":"Próximo gobierno debería ser",
-    "chavesCandidate":"Votaría por cualquier candidato que sea indicado por Rodrigo Chaves",
-    "security":"El gobierno cumplió en tema de seguridad",
-    "migration":"El gobierno cumplió en tema de migración",
-    "education":"El gobierno cumplió en tema de educación",
-    "health":"El gobierno cumplió en tema de salud",
-    "cost":"El gobierno cumplió en tema de costo de vida",
-    "jobs":"El gobierno cumplió en tema de empleo",
-    "corrupt":"El gobierno cumplió en tema de combate a la corrupción",
-    "trabajoCarceles":"Está de acuerdo con Trabajo obligatorio en las cárceles ",
-    "migrationDeport":"Está de acuerdo con Migración regulada con deportación inmediata de extranjeros que comentan crímenes en CR, después de cumplir su condena ",
-    "finalcialEducation":"Está de acuerdo con  Educación financiera y habilidades blandas desde primaria",
-    "independentWorkers":"Está de acuerdo con  Estado más flexible para trabajadores independientes ",
-    "abort":"Está de acuerdo con Aborto libre, en caso de violación ",
-    "childJudge":"Está de acuerdo con Niños juzgados como adultos en casos de homicidio ",
-    "sexualGuides":"Está de acuerdo Uso de las Guías sexuales en la educación ",
-    "mine":"Está de acuerdo con  Que Costa Rica explore y aproveche sus recursos mineros para generar ingresos y empleo (siempre que se haga bajo normas ambientales estrictas) ",
-    "secularState":"Está de acuerdo con  Costa Rica debería ser un Estado laico (es decir, sin una religión oficial. Actualmente la religión católica es reconocida como la religión del Estado) ",
-    "weed":"Está de acuerdo con Que las personas adultas puedan consumir marihuana de forma legal y regulada en Costa Rica (actualmente eso está permitido en otros países) ",
-    "sellInstitutions":"Está de acuerdo con Que el Estado venda algunas instituciones o empresas públicas para reducir la deuda o financiar proyectos prioritarios ",
-    "phrases": "¿Con cuál de las siguientes frases se identifica más? ",
-    "aboutNatalia":" ¿Ha escuchado usted hablar de una persona llamada Natalia Díaz? ",
-    "aboutNataliaScale":" ¿Cuál es su nivel de conocimiento sobre Natalia Díaz? ",
-    "whereAboutNatalia":" ¿Dónde la ha visto o escuchado recientemente? ",
-    "wordAboutNatalia":" ¿Cómo la describiría en una palabra? ",
-    "presidentAboutNatalia":" ¿Cree usted que Natalia Díaz está preparada para ser presidente de la República? ",
-    "crimeCandidates":" ¿A cuál de estos candidatos considera usted más firme para enfrentar el crimen y la inseguridad? ",
-    "politicalMessage":" Si la campaña de un político tuviera un solo mensaje para usted, ¿cuál debería ser? ",
-    "supportReasons":" ¿Cuál de estas razones lo animaría a apoyar a un candidato? ",
-    "recentlyNatalia":"",
-    "contact":"",
-    "opinionJuan":"Opinión sobre Juan Carlos Hidalgo",
-    "differentNatalia":" ¿Qué la diferencia de los demás? ",
-    "otherCrime":"",
-    "otherSupport":""
+    "barvaSupport":"Apoya la gestión al frente del Municipalidad de Barva del alcalde, Jorge Acuña?",
+    "barvaScale":"Del 1 al 10 como califica la labor de la Municipalidad de Barva.",
+    "chavesConoce":"Conoce a Rodrigo Chaves?",
+    "chavesOpinion":"Opinión sobre Rodrigo Chaves",
+    "jorgeConoce":"Conoce a Jorge Acuña?",
+    "jorgeOpinion":"Opinión sobre Jorge Acuña",
     } %}
 
-<div class="container mx-auto col-sm-4">
+<div class="container mx-auto col-12">
 <nav class="pt-5">
     <div class="nav nav-tabs nav justify-content-center" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Porcentajes</button>
@@ -116,8 +39,62 @@
         <section class="py-5">
             <div class="container mt-3">
                 <div class="row">
-                    {% for key, value in stats.items() %}
                     <div class="col-sm-12">
+                        <!-- Usuario -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Usuario</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in stats.userCreation.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    {% for key, value in stats.items() %}
+                    <div class="col-sm-6">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{labels[key]}} </h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in value.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
                         <!-- generalElections -->
                         <div class="card">
                             <div class="card-body">

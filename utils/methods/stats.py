@@ -870,3 +870,63 @@ def generateReport(clazzname,record_id):
 
         print(stats)
         return stats
+    elif record_id == 6:
+        from utils.methods import session
+
+        stats = {}
+
+
+        ### Age groups
+        age_groups = [
+        "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
+        "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
+        "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
+        "m. + 80"
+        ]
+        age = countbygender(clazzname,"age",age_groups)
+        stats["age"] = age
+
+        ### gender groups
+        masc = field_count(clazzname,"gender", "A. Masculino")
+        fem = field_count(clazzname,"gender", "B. Femenino")
+        tot = masc + fem
+        gender = {
+                "Hombres":masc,
+                "Mujeres":fem,
+                "Total":tot
+        }
+        stats["gender"] = gender
+
+        ### User groups
+        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
+        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+        stats["userCreation"] = userCreation
+
+        ### party groups
+        party_groups = [
+            "a. Partido Liberación Nacional",
+            "b. Partido Unidad Social Cristiana",
+            "c. Partido Nueva República",
+            "d. Partido Progreso Social Democrático",
+            "e. Frente Amplio",
+            "f. Partido Liberal Progresista",
+            "g. PAC",
+            "h. PNG",
+            "i. Pueblo Soberano",
+            "j. Partido Unidos Podemos",
+            "k. Partido de Rodrigo Chaves",
+            "l. Otro",
+            "m. Ninguno",
+            "n. NS/NR"
+            ]
+        party = countbygender(clazzname,"party",party_groups)
+        stats["party"] = party
+
+        multipleStat(stats, clazzname,{
+                    "barvaSupport":["Apoya la gestión al frente del Municipalidad de Barva del alcalde, Jorge Acuña?",["a. Sí","b. No","c. NS/NR"]],
+                    "barvaScale":["Del 1 al 10 como califica la labor de la Municipalidad de Barva.",["0","1","2","3","4","5","6","7","8","9","10"]],
+                })
+        multipleOpinionStat(stats, clazzname,{"Rodrigo Chaves":["chavesConoce","chavesOpinion"],
+                "Jorge Acuña":["jorgeConoce","jorgeOpinion"]})
+        print(stats)
+        return stats
