@@ -160,8 +160,8 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                 <h4>8. De las siguientes personas, me puede indicar si la conoce y si lo conoce, su opinión sobre ella es positiva o negativa.</h4>
             </div>
             {% set conoce_opinion = {
-                "a. Rodrigo Chaves":["chavesConoce","chavesOpinion"],
-                "b. Jorge Acuña":["jorgeConoce","jorgeOpinion"]
+                "a. Rodrigo Chaves":["/candidatos/Rodrigo-Chaves-Bukele-jpg.webp",["chavesConoce","chavesOpinion"]],
+                "b. Jorge Acuña":["/candidatos/alcalde-1.png",["jorgeConoce","jorgeOpinion"]]
             } %}
             {% set options = {
                 "a. Sí":"a. Sí",
@@ -179,17 +179,19 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                         <div class="mb-3 p-3">
                         <!-- fieldForm(input,label,id,name,type,required,options,value) -->
                                 {% set title = "¿Conoce a " ~ key ~ "?" %}
-                                {% set name = value[0] %}
-
+                                {% set name = value[1][0] %}
+                                {% if value[0] %}
+                                    <img src='{{ url_for("static", filename=value[0]) }}' alt="" style="max-width: 500px;"><br>
+                                {% endif %}
                                 {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
                                 <script>
-                                    toggleDivOnRadioValue("{{value[0]}}", "div-{{value[1]}}", "a. Sí");
+                                    toggleDivOnRadioValue("{{value[1][0]}}", "div-{{value[1][1]}}", "a. Sí");
                                 </script>
                         </div>
-                        <div id="div-{{value[1]}}" style="display: none;" class="mb-3 p-3">
+                        <div id="div-{{value[1][1]}}" style="display: none;" class="mb-3 p-3">
                         <!-- fieldForm(input,label,id,name,type,required,options,value) -->
                         {% set title = "¿Cuál es su opinión sobre " ~ key ~ "?" %}
-                        {% set name = value[1] %}
+                        {% set name = value[1][1] %}
                         {{ macros.fieldForm("radio",title,name,name,"True",optionsSecond,"")}}
                         </div>
                     </div>
