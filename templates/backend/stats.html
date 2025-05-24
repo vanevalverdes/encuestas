@@ -49,6 +49,24 @@
                                 <table class="table table-responsive">
                                     <tbody>
                                         <tr>
+                                        {% for key, value in stats.age.items() %}
+                                            <td><b>{{ key }}</b><br>
+                                            {{ value[2] }}</td>
+                                        {% endfor %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <!-- Edad -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Edad</h5>
+                                <table class="table table-responsive">
+                                    <tbody>
+                                        <tr>
                                         {% for key, val in value.items() %}
                                             <td><b>{{ key }}</b><br>
                                             {{ val[5] }}</td>
