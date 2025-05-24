@@ -40,6 +40,50 @@
             <div class="container mt-3">
                 <div class="row">
                     {% for key, value in stats.items() %}
+                    {% if key == "age" %}
+                    <div class="col-sm-12">
+                        <!-- Edad -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Edad</h5>
+                                <table class="table table-responsive">
+                                    <tbody>
+                                        <tr>
+                                        {% for key, val in value.items() %}
+                                            <td><b>{{ key }}</b><br>
+                                            {{ val[5] }}</td>
+                                        {% endfor %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif key == "gender" %}
+                    <!-- Genero -->
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Género</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th>Género</th>
+                                        <th>Cant</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, val in value.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ val }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6"></div>
+                    {% else %}
                     <div class="col-sm-6">
                         <!-- generalElections -->
                         <div class="card">
@@ -92,6 +136,7 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>

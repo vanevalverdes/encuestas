@@ -874,12 +874,6 @@ def generateReport(clazzname,record_id):
         from utils.methods import session
 
         stats = {}
-
-        ### User groups
-        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
-        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
-        stats["userCreation"] = userCreation
-        
         ### Age groups
         age_groups = [
         "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
@@ -887,9 +881,7 @@ def generateReport(clazzname,record_id):
         "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
         "m. + 80"
         ]
-        age = countbygender(clazzname,"age",age_groups)
-        stats["age"] = age
-
+        
         ### gender groups
         masc = field_count(clazzname,"gender", "A. Masculino")
         fem = field_count(clazzname,"gender", "B. Femenino")
@@ -900,6 +892,17 @@ def generateReport(clazzname,record_id):
                 "Total":tot
         }
         stats["gender"] = gender
+
+        ### User groups
+        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
+        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+        stats["userCreation"] = userCreation
+
+
+        age = countbygender(clazzname,"age",age_groups)
+        stats["age"] = age
+
+
 
         ### party groups
         party_groups = [
