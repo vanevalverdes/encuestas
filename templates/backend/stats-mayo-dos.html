@@ -14,7 +14,18 @@
     let datasetDict
     let datasetsArray = []
 </script>
-{% set labels = params.labels.items() %}
+{% set labels = {
+    "userCreation":"Encuestador",
+    "gender":"Género",
+    "age":"Edad",
+    "party":"Partido con el que se identifica",
+    "barvaSupport":"Apoya la gestión al frente del Municipalidad de Barva del alcalde, Jorge Acuña?",
+    "barvaScale":"Del 1 al 10 como califica la labor de la Municipalidad de Barva.",
+    "chavesConoce":"Conoce a Rodrigo Chaves?",
+    "chavesOpinion":"Opinión sobre Rodrigo Chaves",
+    "jorgeConoce":"Conoce a Jorge Acuña?",
+    "jorgeOpinion":"Opinión sobre Jorge Acuña",
+    } %}
 
 <div class="container mx-auto col-12">
 <nav class="pt-5">

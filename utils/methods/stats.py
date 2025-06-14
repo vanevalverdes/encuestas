@@ -931,3 +931,46 @@ def generateReport(clazzname,record_id):
                 "Jorge Acuña":["jorgeConoce","jorgeOpinion"]})
         print(stats)
         return stats
+    elif record_id == 7:
+        from utils.methods import session
+
+        stats = {}
+
+
+        ### gender groups
+        masc = field_count(clazzname,"gender", "A. Masculino")
+        fem = field_count(clazzname,"gender", "B. Femenino")
+        tot = masc + fem
+        gender = {
+                "Hombres":masc,
+                "Mujeres":fem,
+                "Total":tot
+        }
+        stats["gender"] = gender
+
+        ### Age groups
+        age_groups = [
+        "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
+        "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
+        "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
+        "m. + 80"
+        ]
+        age = countbygender(clazzname,"age",age_groups)
+        stats["age"] = age
+        ### User groups
+        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
+        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+        stats["userCreation"] = userCreation
+
+        multipleStat(stats, clazzname,{
+                    "apoyaAlcalde":["Apoya usted la gestión del alcalde, Carlos Hidalgo?",["a. Sí","b. No","c. NS/NR"]],
+                    "muniScale":["7. Del 1 al 10 como califica la labor de la Municipalidad de Barva.",["0","1","2","3","4","5","6","7","8","9","10"]],
+                    "apoyaRodrigoChaves":["¿Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                    "chavesParty":["¿Apoyaría usted un partido impulsado por el presidente, Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                })
+        multipleOpinionStat(stats, clazzname,{
+                "Carlos Hidalgo":["conoceCarlos","opinionCarlos"],
+                "Rodrigo Chaves":["conoceRodrigoChaves","opinionRodrigoChaves"]
+                })
+        print(stats)
+        return stats

@@ -108,15 +108,60 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                  } %}
                  {{ macros.fieldForm("radio","2. Género","gender","gender","True",options,"")}}
             </div>
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "a. Partido Liberación Nacional":"a. Partido Liberación Nacional",
+                    "b. Partido Unidad Social Cristiana":"b. Partido Unidad Social Cristiana",
+                    "c. Partido Nueva República":"c. Partido Nueva República",
+                    "d. Partido Progreso Social Democrático":"d. Partido Progreso Social Democrático",
+                    "e. Frente Amplio":"e. Frente Amplio",
+                    "f. Partido Liberal Progresista":"f. Partido Liberal Progresista",
+                    "g. PAC":"g. PAC",
+                    "h. PNG":"h. PNG",
+                    "i. Pueblo Soberano":"i. Pueblo Soberano",
+                    "j. Partido Unidos Podemos":"j. Partido Unidos Podemos",
+                    "k. Partido de Rodrigo Chaves":"k. Partido de Rodrigo Chaves",
+                    "l. Otro":"l. Otro",
+                    "m. Ninguno":"m. Ninguno",
+                    "n. NS/NR":"n. NS/NR"
+                 } %}
+                 {{ macros.fieldForm("radio","3. Cuál es el partido político de su preferencia?","party","party","True",options,"")}}
+            </div>
+        </div>
+        <!-- Opiniones Políticas -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>Opiniones políticas</h4>
+            </div>
+            <div class="my-5">
+                {% set questions = {
+                    "barvaSupport":["6. Apoya la gestión al frente del Municipalidad de Barva del alcalde, Jorge Acuña?",["a. Sí","b. No","c. NS/NR"]],
+                    "barvaScale":["7. Del 1 al 10 como califica la labor de la Municipalidad de Barva.",["0","1","2","3","4","5","6","7","8","9","10"]],
+                } %}
+
+                {% for key, value in questions.items() %}
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set title = value[0] %}
+                    {% set name = key %}
+                    {% set options = {} %}
+                    {% for item in value[1] %}
+                        {% set _ = options.update({item: item}) %}
+                    {% endfor %}
+                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                </div>
+                {% endfor %}
+            </div>
         </div>
         <!-- Conoce Políticos -->
         <div class="my-5">
             <div class="mb-3">
-                <h4>De las siguientes personas, me puede indicar si la conoce y si lo conoce, su opinión sobre ella es positiva o negativa.</h4>
+                <h4>8. De las siguientes personas, me puede indicar si la conoce y si lo conoce, su opinión sobre ella es positiva o negativa.</h4>
             </div>
             {% set conoce_opinion = {
-                "Carlos Hidalgo":["",["conoceCarlos","opinionCarlos"]],
-                "Rodrigo Chaves":["",["conoceRodrigoChaves","opinionRodrigoChaves"]]
+                "a. Rodrigo Chaves":["/candidatos/Rodrigo-Chaves-Bukele-jpg.webp",["chavesConoce","chavesOpinion"]],
+                "b. Jorge Acuña":["/candidatos/alcalde-1.png",["jorgeConoce","jorgeOpinion"]]
             } %}
             {% set options = {
                 "a. Sí":"a. Sí",
@@ -152,33 +197,6 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                     </div>
                 </div>
             {% endfor %}
-        </div>
-        <!-- Opiniones Políticas -->
-        <div class="my-5">
-            <div class="mb-3">
-                <h4>Opiniones políticas</h4>
-            </div>
-            <div class="my-5">
-                {% set questions = {
-                    "apoyaAlcalde":["Apoya usted la gestión del alcalde, Carlos Hidalgo?",["a. Sí","b. No","c. NS/NR"]],
-                    "muniScale":["7. Del 1 al 10 como califica la labor de la Municipalidad de Barva.",["0","1","2","3","4","5","6","7","8","9","10"]],
-                    "apoyaRodrigoChaves":["¿Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
-                    "chavesParty":["¿Apoyaría usted un partido impulsado por el presidente, Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
-                } %}
-
-                {% for key, value in questions.items() %}
-                <div class="mb-3 border border-grey p-3">
-                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
-                    {% set title = value[0] %}
-                    {% set name = key %}
-                    {% set options = {} %}
-                    {% for item in value[1] %}
-                        {% set _ = options.update({item: item}) %}
-                    {% endfor %}
-                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
-                </div>
-                {% endfor %}
-            </div>
         </div>
         <!-- Contacto -->
         <div class="my-2">
