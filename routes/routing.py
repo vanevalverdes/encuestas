@@ -339,7 +339,7 @@ def report(record_id):
         #return stats
         return render_template("backend/stats-mayo-dos.html",stats=stats)
     elif record_id == 7:
-        params = {"labels":{
+        params = {
             "userCreation":"Encuestador",
             "gender":"Género",
             "age":"Edad",
@@ -352,7 +352,7 @@ def report(record_id):
             "apoyaRodrigoChaves":"¿Apoya usted la gestión del presidente Rodrigo Chaves?",
             "chavesParty":"¿Apoyaría usted un partido impulsado por el presidente, Rodrigo Chaves? ",
             "contact":"Contacto"
-            }}
+            }
         #return stats
         return render_template("backend/stats.html",stats=stats,params=params)
 
