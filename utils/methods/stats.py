@@ -1140,7 +1140,7 @@ def generateReport(clazzname,record_id):
                     ]]
                 })
         multipleOpinionStat(stats, clazzname,{
-                "José Aguilar Berrocal":["aguilarConoce","AguilarOpinion"],
+                "José Aguilar Berrocal":["aguilarConoce","aguilarOpinion"],
                 "Ariel Robles":["arielConoce","arielOpinion"],
                 })
         print(stats)
