@@ -276,16 +276,27 @@ def pln_day():
 @traceError
 @login_required
 def reportTest():
-    from utils.methods.stats import field_count, field_count_user
-    fieldname = "party"
-    field = "a. Partido Liberación Nacional"
-    user = "14"
-    array = [
-        field_count_user(fieldname, field, user, "A. Masculino"),
-        field_count_user(fieldname, field, user, "B. Femenino"),
-        field_count_user(fieldname, field, user)
-    ]
-    return array
+    classname = request.args.get("classname")
+    if not classname:
+        return "No se ha especificado el nombre de la clase"
+    fieldQuery = request.args.get("fieldQuery")
+    if not fieldQuery:
+        return "No se ha especificado el campo de consulta"
+    valueFieldQuery = request.args.get("valueFieldQuery")
+    if not valueFieldQuery:
+        return "No se ha especificado el valor del campo de consulta"
+    fieldGroupBy = request.args.get("fieldGroupBy")
+    if not fieldGroupBy:
+        return "No se ha especificado el campo de agrupación"
+    
+    query = session.newQuery(classname)
+    query.addFilter(fieldQuery, "==", valueFieldQuery)
+    table = query.getCountBy("id",fieldGroupBy)
+
+    jsonData = {}
+    for item in table:
+        jsonData[item[0]] = item[1]
+    return jsonData
 
 @blueprintname.route(f'/report-pln/')
 @traceError

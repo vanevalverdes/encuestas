@@ -237,6 +237,14 @@ class Query:
         # Obtener la suma del campo especificado agrupado por otro campo
         result = self.query.with_entities(func.sum(getattr(self.model_class, fieldname)), getattr(self.model_class, groupby)).group_by(getattr(self.model_class, groupby)).all()
         return result or 0
+    
+    def getCountBy(self, fieldname, groupby):
+        from sqlalchemy import func
+        result = self.query.with_entities(
+            getattr(self.model_class, groupby),
+            func.count(getattr(self.model_class, fieldname))
+        ).group_by(getattr(self.model_class, groupby)).all()
+        return result or []
 
     def filterByToday(self):
         from datetime import datetime, timezone
