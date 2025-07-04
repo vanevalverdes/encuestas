@@ -1,3 +1,61 @@
+def import_clazz(dict):
+    from utils.methods import application
+    def safe_int(val):
+        try:
+            return int(val)
+        except (ValueError, TypeError):
+            return None
+    def safe_bool(val):
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, str):
+            return val.strip().lower() in ("true", "1", "yes", "si")
+        return bool(val)
+    # Crear la clase principal
+    newClazz = application.createClazzRecord(
+        name=dict['name'],
+        label=dict['label'],
+        tag=dict.get('tag', ''),
+        plural=dict['plural'],
+        sort_field_results=dict.get('sort_field_results', ''),
+        table_fields=dict.get('table_fields', ''),
+        search_fields=dict.get('search_fields', ''),
+        clazz_representation=dict.get('clazz_representation', '')
+    )
+    # Crear los contenedores y campos
+    for container_name, container_data in dict["containers"].items():
+        container = application.createContainerRecord(
+            name=container_name,
+            title=container_data.get('title', None),
+            extraclass=container_data.get('class', ''),
+            type=container_data.get('type', ''),
+            connected_table=safe_int(container_data.get('connected_table', 0)),
+            connected_table_fields=container_data.get('connected_table_fields', ''),
+            clazz_id=newClazz.id
+        )
+        for field_name, field_data in container_data['fields'].items():
+            application.createFieldRecord(
+                fieldname=field_name,
+                clazz_id=safe_int(newClazz.id),
+                field_type=field_data.get('type', ''),
+                field_label=field_data.get('label', ''),
+                field_input=field_data.get('input', ''),
+                select_options=field_data.get('select_options', None),
+                publicBlob=False,
+                maxlength=safe_int(field_data.get('maxlength', 0)),
+                connected_table=safe_int(field_data.get('connected_table', 0)),
+                sort=None,
+                required=safe_bool(field_data.get('required', False)),
+                hidden=safe_bool(field_data.get('hidden', False)),
+                default_value=field_data.get('defaultValue', None),
+                extraclass=field_data.get('class', None),
+                container_id=safe_int(container.id)
+            )
+    print(f"Created new class: {newClazz.name}")
+    return True
+
+
+
 def field_count(clazz,field, value, gender=None):
     from utils.methods import session
     query = session.newQuery(clazz)
@@ -971,6 +1029,119 @@ def generateReport(clazzname,record_id):
         multipleOpinionStat(stats, clazzname,{
                 "Carlos Hidalgo":["conoceCarlos","opinionCarlos"],
                 "Rodrigo Chaves":["conoceRodrigoChaves","opinionRodrigoChaves"]
+                })
+        print(stats)
+    elif record_id == 15:
+        from utils.methods import session
+
+        stats = {}
+
+
+        ### gender groups
+        masc = field_count(clazzname,"gender", "A. Masculino")
+        fem = field_count(clazzname,"gender", "B. Femenino")
+        tot = masc + fem
+        gender = {
+                "Hombres":masc,
+                "Mujeres":fem,
+                "Total":tot
+        }
+        stats["gender"] = gender
+
+        ### Age groups
+        age_groups = [
+        "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
+        "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
+        "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
+        "m. + 80"
+        ]
+        age = countbygender(clazzname,"age",age_groups)
+        stats["age"] = age
+        ### User groups
+        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
+        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+        stats["userCreation"] = userCreation
+
+        multipleStat(stats, clazzname,{
+                    "county":["Distrito",["San José",
+                        "Curridabat",
+                        "Goicoechea",
+                        "Moravia",
+                        "Tibas",
+                        "Alajuelita",
+                        "Desamparados",
+                        "Escazú",
+                        "Mora",
+                        "Pérez Zeledón",
+                        "Grecia",
+                        "Naranjo",
+                        "Palmares",
+                        "San Ramón",
+                        "San Carlos",
+                        "Upala",
+                        "Tres Ríos",
+                        "Cartago",
+                        "Oreamuno",
+                        "Paraíso",
+                        "Turrialba",
+                        "Sarapiquí",
+                        "Heredia",
+                        "San Rafael",
+                        "Santo Domingo",
+                        "Cañas",
+                        "Liberia",
+                        "Nicoya",
+                        "Guapiles",
+                        "Guacimo",
+                        "Siquirres",
+                        "Limón",
+                        "Puntarenas",
+                        "Quepos",
+                        "Buenos Aires",
+                        "Osa"]],
+                    "party":["Partido político con el que se identifica",["Liberación Nacional",
+                        "Unidad Social Cristiano",
+                        "Liberal Progresista",
+                        "Nueva República",
+                        "Pueblo Soberano",
+                        "Unidos Podemos",
+                        "Frente Amplio",
+                        "PAC",
+                        "Aquí Costa Rica Manda",
+                        "Progreso Social Democrático",
+                        "Nueva Generación",
+                        "Justicia Social",
+                        "Costa Rica Primero",
+                        "Republicano",
+                        "Otro",
+                        "Ninguno",
+                        "NS/NR"]],
+                    "apoyaAlcalde":["Apoya usted la gestión del alcalde, Carlos Hidalgo?",["a. Sí","b. No","c. NS/NR"]],
+                    "apoyaAlcalde":["Apoya usted la gestión del actual alcalde / alcaldesa de su cantón?",["a. Sí","b. No","c. NS/NR"]],
+                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                    "nationalElection":["¿Si las elecciones fueran hoy, por quién votaría?",[
+                        "Rolando Araya",
+                        "Fabricio Alvarado",
+                        "Álvaro Ramos",
+                        "Laura Fernández",
+                        "Natalia Díaz",
+                        "Luis Amador",
+                        "José Aguilar Berrocal",
+                        "Douglas Soto",
+                        "Ariel Robles",
+                        "Claudio Alpízar",
+                        "Fernando Zamora",
+                        "Claudia Dobles",
+                        "Eliécer Feinzaig",
+                        "Juan Carlos Hidalgo",
+                        "Otro",
+                        "Ninguno",
+                        "NS/NR"
+                    ]]
+                })
+        multipleOpinionStat(stats, clazzname,{
+                "José Aguilar Berrocal":["aguilarConoce","AguilarOpinion"],
+                "Ariel Robles":["arielConoce","arielOpinion"],
                 })
         print(stats)
         return stats

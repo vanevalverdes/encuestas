@@ -313,6 +313,15 @@ def report_pln():
 
     return response
 
+@blueprintname.route(f'/import/')
+@traceError
+@login_required
+def importclazz():
+    from utils.methods.stats import import_clazz
+    from dictfields import dict_fields
+    import_clazz(dict_fields)
+    return "Importado correctamente"
+
 @blueprintname.route(f'/report/<int:record_id>/')
 @traceError
 @login_required
@@ -351,6 +360,22 @@ def report(record_id):
             "muniScale":"Del 1 al 10 como califica la labor de la Municipalidad de Turrialba?.",
             "apoyaRodrigoChaves":"¿Apoya usted la gestión del presidente Rodrigo Chaves?",
             "chavesParty":"¿Apoyaría usted un partido impulsado por el presidente, Rodrigo Chaves? ",
+            "contact":"Contacto"
+            }
+    elif record_id == 15:
+        params = {
+            "userCreation":"Encuestador",
+            "gender":"Género",
+            "age":"Edad",
+            "county":"Distrito",
+            "party":"Partido",
+            "chavesSupport":"Apoya usted la gestión del presidente Rodrigo Chaves?",
+            "nationalElection":"Si las elecciones nacionales fueran hoy, ¿por quién votaría?",
+            "aguilarConoce":"Conoce usted a José Aguilar Berrocal?",
+            "aguilarOpinion":"Opinión sobre José Aguilar Berrocal",
+            "arielConoce":"Conoce usted a Ariel Robles?",
+            "arielOpinion":"Opinión sobre Ariel Robles",
+            "apoyaAlcalde":"Apoya usted la gestión del actual alcalde de su cantón?",
             "contact":"Contacto"
             }
         #return stats

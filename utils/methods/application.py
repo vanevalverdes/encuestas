@@ -30,6 +30,63 @@ def getClazzFields(classname):
     clazz = Clazz.query.filter(Clazz.name == classname.capitalize()).first()
     return clazz.fields
 
+def createClazzRecord(name,label=None,tag=None,plural=None,sort_field_results=None,table_fields=None,search_fields=None,clazz_representation=None):
+    from models.develop.clazz import Clazz
+    clazz = Clazz(
+        name=name.capitalize(),
+        label=label,
+        tag=tag,
+        plural=plural,
+        sort_field_results=sort_field_results,
+        table_fields=table_fields,
+        search_fields=search_fields,
+        clazz_representation=clazz_representation
+    )
+    from utils.db import db
+    db.session.add(clazz)
+    db.session.commit()
+    return clazz
+
+def createContainerRecord(name,title=None,extraclass=None,type=None,connected_table=None,connected_table_fields=None,clazz_id=None):
+    from models.develop.container import Container
+    container = Container(
+        name=name,
+        title=title,
+        extraclass=extraclass,
+        type=type,
+        connected_table=connected_table,
+        connected_table_fields=connected_table_fields,
+        clazz_id=clazz_id
+    )
+    from utils.db import db
+    db.session.add(container)
+    db.session.commit()
+    return container
+
+def createFieldRecord(fieldname,clazz_id,field_type,field_label=None,field_input=None,select_options=None,publicBlob=False,maxlength=None,connected_table=None,sort=None,required=False,hidden=False,default_value=None,extraclass=None,container_id=None):
+    from models.develop.field import Field
+    from utils.db import db
+    field = Field(
+        name=fieldname,
+        clazz_id=clazz_id,
+        type=field_type,
+        label=field_label if field_label else fieldname.capitalize(),
+        input=field_input,
+        select_options=select_options,
+        publicBlob=publicBlob,
+        maxlength=maxlength,
+        connected_table=connected_table,
+        sort=sort,
+        required=required,
+        hidden=hidden,
+        default_value=default_value,
+        extraclass=extraclass,
+        container_id=container_id
+    )
+    db.session.add(field)
+    db.session.commit()
+    return field
+
 def getClazzMoneyFields(classname):
     money_fields = {key.name for key in getClazzFields(classname) if key.type == 'Money'}
     return money_fields

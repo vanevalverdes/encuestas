@@ -67,6 +67,8 @@ def get_clazz_fields(clazz_id):
             "connected_table_fields": container.connected_table_fields or "",
             "fields": container_fields
         }
+    print("fields:")
+    print(fields)
     return fields
 
 def get_clazz_fields_migration(clazz_id):
