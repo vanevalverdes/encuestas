@@ -35,8 +35,56 @@
             {% if current_user.usergroup.id == 2%}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('rounting.report', record_id=15) }}" id="">
-                  Ver Reporte
+                  Ver Reporte General
               </a>
+            </li>
+            {% set countys = [
+                "San José",
+                "Curridabat",
+                "Goicoechea",
+                "Moravia",
+                "Tibas",
+                "Alajuelita",
+                "Desamparados",
+                "Escazú",
+                "Mora",
+                "Pérez Zeledón",
+                "Grecia",
+                "Naranjo",
+                "Palmares",
+                "San Ramón",
+                "San Carlos",
+                "Upala",
+                "Tres Ríos",
+                "Cartago",
+                "Oreamuno",
+                "Paraíso",
+                "Turrialba",
+                "Sarapiquí",
+                "Heredia",
+                "San Rafael",
+                "Santo Domingo",
+                "Cañas",
+                "Liberia",
+                "Nicoya",
+                "Guapiles",
+                "Guacimo",
+                "Siquirres",
+                "Limón",
+                "Puntarenas",
+                "Quepos",
+                "Buenos Aires",
+                "Osa"
+              ] %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Reporte por cantón
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for county in countys %}
+                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=15) }}?county={{ county }}">{{ county }}</a></li>
+                {% endfor %}
+              </ul>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('rounting.survey', record_id=15) }}" id="">
