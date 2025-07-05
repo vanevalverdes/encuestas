@@ -339,7 +339,10 @@ def importclazz():
 def report(record_id):
     from utils.methods.stats import generateReport
     classname = application.get_class_name(record_id)
-    stats = generateReport(classname,record_id)
+    county = request.args.get("county")
+    if not county:
+        county = None
+    stats = generateReport(classname,record_id, county=county)
     params = False
     if record_id == 1:
         return render_template("backend/stats-febrero.html",stats=stats)
@@ -389,7 +392,7 @@ def report(record_id):
             "apoyaAlcalde":"Apoya usted la gestión del actual alcalde de su cantón?",
             "contact":"Contacto"
             }
-        county = request.args.get("county")
+        
         #return stats
-        return render_template("backend/stats.html",stats=stats,params=params,county=county)
+        return render_template("backend/stats.html",stats=stats,params=params)
 
