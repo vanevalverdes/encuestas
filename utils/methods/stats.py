@@ -56,15 +56,17 @@ def import_clazz(dict):
 
 
 
-def field_count(clazz,field, value, gender=None):
+def field_count(clazz,field, value, gender=None,county=None):
     from utils.methods import session
     query = session.newQuery(clazz)
     query.addFilter(field, "==", value)
     if gender:
         query.addFilter("gender", "==", gender)
+    if county:
+        query.addFilter("county", "==", county)
     return query.count()
 
-def field_count_user(clazz,field, value, user, gender=None):
+def field_count_user(clazz,field, value, user, gender=None, county=None):
     from utils.methods import session
     query = session.newQuery(clazz)
     query.addFilter(field, "==", value)
@@ -72,16 +74,18 @@ def field_count_user(clazz,field, value, user, gender=None):
     query.filterByToday()
     if gender:
         query.addFilter("gender", "==", gender)
+    if county:
+        query.addFilter("county", "==", county)
     return query.count()
 
-def countbygender(clazz,fieldname,values):
+def countbygender(clazz,fieldname,values, county=None):
     
     ### Cuenta por campo y género
     counts = {
         field: [
-            field_count(clazz,fieldname, field, "A. Masculino"),
-            field_count(clazz,fieldname, field, "B. Femenino"),
-            field_count(clazz,fieldname, field)
+            field_count(clazz,fieldname, field, "A. Masculino", county=county),
+            field_count(clazz,fieldname, field, "B. Femenino", county=county),
+            field_count(clazz,fieldname, field, county=county)
         ]
         for field in values
     }
@@ -109,45 +113,45 @@ def countbygender(clazz,fieldname,values):
         usersValues = {}
         for user in userCreation_groups:
             userArray = [
-                field_count_user(clazz,fieldname, field, user, "A. Masculino"),
-                field_count_user(clazz,fieldname, field, user, "B. Femenino"),
-                field_count_user(clazz,fieldname, field, user)
+                field_count_user(clazz,fieldname, field, user, "A. Masculino", county=county),
+                field_count_user(clazz,fieldname, field, user, "B. Femenino", county=county),
+                field_count_user(clazz,fieldname, field, user, county=county)
             ]
             usersValues[user] = userArray
         values.append(usersValues)
     return counts
 
-def simpleStat(dict,clazzname,fieldname,values):
+def simpleStat(dict,clazzname,fieldname,values, county=None):
     groups = values
-    fieldStat = countbygender(clazzname,fieldname,groups)
+    fieldStat = countbygender(clazzname,fieldname,groups, county=county)
     dict[fieldname] = fieldStat
     return True
 
-def multipleOpinionStat(dict,clazzname,values):
+def multipleOpinionStat(dict,clazzname,values, county=None):
         statsVariables = {}
         for key, value in values.items():
             ### Conoce conoceMauricioBatalla groups
             groups = ["a. Sí","b. No","c. NS/NR"]
-            conoce = countbygender(clazzname,value[0],groups)
+            conoce = countbygender(clazzname,value[0],groups, county=county)
             statsVariables[value[0]] = conoce
 
             ### Opinión opinionMauricioBatalla groups
             opinion_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-            opinion = countbygender(clazzname,value[1],opinion_groups)
+            opinion = countbygender(clazzname,value[1],opinion_groups, county=county)
             statsVariables[value[1]] = opinion
         dict.update(statsVariables)
 
         return True
 
-def multipleStat(dict,clazzname,values):
+def multipleStat(dict,clazzname,values, county=None):
         statsVariables = {}
 
         for key, value in values.items():
-            result = countbygender(clazzname,key,value[1])
+            result = countbygender(clazzname,key,value[1], county=county)
             statsVariables[key] = result
         dict.update(statsVariables)
 
-def generateReport(clazzname,record_id):
+def generateReport(clazzname,record_id, county=None):
     from utils.methods.stats import field_count, countbygender
     print(clazzname)
     if record_id == 1:
@@ -1038,8 +1042,8 @@ def generateReport(clazzname,record_id):
 
 
         ### gender groups
-        masc = field_count(clazzname,"gender", "A. Masculino")
-        fem = field_count(clazzname,"gender", "B. Femenino")
+        masc = field_count(clazzname,"gender", "A. Masculino", county=county)
+        fem = field_count(clazzname,"gender", "B. Femenino", county=county)
         tot = masc + fem
         gender = {
                 "Hombres":masc,
@@ -1055,11 +1059,11 @@ def generateReport(clazzname,record_id):
         "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
         "m. + 80"
         ]
-        age = countbygender(clazzname,"age",age_groups)
+        age = countbygender(clazzname,"age",age_groups, county=county)
         stats["age"] = age
         ### User groups
         userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
-        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups)
+        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups, county=county)
         stats["userCreation"] = userCreation
 
         multipleStat(stats, clazzname,{
@@ -1138,10 +1142,10 @@ def generateReport(clazzname,record_id):
                         "Ninguno",
                         "NS/NR"
                     ]]
-                })
+                }, county=county)
         multipleOpinionStat(stats, clazzname,{
                 "José Aguilar Berrocal":["aguilarConoce","aguilarOpinion"],
                 "Ariel Robles":["arielConoce","arielOpinion"],
-                })
+                }, county=county)
         print(stats)
         return stats

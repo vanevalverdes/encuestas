@@ -389,6 +389,7 @@ def report(record_id):
             "apoyaAlcalde":"Apoya usted la gestión del actual alcalde de su cantón?",
             "contact":"Contacto"
             }
+        county = request.args.get("county")
         #return stats
-        return render_template("backend/stats.html",stats=stats,params=params)
+        return render_template("backend/stats.html",stats=stats,params=params,county=county)
 
