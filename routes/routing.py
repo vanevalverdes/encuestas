@@ -342,7 +342,10 @@ def report(record_id):
     county = request.args.get("county")
     if not county:
         county = None
-    stats = generateReport(classname,record_id, county=county)
+    state = request.args.get("state")
+    if not state:
+        state = None
+    stats = generateReport(classname,record_id, county=county, state=state)
     params = False
     if record_id == 1:
         return render_template("backend/stats-febrero.html",stats=stats)
@@ -392,7 +395,7 @@ def report(record_id):
             "apoyaAlcalde":"Apoya usted la gestión del actual alcalde de su cantón?",
             "contact":"Contacto"
             }
-        stats = generateReport(classname,record_id, county=county)
+        stats = generateReport(classname,record_id, county=county, state=state)
         return render_template("backend/stats-june.html",stats=stats,params=params)
     elif record_id == 16:
         params = {
