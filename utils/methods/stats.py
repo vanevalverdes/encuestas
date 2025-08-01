@@ -56,7 +56,7 @@ def import_clazz(dict):
 
 
 
-def field_count(clazz,field, value, gender=None,county=None):
+def field_count(clazz,field, value, gender=None,county=None,state=None):
     from utils.methods import session
     query = session.newQuery(clazz)
     query.addFilter(field, "==", value)
@@ -64,9 +64,11 @@ def field_count(clazz,field, value, gender=None,county=None):
         query.addFilter("gender", "==", gender)
     if county:
         query.addFilter("county", "==", county)
+    if state:
+        query.addFilter("state", "==", state)
     return query.count()
 
-def field_count_user(clazz,field, value, user, gender=None, county=None):
+def field_count_user(clazz,field, value, user, gender=None, county=None,state=None):
     from utils.methods import session
     query = session.newQuery(clazz)
     query.addFilter(field, "==", value)
@@ -76,16 +78,18 @@ def field_count_user(clazz,field, value, user, gender=None, county=None):
         query.addFilter("gender", "==", gender)
     if county:
         query.addFilter("county", "==", county)
+    if state:
+        query.addFilter("state", "==", state)
     return query.count()
 
-def countbygender(clazz,fieldname,values, county=None):
+def countbygender(clazz,fieldname,values, county=None, state=None):
     
     ### Cuenta por campo y género
     counts = {
         field: [
-            field_count(clazz,fieldname, field, "A. Masculino", county=county),
-            field_count(clazz,fieldname, field, "B. Femenino", county=county),
-            field_count(clazz,fieldname, field, county=county)
+            field_count(clazz,fieldname, field, "A. Masculino", county=county, state=state),
+            field_count(clazz,fieldname, field, "B. Femenino", county=county, state=state),
+            field_count(clazz,fieldname, field, county=county, state=state)
         ]
         for field in values
     }
@@ -113,45 +117,45 @@ def countbygender(clazz,fieldname,values, county=None):
         usersValues = {}
         for user in userCreation_groups:
             userArray = [
-                field_count_user(clazz,fieldname, field, user, "A. Masculino", county=county),
-                field_count_user(clazz,fieldname, field, user, "B. Femenino", county=county),
-                field_count_user(clazz,fieldname, field, user, county=county)
+                field_count_user(clazz,fieldname, field, user, "A. Masculino", county=county, state=state),
+                field_count_user(clazz,fieldname, field, user, "B. Femenino", county=county, state=state),
+                field_count_user(clazz,fieldname, field, user, county=county, state=state)
             ]
             usersValues[user] = userArray
         values.append(usersValues)
     return counts
 
-def simpleStat(dict,clazzname,fieldname,values, county=None):
+def simpleStat(dict,clazzname,fieldname,values, county=None, state=None):
     groups = values
-    fieldStat = countbygender(clazzname,fieldname,groups, county=county)
+    fieldStat = countbygender(clazzname,fieldname,groups, county=county, state=state)
     dict[fieldname] = fieldStat
     return True
 
-def multipleOpinionStat(dict,clazzname,values, county=None):
+def multipleOpinionStat(dict,clazzname,values, county=None, state=None):
         statsVariables = {}
         for key, value in values.items():
             ### Conoce conoceMauricioBatalla groups
             groups = ["a. Sí","b. No","c. NS/NR"]
-            conoce = countbygender(clazzname,value[0],groups, county=county)
+            conoce = countbygender(clazzname,value[0],groups, county=county, state=state)
             statsVariables[value[0]] = conoce
 
             ### Opinión opinionMauricioBatalla groups
             opinion_groups = ["a. Positiva","b. Negativa","c. NS/NR"]
-            opinion = countbygender(clazzname,value[1],opinion_groups, county=county)
+            opinion = countbygender(clazzname,value[1],opinion_groups, county=county, state=state)
             statsVariables[value[1]] = opinion
         dict.update(statsVariables)
 
         return True
 
-def multipleStat(dict,clazzname,values, county=None):
+def multipleStat(dict,clazzname,values, county=None, state=None):
         statsVariables = {}
 
         for key, value in values.items():
-            result = countbygender(clazzname,key,value[1], county=county)
+            result = countbygender(clazzname,key,value[1], county=county, state=state)
             statsVariables[key] = result
         dict.update(statsVariables)
 
-def generateReport(clazzname,record_id, county=None):
+def generateReport(clazzname,record_id, county=None, state=None):
     from utils.methods.stats import field_count, countbygender
     print(clazzname)
     if record_id == 1:
@@ -1147,5 +1151,162 @@ def generateReport(clazzname,record_id, county=None):
                 "José Aguilar Berrocal":["aguilarConoce","aguilarOpinion"],
                 "Ariel Robles":["arielConoce","arielOpinion"],
                 }, county=county)
+        print(stats)
+    elif record_id == 16:
+        from utils.methods import session
+
+        stats = {}
+
+
+        ### gender groups
+        masc = field_count(clazzname,"gender", "A. Masculino", county=county, state=state)
+        fem = field_count(clazzname,"gender", "B. Femenino", county=county, state=state)
+        tot = masc + fem
+        gender = {
+                "Hombres":masc,
+                "Mujeres":fem,
+                "Total":tot
+        }
+        stats["gender"] = gender
+
+        ### Age groups
+        age_groups = [
+        "a. 18 -20", "b. 21 - 24", "c. 25 - 29", "d. 30 - 34",
+        "e. 35 - 39", "f. 40 - 44", "g. 45 - 49", "h. 50 - 54",
+        "i. 55 - 59", "j. 60 - 64", "k. 65 - 69", "l. 70 - 79",
+        "m. + 80"
+        ]
+        age = countbygender(clazzname,"age",age_groups, county=county, state=state)
+        stats["age"] = age
+        ### User groups
+        userCreation_groups = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
+        userCreation = countbygender(clazzname,"createdby_id",userCreation_groups, county=county, state=state)
+        stats["userCreation"] = userCreation
+
+        multipleStat(stats, clazzname,{
+                    "county":["Distrito",[
+                        "San José",
+                        "Escazú",
+                        "Desamparados",
+                        "Puriscal",
+                        "Tarrazú",
+                        "Aserrí",
+                        "Mora",
+                        "Goicoechea",
+                        "Santa Ana",
+                        "Alajuelita",
+                        "Vázquez de Coronado",
+                        "Acosta",
+                        "Tibás",
+                        "Moravia",
+                        "Montes de Oca",
+                        "Turrubares",
+                        "Dota",
+                        "Curridabat",
+                        "Pérez Zeledón",
+                        "León Cortés Castro",
+                        "Alajuela",
+                        "San Ramón",
+                        "Grecia",
+                        "San Mateo",
+                        "Atenas",
+                        "Naranjo",
+                        "Palmares",
+                        "Poás",
+                        "Orotina",
+                        "San Carlos",
+                        "Zarcero",
+                        "Valverde Vega",
+                        "Upala",
+                        "Los Chiles",
+                        "Guatuso",
+                        "Río Cuarto",
+                        "Cartago",
+                        "Paraíso",
+                        "La Unión",
+                        "Jiménez",
+                        "Turrialba",
+                        "Alvarado",
+                        "Oreamuno",
+                        "El Guarco",
+                        "Heredia",
+                        "Barva",
+                        "Santo Domingo",
+                        "Santa Bárbara",
+                        "San Rafael",
+                        "San Isidro",
+                        "Belén",
+                        "Flores",
+                        "San Pablo",
+                        "Sarapiquí",
+                        "Liberia",
+                        "Nicoya",
+                        "Santa Cruz",
+                        "Bagaces",
+                        "Carrillo",
+                        "Cañas",
+                        "Abangares",
+                        "Tilarán",
+                        "Nandayure",
+                        "La Cruz",
+                        "Hojancha",
+                        "Puntarenas",
+                        "Esparza",
+                        "Buenos Aires",
+                        "Montes de Oro",
+                        "Osa",
+                        "Quepos",
+                        "Golfito",
+                        "Coto Brus",
+                        "Parrita",
+                        "Corredores",
+                        "Garabito",
+                        "Monteverde",
+                        "Puerto Jiménez",
+                        "Limón",
+                        "Pococí",
+                        "Siquirres",
+                        "Talamanca",
+                        "Matina",
+                        "Guácimo"
+                    ]],
+                    "party":["Partido político con el que se identifica",["Liberación Nacional",
+                        "Unidad Social Cristiano",
+                        "Liberal Progresista",
+                        "Nueva República",
+                        "Pueblo Soberano",
+                        "Unidos Podemos",
+                        "Frente Amplio",
+                        "PAC",
+                        "Aquí Costa Rica Manda",
+                        "Progreso Social Democrático",
+                        "Nueva Generación",
+                        "Justicia Social",
+                        "Costa Rica Primero",
+                        "Republicano",
+                        "Otro",
+                        "Ninguno",
+                        "NS/NR"]],
+                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                    "nationalElection":["¿Si las elecciones fueran hoy, por quién votaría?",[
+                        "Laura Fernández PPS",
+                        "Fabricio Alvarado NR",
+                        "Fernando Zamora PNG",
+                        "Álvaro Ramos PLN",
+                        "Natalia Díaz UP",
+                        "Eliécer Feinzaig PLP",
+                        "Ariel Robles Frente Amplio",
+                        "Claudia Dobles PAC",
+                        "Claudio Alpízar Esperanza Nacional",
+                        "Jorge Acuña PRSC",
+                        "Luz Mary Alpízar PSD",
+                        "José Aguilar Berrocal Avance",
+                        "Juan Carlos Hidalgo PUSC",
+                        "Luis Amador CR1",
+                        "Otro",
+                        "Ninguno",
+                        "NS/NR"
+                    ]]
+                }, county=county, state=state)
         print(stats)
         return stats

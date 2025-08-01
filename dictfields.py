@@ -1,13 +1,13 @@
 dict_fields = {
-    "name": "JuneSurvey",
-    "label": "Encuesta Junio",
-    "plural": "junesurveys",
+    "name": "AugustSurvey",
+    "label": "Encuesta Agosto",
+    "plural": "augustsurveys",
     'clazz_representation': '|id|,- |created_at|',
     "sort_field_results":"created_at|desc",
     "table_fields": " ID|id,Fecha|created_at",
     "search_fields": "id,created_at",
     "containers": {
-        'JuneSurveyContainer': {
+        'AugustSurveyContainer': {
             'type': 'row',
             'class': 'col-sm-12',
             'title': None,
@@ -40,11 +40,11 @@ dict_fields = {
                     'hidden': '',
                     'defaultValue': ''
                 },
-                'state': {
-                    'id': 'state',
+                'county': {
+                    'id': 'county',
                     'type': 'String',
                     'maxlength': '',
-                    'label': 'Provincia',
+                    'label': 'Cantón',
                     'input': 'text',
                     'class': '',
                     'select_options': '',
@@ -92,50 +92,11 @@ dict_fields = {
                     'hidden': '',
                     'defaultValue': ''
                 },
-                'aguilarConoce': {
-                    'id': 'aguilarConoce',
+                'congressParty': {
+                    'id': 'congressParty',
                     'type': 'String',
                     'maxlength': '',
-                    'label': 'Conoce a José Aguilar Berrocal',
-                    'input': 'text',
-                    'class': '',
-                    'select_options': '',
-                    'connected_table': '',
-                    'required': '',
-                    'hidden': '',
-                    'defaultValue': ''
-                },
-                'aguilarOpinion': {
-                    'id': 'aguilarOpinion',
-                    'type': 'String',
-                    'maxlength': '',
-                    'label': 'Opinión José Aguilar Berrocal',
-                    'input': 'text',
-                    'class': '',
-                    'select_options': '',
-                    'connected_table': '',
-                    'required': '',
-                    'hidden': '',
-                    'defaultValue': ''
-                },
-                'arielConoce': {
-                    'id': 'arielConoce',
-                    'type': 'String',
-                    'maxlength': '',
-                    'label': 'Conoce a Ariel Robles',
-                    'input': 'text',
-                    'class': '',
-                    'select_options': '',
-                    'connected_table': '',
-                    'required': '',
-                    'hidden': '',
-                    'defaultValue': ''
-                },
-                'arielOpinion': {
-                    'id': 'arielOpinion',
-                    'type': 'String',
-                    'maxlength': '',
-                    'label': 'Opinion Ariel Robles',
+                    'label': 'Votaría por el mismo partido para diputados?',
                     'input': 'text',
                     'class': '',
                     'select_options': '',

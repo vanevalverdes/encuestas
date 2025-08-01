@@ -38,63 +38,28 @@
                   Ver Reporte General
               </a>
             </li>
-            {% set countys = [
-                "San José",
-                "Curridabat",
-                "Goicoechea",
-                "Moravia",
-                "Tibas",
-                "Alajuelita",
-                "Desamparados",
-                "Escazú",
-                "Mora",
-                "Pérez Zeledón",
-                "Grecia",
-                "Naranjo",
-                "Palmares",
-                "San Ramón",
-                "San Carlos",
-                "Upala",
-                "Tres Ríos",
-                "Cartago",
-                "Oreamuno",
-                "Paraíso",
-                "Turrialba",
-                "Sarapiquí",
-                "Heredia",
-                "San Rafael",
-                "Santo Domingo",
-                "Cañas",
-                "Liberia",
-                "Nicoya",
-                "Guapiles",
-                "Guacimo",
-                "Siquirres",
-                "Limón",
-                "Puntarenas",
-                "Quepos",
-                "Buenos Aires",
-                "Osa"
+            {% set states = [
+              'alajuela', 'cartago', 'guanacaste', 'heredia', 'limon', 'puntarenas', 'san-jose'
               ] %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Reporte por cantón
+                Reporte por Provincia
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% for county in countys %}
-                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=15) }}?county={{ county }}">{{ county }}</a></li>
+                {% for state in states %}
+                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=16) }}?state={{ state }}">{{ state }}</a></li>
                 {% endfor %}
               </ul>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=15) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=16) }}" id="">
                   Ir a Formulario de Encuesta
               </a>
             </li>
             {% endif %}
             {% if current_user.usergroup.id == 3%}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=15) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=16) }}" id="">
                   Ir a Formulario de Encuesta
               </a>
             </li>

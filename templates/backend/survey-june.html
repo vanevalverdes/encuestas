@@ -1,0 +1,301 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+ <style>
+    .form-check {
+  margin-bottom: 0.5rem;
+}
+ </style>
+<script>
+function toggleDivOnRadioValue(name, divId, value) {
+    document.addEventListener("DOMContentLoaded", function () {
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        const targetDiv = document.getElementById(divId);
+        if (!targetDiv) return;
+        const inputs = targetDiv.querySelectorAll("input");
+
+        function toggleDiv() {
+            const selectedValue = document.querySelector(`input[name="${name}"]:checked`)?.value;
+            if (selectedValue === value) {
+                targetDiv.style.display = "block";
+                inputs.forEach(input => input.removeAttribute("disabled"));
+            } else {
+                targetDiv.style.display = "none";
+                inputs.forEach(input => {
+                    input.setAttribute("disabled", "true");
+                    input.checked = false;
+                });
+            }
+        }
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", toggleDiv);
+        });
+
+        toggleDiv();
+    });
+}
+
+function toggleDivOnRadioNotValue(name, divId, value) {
+    document.addEventListener("DOMContentLoaded", function () {
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        const targetDiv = document.getElementById(divId);
+        if (!targetDiv) return;
+        const inputs = targetDiv.querySelectorAll("input");
+
+        function toggleDiv() {
+            const selectedValue = document.querySelector(`input[name="${name}"]:checked`)?.value;
+            if (selectedValue !== value && selectedValue !== undefined) {
+                targetDiv.style.display = "block";
+                inputs.forEach(input => input.removeAttribute("disabled"));
+            } else {
+                targetDiv.style.display = "none";
+                inputs.forEach(input => {
+                    input.setAttribute("disabled", "true");
+                    input.checked = false;
+                });
+            }
+        }
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", toggleDiv);
+        });
+
+        toggleDiv();
+    });
+}
+</script>
+<div class="container mt-3">
+
+    <h2 class="my-3">Encuesta EC052025-B - Encuestador {{ current_user.id }}</h2>
+    <form method="post">
+        <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}" >
+        <!-- fieldset row -->
+        <!-- Datos demográficos -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>Datos demográficos</h4>
+            </div>
+
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "a. 18 -20":"a. 18 -20",
+                    "b. 21 - 24":"b. 21 - 24",
+                    "c. 25 - 29":"c. 25 - 29",
+                    "d. 30 - 34":"d. 30 - 34",
+                    "e. 35 - 39":"e. 35 - 39",
+                    "f. 40 - 44":"f. 40 - 44",
+                    "g. 45 - 49":"g. 45 - 49",
+                    "h. 50 - 54":"h. 50 - 54",
+                    "i. 55 - 59":"i. 55 - 59",
+                    "j. 60 - 64":"j. 60 - 64",
+                    "k. 65 - 69":"k. 65 - 69",
+                    "l. 70 - 79":"l. 70 - 79",
+                    "m. + 80":"m. + 80"
+                 } %}
+                 {{ macros.fieldForm("radio","1. Edad","age","age","True",options,"")}}
+            </div>
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "A. Masculino":"A. Masculino",
+                    "B. Femenino":"B. Femenino"
+                 } %}
+                 {{ macros.fieldForm("radio","2. Género","gender","gender","True",options,"")}}
+            </div>
+            {% set questions = {
+                "county":["Distrito",["San José",
+                "Curridabat",
+                "Goicoechea",
+                "Moravia",
+                "Tibas",
+                "Alajuelita",
+                "Desamparados",
+                "Escazú",
+                "Mora",
+                "Pérez Zeledón",
+                "Grecia",
+                "Naranjo",
+                "Palmares",
+                "San Ramón",
+                "San Carlos",
+                "Upala",
+                "Tres Ríos",
+                "Cartago",
+                "Oreamuno",
+                "Paraíso",
+                "Turrialba",
+                "Sarapiquí",
+                "Heredia",
+                "San Rafael",
+                "Santo Domingo",
+                "Cañas",
+                "Liberia",
+                "Nicoya",
+                "Guapiles",
+                "Guacimo",
+                "Siquirres",
+                "Limón",
+                "Puntarenas",
+                "Quepos",
+                "Buenos Aires",
+                "Osa"]]
+            } %}
+
+            {% for key, value in questions.items() %}
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                {% set title = value[0] %}
+                {% set name = key %}
+                {% set options = {} %}
+                {% for item in value[1] %}
+                    {% set _ = options.update({item: item}) %}
+                {% endfor %}
+                {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+            </div>
+            {% endfor %}
+            {% set questions = {
+                "party":["Partido político con el que se identifica",["Liberación Nacional",
+                "Unidad Social Cristiano",
+                "Liberal Progresista",
+                "Nueva República",
+                "Pueblo Soberano",
+                "Unidos Podemos",
+                "Frente Amplio",
+                "PAC",
+                "Aquí Costa Rica Manda",
+                "Progreso Social Democrático",
+                "Nueva Generación",
+                "Justicia Social",
+                "Costa Rica Primero",
+                "Republicano",
+                "Otro",
+                "Ninguno",
+                "NS/NR"]]
+            } %}
+
+            {% for key, value in questions.items() %}
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                {% set title = value[0] %}
+                {% set name = key %}
+                {% set options = {} %}
+                {% for item in value[1] %}
+                    {% set _ = options.update({item: item}) %}
+                {% endfor %}
+                {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Conoce Políticos -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>De las siguientes personas, me puede indicar si la conoce y si lo conoce, su opinión sobre ella es positiva o negativa.</h4>
+            </div>
+            {% set conoce_opinion = {
+                "José Aguilar Berrocal":["",["aguilarConoce","aguilarOpinion"]],
+                "Ariel Robles":["",["arielConoce","arielOpinion"]]
+            } %}
+            {% set options = {
+                "a. Sí":"a. Sí",
+                "b. No":"b. No",
+                "c. NS/NR":"c. NS/NR"
+            } %}
+            {% set optionsSecond = {
+                "a. Positiva":"a. Positiva",
+                "b. Negativa":"b. Negativa",
+                "c. NS/NR":"c. NS/NR"
+            } %}
+            {% for key, value in conoce_opinion.items() %}
+                <div class="my-5">
+                    <div class="mb-3 border border-grey p-3">
+                        <div class="mb-3 p-3">
+                        <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                                {% set title = "¿Conoce a " ~ key ~ "?" %}
+                                {% set name = value[1][0] %}
+                                {% if value[0] %}
+                                    <img src='{{ url_for("static", filename=value[0]) }}' alt="" style="max-width: 500px;"><br>
+                                {% endif %}
+                                {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                                <script>
+                                    toggleDivOnRadioValue("{{value[1][0]}}", "div-{{value[1][1]}}", "a. Sí");
+                                </script>
+                        </div>
+                        <div id="div-{{value[1][1]}}" style="display: none;" class="mb-3 p-3">
+                        <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                        {% set title = "¿Cuál es su opinión sobre " ~ key ~ "?" %}
+                        {% set name = value[1][1] %}
+                        {{ macros.fieldForm("radio",title,name,name,"True",optionsSecond,"")}}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- Opiniones Políticas -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>Opiniones políticas</h4>
+            </div>
+            <div class="my-5">
+                {% set questions = {
+                    "apoyaAlcalde":["Apoya usted la gestión del actual alcalde / alcaldesa de su cantón?",["a. Sí","b. No","c. NS/NR"]],
+                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                    "nationalElection":["¿Si las elecciones fueran hoy, por quién votaría?",[
+                        "Rolando Araya",
+                        "Fabricio Alvarado",
+                        "Álvaro Ramos",
+                        "Laura Fernández",
+                        "Natalia Díaz",
+                        "Luis Amador",
+                        "José Aguilar Berrocal",
+                        "Douglas Soto",
+                        "Ariel Robles",
+                        "Claudio Alpízar",
+                        "Fernando Zamora",
+                        "Claudia Dobles",
+                        "Eliécer Feinzaig",
+                        "Juan Carlos Hidalgo",
+                        "Otro",
+                        "Ninguno",
+                        "NS/NR"
+                    ]]
+                } %}
+
+                {% for key, value in questions.items() %}
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set title = value[0] %}
+                    {% set name = key %}
+                    {% set options = {} %}
+                    {% for item in value[1] %}
+                        {% set _ = options.update({item: item}) %}
+                    {% endfor %}
+                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Contacto -->
+        <div class="my-2">
+
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                {% set options = "" %}
+                 {{ macros.fieldForm("text","Contacto","contact","contact","True",options,"")}}
+            </div>
+
+        </div>
+        <!-- finaliza fieldset row -->
+
+        <!-- Botón de envío -->
+        <button type="submit" class="btn btn-primary my-5 btn-lg">Guardar</button>
+
+    </form>
+</div>
+{% endblock %}

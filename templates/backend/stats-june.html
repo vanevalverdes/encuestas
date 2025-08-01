@@ -1,0 +1,165 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        margin-bottom: 20px;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let datasetDict
+    let datasetsArray = []
+</script>
+{% set labels = params %}
+
+<div class="container mx-auto col-12">
+<nav class="pt-5">
+    <div class="nav nav-tabs nav justify-content-center" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Porcentajes</button>
+        <button class="nav-link" id="nav-general-chart-tab" data-bs-toggle="tab" data-bs-target="#nav-general-chart" type="button" role="tab" aria-controls="nav-general-chart" aria-selected="false">Gráficos (porcentajes)</button>
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                <div class="row">
+                    {% for key, value in stats.items() %}
+                    {% if key == "age" %}
+                    <div class="col-sm-12">
+                        <!-- Edad -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Edad</h5>
+                                <table class="table table-responsive">
+                                    <tbody>
+                                        <tr>
+                                        {% for key, value in stats.age.items() %}
+                                            <td><b>{{ key }}</b><br>
+                                            {{ value[2] }}</td>
+                                        {% endfor %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <!-- Edad -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Edad</h5>
+                                <table class="table table-responsive">
+                                    <tbody>
+                                        <tr>
+                                        {% for key, val in value.items() %}
+                                            <td><b>{{ key }}</b><br>
+                                            {{ val[5] }}</td>
+                                        {% endfor %}
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif key == "gender" %}
+                    <!-- Genero -->
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Género</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th>Género</th>
+                                        <th>Cant</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, val in value.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ val }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6"></div>
+                    {% else %}
+                    <div class="col-sm-6">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{labels[key]}} </h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in value.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[0] }}</td>
+                                            <td>{{ value[1] }}</td>
+                                            <td>{{ value[2] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <!-- generalElections -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{labels[key]}} Porcentajes</h5>
+                                <table class="table table-responsive">
+                                    <thead>
+                                        <th></th>
+                                        <th>H</th>
+                                        <th>M</th>
+                                        <th>Total</th>
+                                    </thead>
+                                    <tbody>
+                                        {% for key, value in value.items() %}
+                                        <tr>
+                                            <td><b>{{ key }}</b></td>
+                                            <td>{{ value[3] }}</td>
+                                            <td>{{ value[4] }}</td>
+                                            <td>{{ value[5] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="tab-pane fade" id="nav-general-chart" role="tabpanel" aria-labelledby="nav-general-chart-tab" tabindex="0">
+        <section class="py-5">
+            <div class="container mt-3">
+                {% for key, value in stats.items() %}
+                {{ macros.barchartpercent(labels[key],key,stats)}}
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+</div>
+</div>
+
+{% endblock %}

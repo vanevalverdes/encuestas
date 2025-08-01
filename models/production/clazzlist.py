@@ -7,3 +7,4 @@ from . import surveymay
 from . import barvasurvey
 from . import turrialbasurvey
 from . import junesurvey
+from . import augustsurvey

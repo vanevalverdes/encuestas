@@ -392,7 +392,23 @@ def report(record_id):
             "apoyaAlcalde":"Apoya usted la gestión del actual alcalde de su cantón?",
             "contact":"Contacto"
             }
-        
+        stats = generateReport(classname,record_id, county=county)
+        return render_template("backend/stats-june.html",stats=stats,params=params)
+    elif record_id == 16:
+        params = {
+            "userCreation":"Encuestador",
+            "gender":"Género",
+            "age":"Edad",
+            "county":"Cantón",
+            "party":"Partido",
+            "chavesSupport":"Apoya usted la gestión del presidente Rodrigo Chaves?",
+            "nationalElection":"Si las elecciones nacionales fueran hoy, ¿por quién votaría?",
+            "contact":"Contacto"
+            }
+        state = request.args.get("state")
+        if not state:
+            state = None
+        stats = generateReport(classname,record_id, county=county, state=state)
         #return stats
         return render_template("backend/stats.html",stats=stats,params=params)
 
