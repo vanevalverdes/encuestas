@@ -1152,6 +1152,7 @@ def generateReport(clazzname,record_id, county=None, state=None):
                 "Ariel Robles":["arielConoce","arielOpinion"],
                 }, county=county)
         print(stats)
+        return stats
     elif record_id == 16:
         from utils.methods import session
 

@@ -395,6 +395,9 @@ def report(record_id):
             "apoyaAlcalde":"Apoya usted la gestión del actual alcalde de su cantón?",
             "contact":"Contacto"
             }
+        state = request.args.get("state")
+        if not state:
+            state = None
         stats = generateReport(classname,record_id, county=county, state=state)
         return render_template("backend/stats-june.html",stats=stats,params=params)
     elif record_id == 16:

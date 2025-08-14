@@ -35,7 +35,7 @@
             {% if current_user.usergroup.id == 2%}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('rounting.report', record_id=16) }}" id="">
-                  Ver Reporte General
+                  Ver Reporte General - Agosto
               </a>
             </li>
             {% set states = [
@@ -43,7 +43,7 @@
               ] %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Reporte por Provincia
+                Reporte por Provincia - Agosto
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for state in states %}
@@ -53,8 +53,23 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('rounting.survey', record_id=16) }}" id="">
-                  Ir a Formulario de Encuesta
+                  Ir a Formulario de Encuesta - Agosto
               </a>
+            </li>
+            {% endif %}
+            {% if current_user.usergroup.id == 2%}
+            {% set countys = [
+              'Alajuelita','Cañas','Cartago','Curridabat','Desamparados','Escazú','Goicoechea','Grecia','Guacimo','Guapiles','Heredia','Liberia','Limón','Mora','Moravia','Naranjo','Nicoya','Oreamuno','Osa','Palmares','Paraíso','Pérez Zeledón','Puntarenas','San Carlos','San José','San Rafael','San Ramón','Santo Domingo','Sarapiquí','Siquirres','Tibas','Tres Ríos','Turrialba','Upala'
+              ] %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Reporte Encuesta - Alcaldes
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for county in countys %}
+                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=15) }}?county={{ county }}">{{ county }}</a></li>
+                {% endfor %}
+              </ul>
             </li>
             {% endif %}
             {% if current_user.usergroup.id == 3%}
