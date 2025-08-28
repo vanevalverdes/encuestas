@@ -102,7 +102,7 @@ def list_record():
         #    setattr(new, "_password_hash", hashed_password)
         #    db.session.add(new)
         #db.session.commit()
-        password = "junio25t*"
+        password = "septiembre25*"
         hashed_password = generate_password_hash(password)
         #institutions = Record.query.all() 
         institutions = Record.query.filter(Record.usergroup_id != 1).all()
