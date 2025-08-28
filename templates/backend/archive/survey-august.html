@@ -70,7 +70,7 @@ function toggleDivOnRadioNotValue(name, divId, value) {
 </script>
 <div class="container mt-3">
 
-    <h2 class="my-3">Encuesta EC092025-A - Encuestador {{ current_user.id }}</h2>
+    <h2 class="my-3">Encuesta EC082025-A - Encuestador {{ current_user.id }}</h2>
     <form method="post">
         <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}" >
@@ -80,7 +80,7 @@ function toggleDivOnRadioNotValue(name, divId, value) {
             <div class="mb-3">
                 <h4>Datos demográficos</h4>
             </div>
-            <!-- Edad -->
+
             <div class="mb-3 border border-grey p-3">
                 <!-- fieldForm(input,label,id,name,type,required,options,value) -->
                  {% set options = {
@@ -100,7 +100,6 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                  } %}
                  {{ macros.fieldForm("radio","1. Edad","age","age","True",options,"")}}
             </div>
-            <!-- Género -->
             <div class="mb-3 border border-grey p-3">
                 <!-- fieldForm(input,label,id,name,type,required,options,value) -->
                  {% set options = {
@@ -109,7 +108,6 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                  } %}
                  {{ macros.fieldForm("radio","2. Género","gender","gender","True",options,"")}}
             </div>
-            <!-- Cantón y Provincia -->
             <div class="mb-3 border border-grey p-3" id="countyDiv">
                 <label for="county" class="form-label">Cantón</label>
                 <select class="form-select" id="county" aria-label="Cantones de Costa Rica por provincia" name="county" required>
@@ -250,59 +248,39 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                 }
                 });
             </script>
-            <!-- Religion, Educación y Partido -->
-            <div class="my-5">
-                {% set questions = {
-                    "religion":["¿Profesa alguna religión / creencia?",[
-                    "Católico",
-                    "Cristiano / Evangélico (todas las demás)",
-                    "Ateo",
-                    "No religioso",
-                    "Otro",
-                    "NS/NR"
-                    ]],
-                    "education":["Nivel educativo (último concluido)",[
-                    "Sin estudios",
-                    "Primaria",
-                    "Secundaria",
-                    "Técnico",
-                    "Universitaria",
-                    "Posgrados",
-                    "NS/NR"
-                    ]],
-                    "party":["Partido político con el que se identifica",[
-                    "Liberación Nacional",
-                    "Unidad Social Cristiano",
-                    "Liberal Progresista",
-                    "Nueva República",
-                    "Pueblo Soberano",
-                    "Unidos Podemos",
-                    "Frente Amplio",
-                    "PAC",
-                    "Aquí Costa Rica Manda",
-                    "Progreso Social Democrático",
-                    "Nueva Generación",
-                    "Justicia Social",
-                    "Costa Rica Primero",
-                    "Republicano",
-                    "Otro",
-                    "Ninguno",
-                    "NS/NR"]]
-                } %}
+            
+            {% set questions = {
+                "party":["Partido político con el que se identifica",["Liberación Nacional",
+                "Unidad Social Cristiano",
+                "Liberal Progresista",
+                "Nueva República",
+                "Pueblo Soberano",
+                "Unidos Podemos",
+                "Frente Amplio",
+                "PAC",
+                "Aquí Costa Rica Manda",
+                "Progreso Social Democrático",
+                "Nueva Generación",
+                "Justicia Social",
+                "Costa Rica Primero",
+                "Republicano",
+                "Otro",
+                "Ninguno",
+                "NS/NR"]]
+            } %}
 
-                {% for key, value in questions.items() %}
-                <div class="mb-3 border border-grey p-3">
-                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
-                    {% set title = value[0] %}
-                    {% set name = key %}
-                    {% set options = {} %}
-                    {% for item in value[1] %}
-                        {% set _ = options.update({item: item}) %}
-                    {% endfor %}
-                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
-                </div>
+            {% for key, value in questions.items() %}
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                {% set title = value[0] %}
+                {% set name = key %}
+                {% set options = {} %}
+                {% for item in value[1] %}
+                    {% set _ = options.update({item: item}) %}
                 {% endfor %}
+                {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
             </div>
+            {% endfor %}
         </div>
         <!-- Opiniones Políticas -->
         <div class="my-5">
@@ -310,85 +288,29 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                 <h4>Opiniones políticas</h4>
             </div>
             <div class="my-5">
-                <!-- Votará -->
-                <div class="mb-3 border border-grey p-3">
-                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
-                    {% set title = "¿Votará en las próximas elecciones nacionales?" %}
-                    {% set name = "willvote" %}
-                    {% set options = {
-                        "Sí":"Sí",
-                        "No":"No",
-                        "NS/NR":"NS/NR"
-                    } %}
-                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
-                </div>
-                <script>
-                    toggleDivOnRadioNotValue("willvote", "div-vote", "No");
-                </script>
-                <!-- Intención de voto -->
-                <div class="mb-3 p-3" id="div-vote" style="display: none;">
-                    {% set questions = {
-                        "nationalElection":["¿Si las elecciones fueran hoy, por quién votaría?",[
-                            "Laura Fernández PPS",
-                            "Fabricio Alvarado NR",
-                            "Fernando Zamora PNG",
-                            "Álvaro Ramos PLN",
-                            "Natalia Díaz UP",
-                            "Eliécer Feinzaig PLP",
-                            "Ariel Robles Frente Amplio",
-                            "Claudia Dobles PAC",
-                            "Claudio Alpízar Esperanza Nacional",
-                            "Luz Mary Alpízar PSD",
-                            "José Aguilar Berrocal Avance",
-                            "Juan Carlos Hidalgo PUSC",
-                            "Luis Amador Nuestro Pueblo",
-                            "Ronny Castillo ACRM",
-                            "Ana Virginia Calzada",
-                            "Boris Molina",
-                            "Otro",
-                            "Ninguno",
-                            "NS/NR"
-                        ]],
-                        "congressParty":["Si las elecciones fueran hoy ¿Por cuál partido votaría para diputados?",[
-                            "Partido Pueblo Soberano",
-                            "Nueva República",
-                            "Partido Nueva Generación",
-                            "PLN",
-                            "Unidos Podemos",
-                            "Partido Liberal Progresista",
-                            "Frente Amplio",
-                            "PAC",
-                            "Esperanza Nacional",
-                            "Partido Social Democrático",
-                            "Avance",
-                            "PUSC",
-                            "Nuestro Pueblo",
-                            "Aquí CR Manda",
-                            "Partido Centro Social Democrático",
-                            "Partido Unión Costarricense Democrática",
-                            "Otro",
-                            "Ninguno",
-                            "NS/NR"
-                        ]]
-                    } %}
-
-                    {% for key, value in questions.items() %}
-                    <div class="mb-3 border border-grey p-3">
-                        <!-- fieldForm(input,label,id,name,type,required,options,value) -->
-                        {% set title = value[0] %}
-                        {% set name = key %}
-                        {% set options = {} %}
-                        {% for item in value[1] %}
-                            {% set _ = options.update({item: item}) %}
-                        {% endfor %}
-                        {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
-                    </div>
-                    {% endfor %}
-                </div>
-                <!-- Apoyo a Chaves -->
                 {% set questions = {
-                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]]
+                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                    "nationalElection":["¿Si las elecciones fueran hoy, por quién votaría?",[
+                        "Laura Fernández PPS",
+                        "Fabricio Alvarado NR",
+                        "Fernando Zamora PNG",
+                        "Álvaro Ramos PLN",
+                        "Natalia Díaz UP",
+                        "Eliécer Feinzaig PLP",
+                        "Ariel Robles Frente Amplio",
+                        "Claudia Dobles PAC",
+                        "Claudio Alpízar Esperanza Nacional",
+                        "Jorge Acuña PRSC",
+                        "Luz Mary Alpízar PSD",
+                        "José Aguilar Berrocal Avance",
+                        "Juan Carlos Hidalgo PUSC",
+                        "Luis Amador CR1",
+                        "Otro",
+                        "Ninguno",
+                        "NS/NR"
+                    ]]
                 } %}
+
                 {% for key, value in questions.items() %}
                 <div class="mb-3 border border-grey p-3">
                     <!-- fieldForm(input,label,id,name,type,required,options,value) -->
