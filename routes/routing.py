@@ -452,7 +452,7 @@ def report(record_id):
             "religion":"¿Profesa alguna religión / creencia?",
             "education":"Nivel educativo (último concluido)",
             "chavesSupport":"Apoya usted la gestión del presidente Rodrigo Chaves?",
-            "chavesSupportScale":"Del 1 al 10, como califica la labor de Rodrigo Chaves?",
+            "chavesScale":"Del 1 al 10, como califica la labor de Rodrigo Chaves?",
             "nationalElection":"Si las elecciones nacionales fueran hoy, ¿por quién votaría?",
             "nationalElectionSecond":"Cuál sería su segunda opción, de votación ? ",
             "congressParty":"Si las elecciones nacionales fueran hoy, ¿por cuál partido votaría para diputados?",

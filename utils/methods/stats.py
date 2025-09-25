@@ -1653,7 +1653,7 @@ def generateReport(clazzname,record_id, county=None, state=None):
                         "Ninguno",
                         "NS/NR"]],
                     "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
-                    "chavesSupportScale":["Del 1 al 10, como califica la labor de Rodrigo Chaves?",["1","2","3","4","5","6","7","8","9","10"]],
+                    "chavesScale":["Del 1 al 10, como califica la labor de Rodrigo Chaves?",["1","2","3","4","5","6","7","8","9","10"]],
                     "congressParty":["Si las elecciones fueran hoy ¿Por cuál partido votaría para diputados?",[
                         "Partido Pueblo Soberano",
                         "Nueva República",
