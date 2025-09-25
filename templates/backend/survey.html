@@ -70,7 +70,7 @@ function toggleDivOnRadioNotValue(name, divId, value) {
 </script>
 <div class="container mt-3">
 
-    <h2 class="my-3">Encuesta EC092025-A - Encuestador {{ current_user.id }}</h2>
+    <h2 class="my-3">Encuesta EC102025-A - Encuestador {{ current_user.id }}</h2>
     <form method="post">
         <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}" >
@@ -308,23 +308,8 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                 <h4>Opiniones políticas</h4>
             </div>
             <div class="my-5">
-                <!-- Votará -->
-                <div class="mb-3 border border-grey p-3">
-                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
-                    {% set title = "¿Votará en las próximas elecciones nacionales?" %}
-                    {% set name = "willvote" %}
-                    {% set options = {
-                        "Sí":"Sí",
-                        "No":"No",
-                        "NS/NR":"NS/NR"
-                    } %}
-                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
-                </div>
-                <script>
-                    toggleDivOnRadioNotValue("willvote", "div-vote", "No");
-                </script>
                 <!-- Intención de voto -->
-                <div class="mb-3 p-3" id="div-vote" style="display: none;">
+                <div class="mb-3 p-3" >
                     {% set questions = {
                         "nationalElection":["¿Si las elecciones fueran hoy, por quién votaría?",[
                             "Laura Fernández PPS",
@@ -334,12 +319,33 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                             "Natalia Díaz UP",
                             "Eliécer Feinzaig PLP",
                             "Ariel Robles Frente Amplio",
-                            "Claudia Dobles PAC",
+                            "Claudia Dobles Coalición Agenda Ciudadana",
                             "Claudio Alpízar Esperanza Nacional",
                             "Luz Mary Alpízar PSD",
                             "José Aguilar Berrocal Avance",
                             "Juan Carlos Hidalgo PUSC",
-                            "Luis Amador Nuestro Pueblo",
+                            "Luis Amador PIN",
+                            "Ronny Castillo ACRM",
+                            "Ana Virginia Calzada",
+                            "Boris Molina",
+                            "Otro",
+                            "Ninguno",
+                            "NS/NR"
+                        ]],
+                        "nationalElectionSecond":["Cuál sería su segunda opción, de votación? ",[
+                            "Laura Fernández PPS",
+                            "Fabricio Alvarado NR",
+                            "Fernando Zamora PNG",
+                            "Álvaro Ramos PLN",
+                            "Natalia Díaz UP",
+                            "Eliécer Feinzaig PLP",
+                            "Ariel Robles Frente Amplio",
+                            "Claudia Dobles Coalición Agenda Ciudadana",
+                            "Claudio Alpízar Esperanza Nacional",
+                            "Luz Mary Alpízar PSD",
+                            "José Aguilar Berrocal Avance",
+                            "Juan Carlos Hidalgo PUSC",
+                            "Luis Amador PIN",
                             "Ronny Castillo ACRM",
                             "Ana Virginia Calzada",
                             "Boris Molina",
@@ -358,12 +364,14 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                             "PAC",
                             "Esperanza Nacional",
                             "Partido Social Democrático",
+                            "Partido Integración Nacional",
                             "Avanza",
                             "PUSC",
-                            "Nuestro Pueblo",
                             "Aquí CR Manda",
                             "Partido Centro Social Democrático",
                             "Partido Unión Costarricense Democrática",
+                            "Partido Justicia Social Costarricense",
+                            "Costa Rica Primero",
                             "Otro",
                             "Ninguno",
                             "NS/NR"
@@ -385,7 +393,8 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                 </div>
                 <!-- Apoyo a Chaves -->
                 {% set questions = {
-                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]]
+                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]],
+                    "chavesScale":["Del 1 al 10, como califica la labor de Rodrigo Chaves?",["1","2","3","4","5","6","7","8","9","10"]]
                 } %}
                 {% for key, value in questions.items() %}
                 <div class="mb-3 border border-grey p-3">
@@ -399,6 +408,53 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                     {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
                 </div>
                 {% endfor %}
+                <!-- Conoce Políticos -->
+                <div class="my-5">
+                    <div class="mb-3">
+                        <h4>De las siguientes personas, me puede indicar si la conoce y si lo conoce, su opinión sobre ella es positiva o negativa.</h4>
+                    </div>
+                    {% set conoce_opinion = {
+                        "Juan Carlos Hidalgo":["/candidatos/juancarlos.webp",["conoceJuanCarlos","opinionJuanCarlos"]],
+                        "Walter Rubén Hernández":["/candidatos/Walter-Ruben-Hernandez.webp",["conoceWalter","opinionWalter"]],
+                        "Laura Fernández ":["/candidatos/Laura-Fernandez-ministra-Presidencia-3.webp",["conoceLauraFernandez","opinionLauraFernandez"]],
+                        "Natalia Diaz":["/candidatos/Natalia_Díaz_Quintana.jpg",["conoceNataliaDiaz","opinionNataliaDiaz"]],
+                        "Ariel Robles":["/candidatos/Ariel_Robles_Barrantes_copia.png",["conoceArielRobles","opinionArielRobles"]]
+                    } %}
+                    {% set options = {
+                        "a. Sí":"a. Sí",
+                        "b. No":"b. No",
+                        "c. NS/NR":"c. NS/NR"
+                    } %}
+                    {% set optionsSecond = {
+                        "a. Positiva":"a. Positiva",
+                        "b. Negativa":"b. Negativa",
+                        "c. NS/NR":"c. NS/NR"
+                    } %}
+                    {% for key, value in conoce_opinion.items() %}
+                        <div class="my-5">
+                            <div class="mb-3 border border-grey p-3">
+                                <div class="mb-3 p-3">
+                                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                                        {% set title = "¿Conoce a " ~ key ~ "?" %}
+                                        {% set name = value[1][0] %}
+                                        {% if value[0] %}
+                                            <img src='{{ url_for("static", filename=value[0]) }}' alt="" style="max-width: 500px;  max-height: 400px;"><br>
+                                        {% endif %}
+                                        {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                                        <script>
+                                            toggleDivOnRadioValue("{{value[1][0]}}", "div-{{value[1][1]}}", "a. Sí");
+                                        </script>
+                                </div>
+                                <div id="div-{{value[1][1]}}" style="display: none;" class="mb-3 p-3">
+                                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                                {% set title = "¿Cuál es su opinión sobre " ~ key ~ "?" %}
+                                {% set name = value[1][1] %}
+                                {{ macros.fieldForm("radio",title,name,name,"True",optionsSecond,"")}}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         <!-- Contacto -->

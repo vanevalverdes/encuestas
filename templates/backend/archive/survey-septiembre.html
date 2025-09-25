@@ -1,0 +1,421 @@
+{% import "backend/routing/macros.html" as macros %}
+{% extends "backend/template.html" %}
+
+{% block title %}Nuevo{% endblock %}
+
+{% block content %}
+ <style>
+    .form-check {
+  margin-bottom: 0.5rem;
+}
+ </style>
+<script>
+function toggleDivOnRadioValue(name, divId, value) {
+    document.addEventListener("DOMContentLoaded", function () {
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        const targetDiv = document.getElementById(divId);
+        if (!targetDiv) return;
+        const inputs = targetDiv.querySelectorAll("input");
+
+        function toggleDiv() {
+            const selectedValue = document.querySelector(`input[name="${name}"]:checked`)?.value;
+            if (selectedValue === value) {
+                targetDiv.style.display = "block";
+                inputs.forEach(input => input.removeAttribute("disabled"));
+            } else {
+                targetDiv.style.display = "none";
+                inputs.forEach(input => {
+                    input.setAttribute("disabled", "true");
+                    input.checked = false;
+                });
+            }
+        }
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", toggleDiv);
+        });
+
+        toggleDiv();
+    });
+}
+
+function toggleDivOnRadioNotValue(name, divId, value) {
+    document.addEventListener("DOMContentLoaded", function () {
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        const targetDiv = document.getElementById(divId);
+        if (!targetDiv) return;
+        const inputs = targetDiv.querySelectorAll("input");
+
+        function toggleDiv() {
+            const selectedValue = document.querySelector(`input[name="${name}"]:checked`)?.value;
+            if (selectedValue !== value && selectedValue !== undefined) {
+                targetDiv.style.display = "block";
+                inputs.forEach(input => input.removeAttribute("disabled"));
+            } else {
+                targetDiv.style.display = "none";
+                inputs.forEach(input => {
+                    input.setAttribute("disabled", "true");
+                    input.checked = false;
+                });
+            }
+        }
+
+        radios.forEach(radio => {
+            radio.addEventListener("change", toggleDiv);
+        });
+
+        toggleDiv();
+    });
+}
+</script>
+<div class="container mt-3">
+
+    <h2 class="my-3">Encuesta EC092025-A - Encuestador {{ current_user.id }}</h2>
+    <form method="post">
+        <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" id="createdby_id" name="createdby_id" value="{{ current_user.id }}" >
+        <!-- fieldset row -->
+        <!-- Datos demográficos -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>Datos demográficos</h4>
+            </div>
+            <!-- Edad -->
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "a. 18 -20":"a. 18 -20",
+                    "b. 21 - 24":"b. 21 - 24",
+                    "c. 25 - 29":"c. 25 - 29",
+                    "d. 30 - 34":"d. 30 - 34",
+                    "e. 35 - 39":"e. 35 - 39",
+                    "f. 40 - 44":"f. 40 - 44",
+                    "g. 45 - 49":"g. 45 - 49",
+                    "h. 50 - 54":"h. 50 - 54",
+                    "i. 55 - 59":"i. 55 - 59",
+                    "j. 60 - 64":"j. 60 - 64",
+                    "k. 65 - 69":"k. 65 - 69",
+                    "l. 70 - 79":"l. 70 - 79",
+                    "m. + 80":"m. + 80"
+                 } %}
+                 {{ macros.fieldForm("radio","1. Edad","age","age","True",options,"")}}
+            </div>
+            <!-- Género -->
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                 {% set options = {
+                    "A. Masculino":"A. Masculino",
+                    "B. Femenino":"B. Femenino"
+                 } %}
+                 {{ macros.fieldForm("radio","2. Género","gender","gender","True",options,"")}}
+            </div>
+            <!-- Cantón y Provincia -->
+            <div class="mb-3 border border-grey p-3" id="countyDiv">
+                <label for="county" class="form-label">Cantón</label>
+                <select class="form-select" id="county" aria-label="Cantones de Costa Rica por provincia" name="county" required>
+                <option value="" selected disabled>Seleccione un cantón</option>
+                <optgroup label="San José">
+                    <option value="san-jose">San José</option>
+                    <option value="escazu">Escazú</option>
+                    <option value="desamparados">Desamparados</option>
+                    <option value="puriscal">Puriscal</option>
+                    <option value="tarrazu">Tarrazú</option>
+                    <option value="aserri">Aserrí</option>
+                    <option value="mora">Mora</option>
+                    <option value="goicoechea">Goicoechea</option>
+                    <option value="santa-ana">Santa Ana</option>
+                    <option value="alajuelita">Alajuelita</option>
+                    <option value="vazquez-de-coronado">Vázquez de Coronado</option>
+                    <option value="acosta">Acosta</option>
+                    <option value="tibas">Tibás</option>
+                    <option value="moravia">Moravia</option>
+                    <option value="montes-de-oca">Montes de Oca</option>
+                    <option value="turrubares">Turrubares</option>
+                    <option value="dota">Dota</option>
+                    <option value="curridabat">Curridabat</option>
+                    <option value="perez-zeledon">Pérez Zeledón</option>
+                    <option value="leon-cortes-castro">León Cortés Castro</option>
+                </optgroup>
+                <optgroup label="Alajuela">
+                    <option value="alajuela">Alajuela</option>
+                    <option value="san-ramon">San Ramón</option>
+                    <option value="grecia">Grecia</option>
+                    <option value="san-mateo">San Mateo</option>
+                    <option value="atenas">Atenas</option>
+                    <option value="naranjo">Naranjo</option>
+                    <option value="palmares">Palmares</option>
+                    <option value="poas">Poás</option>
+                    <option value="orotina">Orotina</option>
+                    <option value="san-carlos">San Carlos</option>
+                    <option value="zarcero">Zarcero</option>
+                    <option value="valverde-vega">Valverde Vega</option>
+                    <option value="upala">Upala</option>
+                    <option value="los-chiles">Los Chiles</option>
+                    <option value="guatuso">Guatuso</option>
+                    <option value="rio-cuarto">Río Cuarto</option>
+                </optgroup>
+                <optgroup label="Cartago">
+                    <option value="cartago">Cartago</option>
+                    <option value="paraiso">Paraíso</option>
+                    <option value="la-union">La Unión</option>
+                    <option value="jimenez">Jiménez</option>
+                    <option value="turrialba">Turrialba</option>
+                    <option value="alvarado">Alvarado</option>
+                    <option value="oremuno">Oreamuno</option>
+                    <option value="el-guarco">El Guarco</option>
+                </optgroup>
+                <optgroup label="Heredia">
+                    <option value="heredia">Heredia</option>
+                    <option value="barva">Barva</option>
+                    <option value="santo-domingo">Santo Domingo</option>
+                    <option value="santa-barbara">Santa Bárbara</option>
+                    <option value="san-rafael">San Rafael</option>
+                    <option value="san-isidro">San Isidro</option>
+                    <option value="belen">Belén</option>
+                    <option value="flores">Flores</option>
+                    <option value="san-pablo">San Pablo</option>
+                    <option value="sarapiqui">Sarapiquí</option>
+                </optgroup>
+                <optgroup label="Guanacaste">
+                    <option value="liberia">Liberia</option>
+                    <option value="nicoya">Nicoya</option>
+                    <option value="santa-cruz">Santa Cruz</option>
+                    <option value="bagaces">Bagaces</option>
+                    <option value="carrillo">Carrillo</option>
+                    <option value="cañas">Cañas</option>
+                    <option value="abangares">Abangares</option>
+                    <option value="tilaran">Tilarán</option>
+                    <option value="nandayure">Nandayure</option>
+                    <option value="la-cruz">La Cruz</option>
+                    <option value="hojancha">Hojancha</option>
+                </optgroup>
+                <optgroup label="Puntarenas">
+                    <option value="puntarenas">Puntarenas</option>
+                    <option value="esparza">Esparza</option>
+                    <option value="buenos-aires">Buenos Aires</option>
+                    <option value="montes-de-oro">Montes de Oro</option>
+                    <option value="osa">Osa</option>
+                    <option value="quepos">Quepos</option>
+                    <option value="golfito">Golfito</option>
+                    <option value="coto-brus">Coto Brus</option>
+                    <option value="parrita">Parrita</option>
+                    <option value="corredores">Corredores</option>
+                    <option value="garabito">Garabito</option>
+                    <option value="monteverde">Monteverde</option>
+                    <option value="puerto-jimenez">Puerto Jiménez</option>
+                </optgroup>
+                <optgroup label="Limón">
+                    <option value="limon">Limón</option>
+                    <option value="pococí">Pococí</option>
+                    <option value="siquirres">Siquirres</option>
+                    <option value="talamanca">Talamanca</option>
+                    <option value="matina">Matina</option>
+                    <option value="guacimo">Guácimo</option>
+                </optgroup>
+                </select>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', (event) => {
+                const countySelect = document.getElementById('county');
+
+                if (countySelect) {
+                    countySelect.addEventListener('change', (e) => {
+                    const selectedOption = e.target.options[e.target.selectedIndex];
+                    const provinceGroup = selectedOption.closest('optgroup');
+                    const containerDiv = document.getElementById('countyDiv');
+
+                    // Remover cualquier input 'state' hidden existente para evitar duplicados.
+                    const existingStateInput = containerDiv.querySelector('input[name="state"]');
+                    if (existingStateInput) {
+                        existingStateInput.remove();
+                    }
+
+                    if (provinceGroup) {
+                        // Obtener el nombre de la provincia del label de optgroup
+                        let provinceName = provinceGroup.label;
+                        
+                        // Formatear el nombre de la provincia a un valor de URL-friendly (lowercase, sin acentos, con guiones)
+                        let provinceValue = provinceName.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s/g, '-');
+
+                        // Crear el input hidden
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'state';
+                        hiddenInput.value = provinceValue;
+                        
+                        // Agregar el input hidden al div contenedor
+                        containerDiv.appendChild(hiddenInput);
+                    }
+                    });
+                }
+                });
+            </script>
+            <!-- Religion, Educación y Partido -->
+            <div class="my-5">
+                {% set questions = {
+                    "religion":["¿Profesa alguna religión / creencia?",[
+                    "Católico",
+                    "Cristiano / Evangélico (todas las demás)",
+                    "Ateo",
+                    "No religioso",
+                    "Otro",
+                    "NS/NR"
+                    ]],
+                    "education":["Nivel educativo (último concluido)",[
+                    "Sin estudios",
+                    "Primaria",
+                    "Secundaria",
+                    "Técnico",
+                    "Universitaria",
+                    "Posgrados",
+                    "NS/NR"
+                    ]],
+                    "party":["Partido político con el que se identifica",[
+                    "Acción Ciudadana",
+                    "Aquí Costa Rica Manda",
+                    "Avanza",
+                    "Frente Amplio",
+                    "Liberación Nacional",
+                    "Liberal Progresista",
+                    "Nueva Generación",
+                    "Nueva República",
+                    "Progreso Social Democrático",
+                    "Pueblo Soberano",
+                    "Unidad Social Cristiano",
+                    "Unidos Podemos",
+                    "Otro",
+                    "Ninguno",
+                    "NS/NR"]]
+                } %}
+
+                {% for key, value in questions.items() %}
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set title = value[0] %}
+                    {% set name = key %}
+                    {% set options = {} %}
+                    {% for item in value[1] %}
+                        {% set _ = options.update({item: item}) %}
+                    {% endfor %}
+                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Opiniones Políticas -->
+        <div class="my-5">
+            <div class="mb-3">
+                <h4>Opiniones políticas</h4>
+            </div>
+            <div class="my-5">
+                <!-- Votará -->
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set title = "¿Votará en las próximas elecciones nacionales?" %}
+                    {% set name = "willvote" %}
+                    {% set options = {
+                        "Sí":"Sí",
+                        "No":"No",
+                        "NS/NR":"NS/NR"
+                    } %}
+                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                </div>
+                <script>
+                    toggleDivOnRadioNotValue("willvote", "div-vote", "No");
+                </script>
+                <!-- Intención de voto -->
+                <div class="mb-3 p-3" id="div-vote" style="display: none;">
+                    {% set questions = {
+                        "nationalElection":["¿Si las elecciones fueran hoy, por quién votaría?",[
+                            "Laura Fernández PPS",
+                            "Fabricio Alvarado NR",
+                            "Fernando Zamora PNG",
+                            "Álvaro Ramos PLN",
+                            "Natalia Díaz UP",
+                            "Eliécer Feinzaig PLP",
+                            "Ariel Robles Frente Amplio",
+                            "Claudia Dobles PAC",
+                            "Claudio Alpízar Esperanza Nacional",
+                            "Luz Mary Alpízar PSD",
+                            "José Aguilar Berrocal Avance",
+                            "Juan Carlos Hidalgo PUSC",
+                            "Luis Amador Nuestro Pueblo",
+                            "Ronny Castillo ACRM",
+                            "Ana Virginia Calzada",
+                            "Boris Molina",
+                            "Otro",
+                            "Ninguno",
+                            "NS/NR"
+                        ]],
+                        "congressParty":["Si las elecciones fueran hoy ¿Por cuál partido votaría para diputados?",[
+                            "Partido Pueblo Soberano",
+                            "Nueva República",
+                            "Partido Nueva Generación",
+                            "PLN",
+                            "Unidos Podemos",
+                            "Partido Liberal Progresista",
+                            "Frente Amplio",
+                            "PAC",
+                            "Esperanza Nacional",
+                            "Partido Social Democrático",
+                            "Avanza",
+                            "PUSC",
+                            "Nuestro Pueblo",
+                            "Aquí CR Manda",
+                            "Partido Centro Social Democrático",
+                            "Partido Unión Costarricense Democrática",
+                            "Otro",
+                            "Ninguno",
+                            "NS/NR"
+                        ]]
+                    } %}
+
+                    {% for key, value in questions.items() %}
+                    <div class="mb-3 border border-grey p-3">
+                        <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                        {% set title = value[0] %}
+                        {% set name = key %}
+                        {% set options = {} %}
+                        {% for item in value[1] %}
+                            {% set _ = options.update({item: item}) %}
+                        {% endfor %}
+                        {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- Apoyo a Chaves -->
+                {% set questions = {
+                    "chavesSupport":["Apoya usted la gestión del presidente Rodrigo Chaves?",["a. Sí","b. No","c. NS/NR"]]
+                } %}
+                {% for key, value in questions.items() %}
+                <div class="mb-3 border border-grey p-3">
+                    <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                    {% set title = value[0] %}
+                    {% set name = key %}
+                    {% set options = {} %}
+                    {% for item in value[1] %}
+                        {% set _ = options.update({item: item}) %}
+                    {% endfor %}
+                    {{ macros.fieldForm("radio",title,name,name,"True",options,"")}}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Contacto -->
+        <div class="my-2">
+
+            <div class="mb-3 border border-grey p-3">
+                <!-- fieldForm(input,label,id,name,type,required,options,value) -->
+                {% set options = "" %}
+                 {{ macros.fieldForm("text","Contacto","contact","contact","True",options,"")}}
+            </div>
+
+        </div>
+        <!-- finaliza fieldset row -->
+
+        <!-- Botón de envío -->
+        <button type="submit" class="btn btn-primary my-5 btn-lg">Guardar</button>
+
+    </form>
+</div>
+{% endblock %}

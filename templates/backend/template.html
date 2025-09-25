@@ -34,8 +34,8 @@
             {% endif %}
             {% if current_user.usergroup.id == 2%}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.report', record_id=17) }}" id="">
-                  Ver Reporte General - Septiembre
+              <a class="nav-link" href="{{ url_for('rounting.report', record_id=18) }}" id="">
+                  Ver Reporte General - Octubre
               </a>
             </li>
             {% set states = [
@@ -43,16 +43,16 @@
               ] %}
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Reporte por Provincia - Septiembre
+                Reporte por Provincia - Octubre
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% for state in states %}
-                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=17) }}?state={{ state }}">{{ state }}</a></li>
+                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=18) }}?state={{ state }}">{{ state }}</a></li>
                 {% endfor %}
               </ul>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=17) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=18) }}" id="">
                   Ir a Formulario de Encuesta - Septiembre
               </a>
             </li>
@@ -76,7 +76,7 @@
             #}
             {% if current_user.usergroup.id == 3%}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=17) }}" id="">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=18) }}" id="">
                   Ir a Formulario de Encuesta
               </a>
             </li>

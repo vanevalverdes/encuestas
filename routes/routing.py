@@ -276,6 +276,7 @@ def pln_day():
 @traceError
 @login_required
 def reportTest():
+    """
     classname = request.args.get("classname")
     if not classname:
         return "No se ha especificado el nombre de la clase"
@@ -292,6 +293,11 @@ def reportTest():
     query = session.newQuery(classname)
     query.addFilter(fieldQuery, "==", valueFieldQuery)
     table = query.getCountBy("id",fieldGroupBy)
+    """
+    query = session.newQuery("septemberSurvey")
+    query.addFilter("nationalElection", "==", "Ariel Robles Frente Amplio")
+    query.addFilter("createdby_id", "==", 7)
+    table = query.getCountBy("id","county")
 
     jsonData = {}
     for item in table:
@@ -430,6 +436,36 @@ def report(record_id):
             "nationalElection":"Si las elecciones nacionales fueran hoy, ¿por quién votaría?",
             "congressParty":"Si las elecciones nacionales fueran hoy, ¿por cuál partido votaría para diputados?",
             "willvote":"¿Votará usted en las próximas elecciones?",
+            }
+        state = request.args.get("state")
+        if not state:
+            state = None
+        stats = generateReport(classname,record_id, county=county, state=state)
+        return render_template("backend/stats.html",stats=stats,params=params)
+    elif record_id == 18:
+        params = {
+            "userCreation":"Encuestador",
+            "gender":"Género",
+            "age":"Edad",
+            "county":"Cantón",
+            "party":"Partido político con el que se identifica",
+            "religion":"¿Profesa alguna religión / creencia?",
+            "education":"Nivel educativo (último concluido)",
+            "chavesSupport":"Apoya usted la gestión del presidente Rodrigo Chaves?",
+            "chavesSupportScale":"Del 1 al 10, como califica la labor de Rodrigo Chaves?",
+            "nationalElection":"Si las elecciones nacionales fueran hoy, ¿por quién votaría?",
+            "nationalElectionSecond":"Cuál sería su segunda opción, de votación ? ",
+            "congressParty":"Si las elecciones nacionales fueran hoy, ¿por cuál partido votaría para diputados?",
+            "conoceJuanCarlos":"¿Conoce usted a Juan Carlos Hidalgo?",
+            "opinionJuanCarlos":"¿Cuál es su opinión sobre Juan Carlos Hidalgo?",
+            "conoceWalter":"¿Conoce usted a Walter Ruben Hernández?",
+            "opinionWalter":"¿Cuál es su opinión sobre Walter Ruben Hernández?",
+            "conoceLauraFernandez":"¿Conoce usted a Laura Fernández?",
+            "opinionLauraFernandez":"¿Cuál es su opinión sobre Laura Fernández?",
+            "conoceNataliaDiaz":"¿Conoce usted a Natalia Díaz?",
+            "opinionNataliaDiaz":"¿Cuál es su opinión sobre Natalia Díaz?",
+            "conoceArielRobles":"¿Conoce usted a Ariel Robles?",
+            "opinionArielRobles":"¿Cuál es su opinión sobre Ariel Robles?",
             }
         state = request.args.get("state")
         if not state:

@@ -7,6 +7,7 @@ from config import Config
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from models.develop.user import User
+from models.develop.historial import Historial
 from models.production import clazzlist
 
 

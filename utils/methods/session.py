@@ -25,6 +25,8 @@ def saveForm(institution, containers, id=None):
     from datetime import datetime
     from . import engine
     import uuid
+    import json
+    from models.develop.historial import Historial
     
     # Define los diferentes tipos de campos
     checkbox_fields_boolean = {key for container_key, container in containers.items()
@@ -40,6 +42,14 @@ def saveForm(institution, containers, id=None):
     blob_fields = {key for container_key, container in containers.items()
             for key, value in container['fields'].items() if value['input'] == 'blob'}
     
+    requestDict = request.form.to_dict()
+    requestJson = json.dumps(requestDict, indent=4)
+    newHistorial = Historial()
+    setattr(newHistorial, "dataRequest", requestJson)
+    setattr(newHistorial, "createdby_id", request.form.get("createdby_id"))
+    db.session.add(newHistorial)
+    db.session.commit()
+
     # Itera sobre los campos del formulario que coinciden con los nombres de las columnas
     for key in request.form:
         if hasattr(institution, key):
