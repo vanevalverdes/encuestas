@@ -43,7 +43,7 @@ def saveForm(institution, containers, id=None):
             for key, value in container['fields'].items() if value['input'] == 'blob'}
     
     requestDict = request.form.to_dict()
-    requestJson = json.dumps(requestDict, indent=4)
+    requestJson = json.dumps(requestDict, indent=4, ensure_ascii=False)
     newHistorial = Historial()
     setattr(newHistorial, "dataRequest", requestJson)
     setattr(newHistorial, "createdby_id", request.form.get("createdby_id"))
