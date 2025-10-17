@@ -1,9 +1,7 @@
-#/utils/exporter.py
-#/static/uploads
-#/static/qrcodes
 
 # Excluye el entorno virtual
 /venv
+/venv_39
 
 # Excluye archivos y directorios de configuración de Python
 __pycache__/
@@ -38,5 +36,8 @@ env.bak/
 venv.bak/
 
 # Excluye Migrations
-#migrations/
-#/migrations
+migrations/
+/migrations
+
+# Excluye uploads
+uploads/

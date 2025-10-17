@@ -1,0 +1,3 @@
+{%- from "backend/snippets/snippets.html" import getTable -%}
+{%- set args = request.args.copy() -%}
+{{- getTable(classid, args, table) -}}

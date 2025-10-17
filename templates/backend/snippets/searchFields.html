@@ -1,0 +1,268 @@
+
+    {% macro boolean(id,value)%}
+        <input class="form-check-input" type="checkbox" id="{{id}}" name="{{id}}" {% if value %}checked{% endif %} >
+    {% endmacro %}
+    
+    {% macro checkbox(id,options, value) %}
+        {% if options is string %}
+            {% set options = options|from_json %}
+            {% for label, checkvalue in options.items() %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{id}}-{{ loop.index }}" name="{{id}}[]" value="{{ checkvalue }}">
+                <label class="form-check-label" for="{{id}}-{{ loop.index }}">
+                    {{ label }}
+                </label>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endmacro %}
+
+    {% macro radio(id, options, value) %}
+        {% for label, checkvalue in options.items() %}
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="{{ id }}-{{ loop.index }}" name="{{ id }}" value="{{ checkvalue }}"{% if checkvalue == value %} checked {% endif %}>
+            <label class="form-check-label" for="{{ id }}-{{ loop.index }}">
+                {{ label }}
+            </label>
+        </div>
+        {% endfor %}
+    {% endmacro %}
+
+    {% macro money(id, required,value) %}
+        <input class="form-control" type="number"
+            id="{{id}}" name="{{id}}" value='{% if value %}{{ value | money_format }}{% endif %}' step="0.01" placeholder="0.00" min="0" >
+    {% endmacro %}
+
+    {% macro number(id, value) %}
+        <input class="form-control" type="number"
+            id="{{ id }}" name="{{ id }}" value="{% if value %}{{ value }}{% endif %}" step="1" >
+    {% endmacro %}
+
+    {% macro float(id, value) %}
+        <input class="form-control" type="number" 
+            id="{{ id }}" name="{{ id }}" value="{% if value %}{{ value }}{%  endif %}" step="0.01" >
+    {% endmacro %}
+
+    {% macro integer(id, valueStart, valueUntil) %}
+    <div class="d-flex justify-content-between">
+    <input class="form-control me-2" type="number" id="{{id}}" placeholder="Desde" name="start-{{id}}" {% if valueStart %} value="{{valueStart}}" {% endif %}>
+    <input class="form-control" type="number" id="{{id}}" placeholder="Hasta" name="until-{{id}}" {% if valueUntil %} value="{{valueUntil}}" {% endif %}>
+    </div>
+    {% endmacro %}
+
+    {% macro select(id, options,value) %}
+    <select class="form-select" id="{{id}}" name="{{id}}">
+        {% if options is string %}
+            {% set options = options|from_json %}
+            <option ></option>
+            {% for label, valueOption in options.items() %}
+            <option {% if value|string == valueOption|string %} selected {% endif %} value="{{ valueOption }}">
+                {{ label }}</option>
+            {% endfor %}
+        {% endif %}
+    </select>
+    {%endmacro%}
+
+    {% macro tagsInput(id, options,value) %}
+        {% set tags = connected_table|get_table_options %}
+        <div class="tags-container" id="tagsContainer-{{ id }}">
+            <input type="text" id="tagInput-{{ id }}" class="tag-input" placeholder="Escribe para buscar...">
+        </div>
+        <input type="hidden" name="{{ id }}" id="tagsValue-{{ id }}" {% if required %}data-required="true"{% endif %}>
+        <div id="suggestions-{{ id }}" class="suggestions" style="display: none;"></div>
+
+        <script>
+            (function() {
+                const data = {{ tags|tojson }};  // { "nombre": id }
+                // Construir diccionario inverso { id: "nombre" }
+                const reverseData = Object.fromEntries(Object.entries(data).map(([k,v]) => [v,k]));
+
+                const tagsContainer = document.getElementById('tagsContainer-{{ id }}');
+                const tagInput = document.getElementById('tagInput-{{ id }}');
+                const tagsValue = document.getElementById('tagsValue-{{ id }}');
+                const suggestionsBox = document.getElementById('suggestions-{{ id }}');
+
+                let selectedTags = [];
+
+                // --- Preload de valores ---
+                {% if value %}
+                    tagsPreloaded = [];
+                    {% for item in value %}
+                        tagsPreloaded.push({{ item.id }});
+                    {%endfor%}
+                    selectedTags = tagsPreloaded;
+                    selectedTags.forEach(id => {
+                        const name = reverseData[id];
+                        if (name) addTagElement(name, id);
+                    });
+                    tagsValue.value = selectedTags.join(",");
+                {% endif %}
+                // --- Fin Preload de valores ---
+
+                tagInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase();
+                    suggestionsBox.innerHTML = '';
+
+                    if (query) {
+                        const filteredTags = Object.keys(data).filter(tag =>
+                            tag.toLowerCase().includes(query) && !selectedTags.includes(data[tag])
+                        );
+                        if (filteredTags.length > 0) {
+                            suggestionsBox.style.display = 'block';
+                            filteredTags.forEach(tag => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.textContent = tag;
+                                div.addEventListener('click', () => selectTag(tag));
+                                suggestionsBox.appendChild(div);
+                            });
+                        } else {
+                            suggestionsBox.style.display = 'none';
+                        }
+                    } else {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+
+                function selectTag(tag) {
+                    const id = data[tag];
+                    if (!selectedTags.includes(id)) {
+                        addTagElement(tag, id);
+                        selectedTags.push(id);
+                        updateHiddenInput();
+                    }
+                    tagInput.value = '';
+                    suggestionsBox.style.display = 'none';
+                }
+
+                function addTagElement(name, id) {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'tag';
+                    tagElement.innerHTML = `${name} <span class="remove-tag">&times;</span>`;
+                    tagElement.querySelector('.remove-tag').addEventListener('click', () => removeTag(tagElement, id));
+                    tagsContainer.insertBefore(tagElement, tagInput);
+                }
+
+                function removeTag(element, id) {
+                    tagsContainer.removeChild(element);
+                    selectedTags = selectedTags.filter(tagId => tagId !== id);
+                    updateHiddenInput();
+                }
+
+                function updateHiddenInput() {
+                    tagsValue.value = selectedTags.join(",");
+                }
+
+                // --- Validación required ---
+                if (tagsValue.dataset.required === "true") {
+                    tagsValue.form.addEventListener('submit', function(e) {
+                        if (selectedTags.length === 0) {
+                            e.preventDefault();
+                            tagsContainer.style.borderColor = "red";
+                            alert("El campo '{{ label }}' es obligatorio.");
+                        }
+                    });
+                }
+
+                document.addEventListener('click', (e) => {
+                    if (!tagsContainer.contains(e.target)) {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+            })();
+        </script>
+    {% endmacro %}
+
+    {% macro treeView(id, options, connected_table, value) %}
+        {% set tree_json = connected_table | treeView %}
+        <div class="d-flex align-items-center mb-3">
+            <input type="text" id="{{id}}-selected-ids" name="{{id}}" hidden value="{% if value %}{{ value.id|join(',') }}{% endif %}">
+            <input type="text" class="form-control" id="{{id}}-display-name" value="{% if value %}{{ value|join(',') }}{% endif %}" disabled placeholder="Haz clic en la lupa para seleccionar...">
+            <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#tree-modal-{{id}}">
+                <i class="material-icons">search</i>
+            </button>
+        </div>
+        <div class="modal fade" id="tree-modal-{{id}}" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="treeModalLabel">Seleccionar Categorías</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="tree-{{ id }}"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+                let treeInitialized = false;
+                $('#tree-modal-{{id}}').on('shown.bs.modal', function () {
+                    if (!treeInitialized) {
+                        let initialSelectedIds = $('#{{id}}-selected-ids').val();
+                        let initialSelectedArray = initialSelectedIds ? initialSelectedIds.split(',').map(Number) : [];
+                        $('#tree-{{ id }}').jstree({
+                            'core': {
+                                'data': {{ tree_json|tojson }}
+                            },
+                            'plugins': ["checkbox", "state"],
+                            'state': {
+                                'core': {
+                                    'selected': initialSelectedArray
+                                }
+                            }
+                        });
+                        // Maneja el evento de cambio de selección
+                        $('#tree-{{ id }}').on('changed.jstree', function(e, data) {
+                            let selectedIds = data.selected;
+                            let idString = selectedIds.join(',');
+                            $('#{{id}}-selected-ids').val(idString);
+                            
+                            let selectedNames = data.instance.get_selected(true).map(function(node) {
+                                return node.text;
+                            });
+                            $('#{{id}}-display-name').val(selectedNames.join(', '));
+                        });
+                        treeInitialized = true;
+                    }
+                });
+
+                // Opcional: Para evitar problemas de scroll en móviles
+                $('#tree-modal-{{id}}').on('hidden.bs.modal', function () {
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                });
+            });
+        </script>
+    {%endmacro%}
+
+    {% macro connected_table(id,connected_table, value)%}
+    
+    {% set options = connected_table|get_table_options %}
+    <select class="form-select select-searchable" id="{{id}}" name="{{id}}">
+        
+            <option {% if not value %} selected {% endif %}></option>
+            {% for label, valueOption in options.items() %}
+            <option {% if value.id|string == valueOption|string %} selected {% endif %} value="{{ valueOption }}">
+                {{ label }}</option>
+            {% endfor %}
+    </select>
+    {%endmacro%}
+
+    {% macro date(id, value) %}
+        <input  class="form-control" id="{{id}}" name="{{id}}" type="date" {% if value %} value="{{value}}" {% endif %} />
+    {%endmacro%}
+
+    {% macro email(id, value) %}
+    <input class="form-control" type="email" id="{{id}}" name="{{id}}"
+        maxlength="{{ value.maxlength }}" {% if value %} value="{{value}}" {% endif %}>
+    {%endmacro%}
+
+    {% macro text(id, value) %}
+        <input class="form-control" name="{{id}}" id="{{id}}" type="text" {% if value %} value="{{value}}" {% endif %}/>
+    {% endmacro %}
+

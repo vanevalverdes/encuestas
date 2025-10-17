@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from utils.db import db
 
 class Relevant(db.Model):
@@ -11,12 +12,16 @@ class Relevant(db.Model):
     usergroup = db.relationship('Usergroup', backref='relevants')
     clazz_id = db.Column(db.Integer, db.ForeignKey('clazz.id'))
     clazz = db.relationship('Clazz', backref='relevants')
+    __table_args__ = {
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci",
+    }
     
     def __repr__(self) -> str:
         return f"{repr(self.clazz)} - {repr(self.usergroup)}"
     
 def get_fields(parent=False):
-    from utils.methods import application
+    from utils.packages import application
     clazzes = application.list_class_names()
     usergroups = application.getAllUsergroups()
     usergroupsOptions = [{"label": "Ninguno", "value": ""}] + [{"label": relevant.name, "value": relevant.id} for relevant in usergroups]
@@ -36,14 +41,6 @@ def get_fields(parent=False):
                     "maxlength": "", 
                     "label": "Id", 
                     "input": "integer",
-                    "class":""
-                },
-                "name": {
-                    "id": "name", 
-                    "type": "String", 
-                    "maxlength": "100", 
-                    "label": "Nombre de la Clase en BD", 
-                    "input": "text",
                     "class":""
                 },
                 "search": {

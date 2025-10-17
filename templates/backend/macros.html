@@ -1,0 +1,132 @@
+{% import "backend/snippets/snippets.html" as snippets %}
+
+{% macro fieldForm(field,record=False,editable=False,origin=False,label=False) %}
+    {% set hidden = field.hidden %}
+    {% if hidden %}
+        <div style="display: none;">
+    {%endif%}
+        {% if record %}
+            {% if field == "createdby" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Creado por:</label>
+                    <div class="col-sm-8">
+                        {{ record.createdby }}
+                    </div>
+                </div>
+            {% elif field == "modifiedby" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Modificado por:</label>
+                    <div class="col-sm-8">
+                        {{ record.modifiedby }}
+                    </div>
+                </div>
+            {% elif field == "creationDate" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Fecha de creación:</label>
+                    <div class="col-sm-8">
+                        {{ record.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                    </div>
+                </div>
+            {% elif field == "modificationDate" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Fecha de modificación:</label>
+                    <div class="col-sm-8">
+                        {{ record.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                    </div>
+                </div>
+            {% else %}
+                {% if editable and field.readOnly == False %}
+                    {{ snippets.fieldFormEdit(field, record,origin,label) }}
+                {% else %}
+                    {{ snippets.fieldFormRead(field,record,label) }}
+                {% endif %}
+            {% endif %}
+        {% elif field.readOnly == False %}
+                {{ snippets.fieldFormEdit(field,record,origin,label) }}
+        {% endif %}
+    {% if hidden %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro getConnectedTable(record, table_id, fields=False,origin=False) %}
+    {% set records = record|get_connected_records(table_id) %}
+    {{ snippets.connectedTable(fields, table_id, records, origin) }}
+{% endmacro %}
+
+{% macro searchFieldset(clazzDetails,args=False)%}
+        {% set searchFields = clazzDetails.get("search_fields")|split_string %}
+        {% set classid = clazzDetails.get("id") %}
+        <div class="mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ url_for('.list_record', classid=classid,page=1) }}">
+                        {% for searchField in searchFields %}
+                            <div class="row my-2">
+                                {{ snippets.getSearchField(searchField,clazzDetails,args) }}
+                            </div>
+                        {% endfor %}
+                        <div class="row my-2">
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+{% endmacro %}
+
+{% macro getTableBody(classid,args,table)%}
+        {{ snippets.getTableBody(classid,args,table)}}
+{%endmacro%}
+
+{% macro fieldFormSurvey(field,record=False,editable=False,origin=False,label=False) %}
+    {% set hidden = field.hidden %}
+    {% if hidden %}
+        <div style="display: none;">
+    {%endif%}
+        {% if record %}
+            {% if field == "createdby" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Creado por:</label>
+                    <div class="col-sm-8">
+                        {{ record.createdby }}
+                    </div>
+                </div>
+            {% elif field == "modifiedby" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Modificado por:</label>
+                    <div class="col-sm-8">
+                        {{ record.modifiedby }}
+                    </div>
+                </div>
+            {% elif field == "creationDate" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Fecha de creación:</label>
+                    <div class="col-sm-8">
+                        {{ record.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                    </div>
+                </div>
+            {% elif field == "modificationDate" %}
+                <div class="row mb-3">
+                    <label class="col-sm-4">Fecha de modificación:</label>
+                    <div class="col-sm-8">
+                        {{ record.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                    </div>
+                </div>
+            {% else %}
+                {% if editable and field.readOnly == False %}
+                    {{ snippets.fieldSurvey(field, record,origin,label) }}
+                {% else %}
+                    {{ snippets.fieldSurvey(field,record,label) }}
+                {% endif %}
+            {% endif %}
+        {% elif field.readOnly == False %}
+                {{ snippets.fieldSurvey(field,record,origin,label) }}
+        {% endif %}
+    {% if hidden %}
+        </div>
+    {% endif %}
+{% endmacro %}

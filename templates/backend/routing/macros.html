@@ -1,7 +1,7 @@
-{% macro editFields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) %}
+{% macro editFields(container_data, record,fieldsMoneyFields,connectedTables,classid,classname) %}
     {% for key, value in container_data.fields.items() %}
     {% if not value.hidden %}
-        {% set field_value = institution|safe_getattr(value.id) %}
+        {% set field_value = record|safe_getattr(value.id) %}
         <!-- fieldset tab -->
         <div class="mb-3  {% if value.class %} {{ value.class }} {% endif %} pt-2">
             <label for="{{ value.id }}" class="form-label">{{ value.label }}</label>
@@ -28,13 +28,13 @@
             <textarea class="form-control" id="{{ value.id }}" name="{{ value.id }}"
                 maxlength="{{ value.maxlength }}" {% if value.required %} required {% endif %}>{% if field_value %}{{ field_value }}{% endif%}</textarea>
             {% elif value.type == "modifiedby" %}
-                {{ institution.modifiedby }}
+                {{ record.modifiedby }}
             {% elif value.type == "createdby" %}
-                {{ institution.createdby }}
+                {{ record.createdby }}
             {% elif value.type == "creationDate" %}
-                {{ institution.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                {{ record.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
             {% elif value.type == "modificationDate" %}
-                {{ institution.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                {{ record.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
             {% elif value.input == "date" %}
                 <input  class="form-control" id="{{ value.id }}" name="{{ value.id }}" type="date" value="{{ field_value }}" {% if value.required %} required {% endif %}/>
             {% elif value.input == "select" or value.input == "connected_table" %}
@@ -73,7 +73,7 @@
             {% elif value.input == "blob" %}
             {% if field_value %}
             {% if field_value.endswith('.jpg') or field_value.endswith('.JPG') or field_value.endswith('.png') or field_value.endswith('.PNG') or field_value.endswith('.jpeg') or field_value.endswith('.JPEG') %}
-                <img id="preview-{{ value.id }}" src="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=institution.id) }}" width="200">
+                <img id="preview-{{ value.id }}" src="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=record.id) }}" width="200">
             {%else%}
             <b>{{field_value}}</b>
             {%endif%}
@@ -135,11 +135,11 @@
     {% endfor %}
 
 {% endmacro %}
-{% macro fields(container_data, institution,fieldsMoneyFields,connectedTables,classid,classname) %}
+{% macro fields(container_data, record,fieldsMoneyFields,connectedTables,classid,classname) %}
 <div class="py-4">
     {% for key, value in container_data.fields.items() %}
     {% if not value.hidden %}
-    {% set field_value = institution|safe_getattr(value.id) %}
+    {% set field_value = record|safe_getattr(value.id) %}
     <div class="{% if value.class %}{{ value.class }}{% endif %}">
         <p class="text-break">
             <b>{{ value.label }}:</b>
@@ -156,13 +156,13 @@
             {% elif value.type == "Date" %}
                 {{ field_value.strftime('%d/%m/%Y') }}
             {% elif value.type == "creationDate" %}
-                {{ institution.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                {{ record.created_at.strftime('%d/%m/%Y - %H:%M:%S') }}
             {% elif value.type == "createdby" %}
-                {{ institution.createdby }}
+                {{ record.createdby }}
             {% elif value.type == "modifiedby" %}
-                {{ institution.modifiedby }}
+                {{ record.modifiedby }}
             {% elif value.type == "modificationDate" %}
-                {{ institution.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
+                {{ record.updated_at.strftime('%d/%m/%Y - %H:%M:%S') }}
             {% elif value.input == "textarea" %}
                 {% if field_value and field_value != "None" %} {{ field_value }} {% endif %}
             {% elif value.input == "select" %}
@@ -177,9 +177,9 @@
             <img src="{{ url_for('static', filename='uploads/' ~ field_value) }}" width="200" />
             {% elif value.input == "blob" %}
                 {% if field_value %}
-                <a href="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=institution.id) }}" target="_blank">
+                <a href="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=record.id) }}" target="_blank">
                     {% if field_value.endswith('.jpg') or field_value.endswith('.JPG') or field_value.endswith('.png') or field_value.endswith('.PNG') or field_value.endswith('.jpeg') or field_value.endswith('.JPEG') %}
-                        <img src="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=institution.id) }}" width="200">
+                        <img src="{{ url_for('application.uploaded_file', filename=field_value, fieldname=value.id, classname=classname, record=record.id) }}" width="200">
                     {% else %}
                         Ver archivo
                     {% endif %}
@@ -229,7 +229,7 @@
                             </td>
                             {% endfor %}
                             <td>
-                                <a href="{{ url_for('.view_record',classid=table_id, record_id=record.id, backlink=url_for('.view_record', record_id=institution.id, classid=classid)) }}" class="btn btn-primary">Ver</a>
+                                <a href="{{ url_for('.view_record',classid=table_id, record_id=record.id, backlink=url_for('.view_record', record_id=record.id, classid=classid)) }}" class="btn btn-primary">Ver</a>
                             </td>
                             
                     </tr>
@@ -243,7 +243,7 @@
                 </tbody>
             </table>
             <div>
-                <a href="{{ url_for('.create_record', classid=table_id, foreignrecord=connected_table.parent_field ~ ':' ~ institution.id, backlink=url_for('.view_record', record_id=institution.id, classid=classid)) }}" class="btn btn-success mb-3">Crear {{connected_table.class_label}}</a>
+                <a href="{{ url_for('.create_record', classid=table_id, fr=connected_table.parent_field ~ ':' ~ record.id, backlink=url_for('.view_record', record_id=record.id, classid=classid)) }}" class="btn btn-success mb-3">Crear {{connected_table.class_label}}</a>
             </div>
         {% else %}
             <p>No connected table found for ID {{ table_id }}</p>
@@ -301,14 +301,14 @@
 {% endmacro %}
 
 
-{% macro fieldForm(input,label,id,name,required,options,value)%}
-    <label for="{{id}}" style="font-size: larger;" class="form-label"><b>{{label}}</b></label>
+{% macro fieldTable(input, id, required, options=False, connected_table=False, value=None) %}
+<td class="border-0">
     {% if input == "boolean"%}
-    <input class="form-check-input" type="checkbox" id="{{id}}" name="{{name}}" {% if required %} required {% endif %}>
+    <input class="form-check-input" type="checkbox" id="{{id}}" name="{{id}}" {% if required %} required {% endif %}>
     {% elif input == "checkbox" %}
         {% for label, checkvalue in options.items() %}
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="{{id}}-{{ loop.index }}" name="{{name}}" value="{{ checkvalue }}"{% if required %} required {% endif %}>
+            <input class="form-check-input" type="checkbox" id="{{id}}-{{ loop.index }}" name="{{id}}[]" value="{{ checkvalue }}"{% if required %} required {% endif %}>
             <label class="form-check-label" for="{{id}}-{{ loop.index }}">
                 {{ label }}
             </label>
@@ -317,18 +317,26 @@
     {% elif input == "radio" %}
         {% for label, checkvalue in options.items() %}
         <div class="form-check">
-            <input class="form-check-input" type="radio" id="{{ id }}-{{ loop.index }}" name="{{ name }}" value="{{ checkvalue }}"{% if required %} required {% endif %}{% if checkvalue == value %} checked {% endif %}>
+            <input class="form-check-input" type="radio" id="{{ id }}-{{ loop.index }}" name="{{ id }}" value="{{ checkvalue }}"{% if required %} required {% endif %}{% if checkvalue == value %} checked {% endif %}>
             <label class="form-check-label" for="{{ id }}-{{ loop.index }}">
                 {{ label }}
             </label>
         </div>
         {% endfor %}
     {% elif input == "integer" or input == "float" or input == "number" %}
-    <input class="form-control" type="number" id="{{id}}" name="{{name}}" {% if input=="float" %} step="0.01" {% else %} step="1" {% endif %} {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
+    <input class="form-control" type="number" id="{{id}}" name="{{id}}" {% if input=="float" %} step="0.01" {% else %} step="1" {% endif %} {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
     {% elif input == "textarea" %}
-    <textarea class="form-control" id="{{id}}" name="{{name}}" {% if required %} required {% endif %}>{% if value %} {{value}} {% endif %}</textarea>
+    <textarea class="form-control" id="{{id}}" name="{{id}}" {% if required %} required {% endif %}>{% if value %} {{value}} {% endif %}</textarea>
     {% elif input == "select" %}
-    <select class="form-control" id="{{id}}" name="{{name}}"{% if required %} required {% endif %}>
+    <select class="form-control" id="{{id}}" name="{{id}}"{% if required %} required {% endif %}>
+        {% for label, value in options.items() %}
+        <option value="{{ value }}">
+            {{ label }}</option>
+        {% endfor %}
+    </select>
+    {% elif input == "connected_table" %}
+    <select class="form-select" id="{{id}}" name="{{id}}"{% if required %} required {% endif %}>
+        {% set options = connected_table|get_table_options %}
         {% for label, value in options.items() %}
         <option value="{{ value }}">
             {{ label }}</option>
@@ -336,9 +344,9 @@
     </select>
         
     {% elif input == "date" %}
-        <input  class="form-control" id="{{id}}" name="{{name}}" type="date" {% if value %} value="{{value}}" {% endif %} {% if required %} required {% endif %}/>
+        <input  class="form-control" id="{{id}}" name="{{id}}" type="date" {% if value %} value="{{value}}" {% endif %} {% if required %} required {% endif %}/>
     {% elif input == "image" %}
-    <input class="form-control" type="file" id="{{id}}" name="{{name}}"
+    <input class="form-control" type="file" id="{{id}}" name="{{id}}"
         accept=".png, .jpg, .jpeg, .gif" {% if required %} required {% endif %}>
     <img id="preview" width="200">
     <script>
@@ -356,252 +364,13 @@
 
     {% elif input == "blob" %}
     <!-- Input para subir una nueva imagen, solo se muestra si el usuario selecciona eliminar la imagen actual -->
-    <input class="form-control" type="file" id="{{id}}" name="{{name}}" {% if required %} required {% endif %}>
+    <input class="form-control" type="file" id="{{id}}" name="{{id}}" {% if required %} required {% endif %}>
     {% elif input == "email" %}
-    <input class="form-control" type="email" id="{{id}}" name="{{name}}"
+    <input class="form-control" type="email" id="{{id}}" name="{{id}}"
         maxlength="{{ value.maxlength }}" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
     {% else %}
-    <input class="form-control" type="text" id="{{id}}" name="{{name}}"
-        maxlength="{{ value.maxlength }}" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
+        <input class="form-control" name="{{id}}" id="{{id}}" type="text" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}/>
     {% endif %}
+</td>
 {% endmacro %}
-{% macro barchartbyuser(title,fieldname,stats)%}
-<div class="row">
-    <div class="col-sm-12">
-        <!-- Provincia -->
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{title}}</h5>
 
-                {% set ns = namespace(values=[], subLabels=[]) %}   
-                {% for key, value in stats[fieldname].items() %}
-                {% if loop.index == 1 %}
-                {% for sub_key, sub_value in value[6].items() %}
-                    {% set _ = ns.values.append(sub_key) %}
-                {% endfor %}
-                {%endif%}
-                {% endfor %}
-                {% set labelsArray = ns.values %}
-
-                {% for key, value in stats[fieldname].items() %}
-                {% set ns = namespace(values=[], subLabels=[]) %}   
-                {% for sub_key, sub_value in value[6].items() %}
-                    {% set _ = ns.values.append(sub_value[2]) %}
-                {% endfor %}
-                {% set dataArray = ns.values %}
-                <script>
-                    datasetDict = {
-                        label: "{{ key }}",
-                        data: {{dataArray}},
-                        borderWidth: 1
-                    }
-                    datasetsArray.push(datasetDict)
-                </script>
-                {% endfor %}
-                    <div>
-                    <canvas id="div-barchartbyuser-{{fieldname}}"></canvas>
-                    </div>
-                    <script>
-                    var ctx = document.getElementById('div-barchartbyuser-{{fieldname}}');
-                    
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                        labels: {{labelsArray | tojson }},
-                        datasets: datasetsArray
-                        },
-                        options: {
-                        scales: {
-                            y: {
-                            beginAtZero: true
-                            }
-                        }
-                        }
-                    });
-                    </script>
-                    <script>
-                        datasetDict = ""
-                        datasetsArray = []
-                    </script>
-            </div>
-        </div>
-    </div>
-</div>
-{%endmacro%}
-{% macro barchart(title,fieldname,stats)%}
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{title}}</h5>
-
-                {% set ns = namespace(values=[], subLabels=[]) %}   
-                {% for key, value in stats[fieldname].items() %}
-                {% set _ = ns.values.append(key) %}
-                {% endfor %}
-                {% set labelsArray = ns.values %}
-
-                {% set ns = namespace(values=[], subLabels=[]) %}   
-                {% for key, value in stats[fieldname].items() %}
-                    {% set _ = ns.values.append(value[2]) %}
-                {% endfor %}
-                {% set dataArray = ns.values %}
-                <script>
-                    datasetDict = {
-                        label: "{{title}}",
-                        data: {{dataArray}},
-                        borderWidth: 1
-                    }
-                    datasetsArray.push(datasetDict)
-                </script>
-                    <div>
-                    <canvas id="div-barchart-{{fieldname}}"></canvas>
-                    </div>
-                    <script>
-                    var ctx = document.getElementById('div-barchart-{{fieldname}}');
-                    
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                        labels: {{labelsArray | tojson }},
-                        datasets: datasetsArray
-                        },
-                        options: {
-                        scales: {
-                            y: {
-                            beginAtZero: true
-                            }
-                        }
-                        }
-                    });
-                    </script>
-                    <script>
-                        datasetDict = ""
-                        datasetsArray = []
-                    </script>
-            </div>
-        </div>
-    </div>
-</div>
-{%endmacro%}
-{% macro barchartpercent(title,fieldname,stats)%}
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{title}}</h5>
-
-                {% set ns = namespace(values=[], subLabels=[]) %}   
-                {% for key, value in stats[fieldname].items() %}
-                {% set _ = ns.values.append(key) %}
-                {% endfor %}
-                {% set labelsArray = ns.values %}
-
-                {% set ns = namespace(values=[], subLabels=[]) %}   
-                {% for key, value in stats[fieldname].items() %}
-                    {% set _ = ns.values.append(value[5]) %}
-                {% endfor %}
-                {% set dataArray = ns.values %}
-                <script>
-                    datasetDict = {
-                        label: "{{title}}",
-                        data: {{dataArray}},
-                        borderWidth: 1
-                    }
-                    datasetsArray.push(datasetDict)
-                </script>
-                    <div>
-                    <canvas id="div-barchartpercent-{{fieldname}}"></canvas>
-                    </div>
-                    <script>
-                    var ctx = document.getElementById('div-barchartpercent-{{fieldname}}');
-                    
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                        labels: {{labelsArray | tojson }},
-                        datasets: datasetsArray
-                        },
-                        options: {
-                        scales: {
-                            y: {
-                            beginAtZero: true
-                            }
-                        }
-                        }
-                    });
-                    </script>
-                    <script>
-                        datasetDict = ""
-                        datasetsArray = []
-                    </script>
-            </div>
-        </div>
-    </div>
-</div>
-{%endmacro%}
-{% macro barchartjson(title,fieldname,labels,data)%}
-<div class="row">
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{title}}</h5>
-                <canvas id="div-barchart-{{fieldname}}"></canvas>
-
-                <script>
-                     data = {{data | tojson }};
-
-                    ctx = document.getElementById('div-barchart-{{fieldname}}').getContext('2d');
-                    chart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                        labels: Object.keys(data),
-                        /* labels: {{labels | tojson }},*/
-                        datasets: [{
-                            label: '{{title}}',
-                            data: Object.values(data),
-                            backgroundColor: '#2e2d6c',
-                            borderColor: '#2e2d6c',
-                            borderWidth: 1
-                        }]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                beginAtZero: true,
-                                max: 100,
-                                title: {
-                                    display: true,
-                                    text: 'Porcentaje (%)'
-                                }
-                                }
-                            },
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: '{{title}}'
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                        return context.dataset.label + ': ' + context.raw + '%';
-                                        }
-                                    }
-                                },
-                                datalabels: {
-                                    color: 'white', 
-                                    font: {
-                                        weight: 'bold',
-                                        size: 14 
-                                    }
-                                }
-                            }
-                        },
-                        plugins: [ChartDataLabels]
-                    });
-                </script>
-            </div>
-        </div>
-    </div>
-</div>
-{%endmacro%}

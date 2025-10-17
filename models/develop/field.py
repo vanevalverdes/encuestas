@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 from utils.db import db
+from sqlalchemy.orm import backref
 
 class Field(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -15,28 +17,80 @@ class Field(db.Model):
     default_value = db.Column(db.Text)
     select_options = db.Column(db.Text)
     extraclass = db.Column(db.String(255))
-    container_id = db.Column(db.Integer, db.ForeignKey('container.id'))
-    container = db.relationship('Container', order_by="Field.sort.asc()", backref='fields')
-    clazz_id = db.Column(db.Integer, db.ForeignKey('clazz.id'))
-    clazz = db.relationship('Clazz', order_by="Field.sort.asc()", backref='fields')
+    hasManyValues = db.Column(db.Boolean)
+    readOnly = db.Column(db.Boolean)
+    calculate_file = db.Column(db.String(255))
+    calculate_function = db.Column(db.String(255))
+    helper = db.Column(db.String(255))
+    clazz_id = db.Column(
+        db.Integer,
+        db.ForeignKey('clazz.id', ondelete='CASCADE')
+    )
+    clazz = db.relationship(
+        'Clazz',
+        backref=backref(
+            'fields',
+            cascade='all, delete-orphan',
+            passive_deletes=True
+        ),
+        order_by="Field.sort.asc()"
+    )
+    __table_args__ = {
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci",
+    }
 
     def __repr__(self) -> str:
         return f"{self.name}"
 
 def get_fields(parent=False):
-    from utils.methods import application
-    clazzes = application.list_class_names()
-    options = [{"label": "Ninguna", "value": ""}] + [{"label": name, "value": id} for id, name in clazzes]
-    if parent:
-        container = application.getContainerDetails(parent)
-        print(parent)
-        clazzparent = container.getClazz()
-        print(clazzparent)
+    fields_form = get_fields_form(parent)
     fields = {
         "GeneralInfo":{
             "class":"col-sm-6",
             "title":"Configuración General y de DB",
             "fields":{
+                "id": fields_form["id"],
+                "name": fields_form["name"],
+                "label": fields_form["label"],
+                "type": fields_form["type"],
+                "helper": fields_form["helper"],
+                "required": fields_form["required"],
+                "readOnly": fields_form["readOnly"],
+                "publicBlob": fields_form["publicBlob"],
+                "default_value": fields_form["default_value"],
+                }
+            },
+        "GeneralConfig":{
+            "class":"col-sm-6",
+            "title":"Config. del Formulario",
+            "fields":{ 
+                "sort": fields_form["sort"],
+                "input": fields_form["input"],
+                "select_options": fields_form["select_options"],
+                "maxlength": fields_form["maxlength"],
+                "extraclass": fields_form["extraclass"],
+                "hidden": fields_form["hidden"],
+                "calculate_file": fields_form["calculate_file"],
+                "calculate_function": fields_form["calculate_function"],
+            }
+        },
+        "ConnectedConfig":{
+            "class":"col-sm-6",
+            "title":"Config. de Conexiones",
+            "fields":{
+                "connected_table": fields_form["connected_table"],
+                "clazz_id": fields_form["clazz_id"],
+                "hasManyValues": fields_form["hasManyValues"]
+            }
+        }
+    }
+    return fields
+def get_fields_form(parent=False):
+    from utils.packages import application
+    clazzes = application.getClazzDevelopList()
+    options = [{"label": "Ninguna", "value": ""}] + [{"label": name, "value": id} for id, name in clazzes]
+    fields = {
                 "id": {
                     "id": "id", 
                     "type": "Integer", 
@@ -76,11 +130,26 @@ def get_fields(parent=False):
                         {"label": "Time", "value": "Time"},
                         {"label": "DateTime", "value": "DateTime"},
 			            {"label": "Text", "value": "Text"},
-                        {"label": "Foreing Class", "value": "connected_table"},
+                        {"label": "Blob", "value": "blob"},
+                        {"label": "Clase Foránea", "value": "connected_table"},
+                        {"label": "Padre / hijo", "value": "selfParent"},
+                        {"label": "Calculado (script)", "value": "calculate"},
                         {"label": "Creado por usuario", "value": "createdby"},
                         {"label": "Modificado por usuario", "value": "modifiedby"},
                         {"label": "Fecha Creación", "value": "creationDate"},
                         {"label": "Fecha Modificación", "value": "modificationDate"}
+                    ],
+                    "class":""
+                },
+                "helper": {
+                    "id": "helper", 
+                    "type": "String", 
+                    "maxlength": "100", 
+                    "label": "Helper para calculo", 
+                    "input": "select",
+                    "options": [
+                        {"label": "", "value": ""},
+                        {"label": "Script", "value": "script"},
                     ],
                     "class":""
                 },
@@ -108,12 +177,6 @@ def get_fields(parent=False):
                     "input": "textarea",
                     "class":""
                 },
-            }
-        },
-        "GeneralConfig":{
-            "class":"col-sm-6",
-            "title":"Config. del Formulario",
-            "fields":{
                 "sort": {
                     "id": "sort", 
                     "type": "String", 
@@ -131,9 +194,13 @@ def get_fields(parent=False):
                     "options": [
                         {"label": "Texto", "value": "text"},
                         {"label": "Número", "value": "number"},
+                        {"label": "Booleano", "value": "boolean"},
                         {"label": "Flotante", "value": "float"},
+                        {"label": "Dinero", "value": "money"},
                         {"label": "Área de Texto", "value": "textarea"},
                         {"label": "Fecha", "value": "date"},
+                        {"label": "Fecha Incompleta", "value": "incompletedate"},
+                        {"label": "Imagen", "value": "image"},
                         {"label": "Blob", "value": "blob"},
                         {"label": "Teléfono", "value": "telephone"},
                         {"label": "Email", "value": "email"},
@@ -141,6 +208,8 @@ def get_fields(parent=False):
                         {"label": "Selector", "value": "select"},
                         {"label": "Radio", "value": "radius"},
                         {"label": "Foreing Class", "value": "connected_table"},
+                        {"label": "Tags", "value": "tagsInput"},
+                        {"label": "Vista Árbol", "value": "treeView"},
                     ],
                     "class":""
                 },
@@ -175,13 +244,7 @@ def get_fields(parent=False):
                     "label": "Ocultar", 
                     "input": "checkbox",
                     "class":""
-                }
-            }
-        },
-        "ConnectedConfig":{
-            "class":"col-sm-6",
-            "title":"Config. de Conexiones",
-            "fields":{
+                },
                 "connected_table": {
                     "id": "connected_table", 
                     "type": "Integer", 
@@ -191,25 +254,46 @@ def get_fields(parent=False):
                     "options": options,
                     "class":""
                 },
-                "container_id": {
-                    "id": "container_id", 
-                    "type": "Integer", 
-                    "maxlength": "", 
-                    "label": "Id del Container al que pertenece", 
-                    "input": "parent",
-                    "value": parent or "",
-                    "class":""
-                },
                 "clazz_id": {
                     "id": "clazz_id", 
                     "type": "Integer", 
                     "maxlength": "", 
                     "label": "Id de la Clase", 
                     "input": "parent",
-                    "value": clazzparent or options,
+                    "value": parent or options,
                     "class":""
-                }
+                },
+                "readOnly": {
+                    "id": "readOnly", 
+                    "type": "Boolean", 
+                    "maxlength": "", 
+                    "label": "Solo lectura", 
+                    "input": "checkbox",
+                    "class":""
+                },
+                "hasManyValues": {
+                    "id": "hasManyValues", 
+                    "type": "Boolean", 
+                    "maxlength": "", 
+                    "label": "¿Tiene múltiples valores?", 
+                    "input": "checkbox",
+                    "class":""
+                },
+                "calculate_file": {
+                    "id": "calculate_file", 
+                    "type": "String", 
+                    "maxlength": "255", 
+                    "label": "Archivo de Campos Calculados", 
+                    "input": "text",
+                    "class":""
+                },
+                "calculate_function": {
+                    "id": "calculate_function", 
+                    "type": "String", 
+                    "maxlength": "255", 
+                    "label": "Función de Campos Calculados", 
+                    "input": "text",
+                    "class":""
+                },
             }
-        }
-    }
     return fields

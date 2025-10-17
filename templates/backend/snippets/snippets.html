@@ -1,0 +1,686 @@
+{% import "backend/snippets/editFields.html" as edit %}
+{% import "backend/snippets/readFields.html" as read %}
+{% import "backend/snippets/searchFields.html" as search %}
+
+
+{% macro fieldFormEdit(field,record=False,origin=False,label=False) %}
+    {% if record %}
+        {% set value = record|safe_getattr(field.id) %}
+    {% else %}
+        {% set value = None %}
+    {% endif %}
+    {% set input = field.input %}
+    {% if label %}
+        {% set label = label %}
+    {% else %}
+        {% set label = field.label %}
+    {% endif%}
+    {% set id = field.id %}
+    {% set required = field.required %}
+    {% set options = field.select_options %}
+    {% set connected_table = field.connected_table %}
+<div class="row mb-3">
+    <label class="col-sm-4 col-form-label text-sm-end" for="{{id}}">{{ label }}</label>
+    <div class="col-sm-8">
+    {% if input == "boolean"%}
+        {{ edit.boolean(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "checkbox" %}
+        {{ edit.checkbox(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "radio" %}
+        {{ edit.radio(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "money" %}
+        {{ edit.money(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "number"  or input == "float" %}
+        {{ edit.number(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "integer" %}
+        {{ edit.integer(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "textarea" %}
+        {{ edit.textarea(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "select" %}
+        {{ edit.select(input, label, id, required, options, connected_table, value) }} 
+    {% elif input == "tagsInput" %}
+        {{ edit.tagsInput(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "treeView" %}
+        {{ edit.treeView(input, label, id, required, options, connected_table, value) }}
+    {% elif id == origin["fieldName"] %}
+        {{ edit.connected_table(input, label, id, required, options, connected_table, origin["value"]) }}
+    {% elif input == "connected_table" %}
+        {{ edit.connected_table(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "incompletedate" %}
+        {{ edit.incompletedate(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "date" %}
+        {{ edit.date(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "image" %}
+        {{ edit.image(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "imageOld" %}
+        {{ edit.imageOld(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "blob" %}
+        {{ edit.blob(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "email" %}
+        {{ edit.email(input, label, id, required, options, connected_table, value) }}
+    {% else %}
+        {{ edit.text(input, label, id, required, options, connected_table, value) }}
+    {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro fieldFormRead(field,record=False,label=False) %}
+    {% if record %}
+        {% set value = record|safe_getattr(field.id) %}
+    {% else %}
+        {% set value = None %}
+    {% endif %}
+    {% set input = field.input %}
+    {% if label %}
+        {% set label = label %}
+    {% else %}
+        {% set label = field.label %}
+    {% endif%}
+    {% set id = field.id %}
+    {% set required = field.required %}
+    {% set options = field.select_options %}
+    {% set connected_table = field.connected_table %}
+<div class="row mb-3">
+    <label class="col-sm-4 text-sm-end"><b>{{ label }}</b></label>
+    <div class="col-sm-8">
+    {% if input == "boolean"%}
+        {{ read.boolean(id, value) }}
+    {% elif input == "checkbox" %}
+        {{ read.checkbox(id,options, value) }}
+    {% elif input == "radio" %}
+        {{ read.radio(id,options, value) }}
+    {% elif input == "money" %}
+        {{ read.money(id,value) }}
+    {% elif input == "number"  or input == "float" %}
+        {{ read.number(id, value) }}
+    {% elif input == "integer" %}
+        {{ read.integer(id, value) }}
+    {% elif input == "textarea" %}
+        {{ read.textarea(id,value) }}
+    {% elif input == "select" %}
+        {{ read.select(id,options, value) }}
+    {% elif input == "connected_table" and value %}
+        {{ read.connected_table(id,connected_table, value) }}
+    {% elif input == "treeView" and value %}
+        {{ read.treeView(id, connected_table, value) }}
+    {% elif input == "tagsInput" %}
+        {{ read.tagsInput(id, connected_table, value) }}
+    {% elif input == "incompletedate" %}
+        {{ read.incompletedate(id, value) }}
+    {% elif input == "date" %}
+        {{ read.date(id, value) }}
+    {% elif input == "image" %}
+        {{ read.image(id, value) }}
+    {% elif input == "blob" %}
+        {{ read.blob(id, value) }}
+    {% elif input == "email" %}
+        {{ read.email(id, value) }}
+    {% else %}
+        {{ read.default(id, value) }}
+    {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro fieldTableExport(field,record) %}
+    {% set value = record|safe_getattr(field.id) %}
+    {% set input = field.input %}
+    {% set label = field.label %}
+    {% set id = field.id %}
+    {% set required = field.required %}
+    {% set options = field.select_options %}
+    {% set connected_table = field.connected_table %}
+
+        {% if input == "boolean"%}
+            {{ read.boolean(id, value) }}
+        {% elif input == "checkbox" %}
+            {{ read.checkbox(id,options, value) }}
+        {% elif input == "radio" %}
+            {{ read.radio(id,options, value) }}
+        {% elif input == "money" %}
+            {{ read.money(id,value) }}
+        {% elif input == "number"  or input == "float" %}
+            {{ read.number(id, value) }}
+        {% elif input == "integer" %}
+            {{ read.integer(id, value) }}
+        {% elif input == "textarea" %}
+            {{ read.textarea(id,value) }}
+        {% elif input == "select" %}
+            {{ read.select(id,options, value) }}
+        {% elif input == "connected_table" and value %}
+            {{ read.connected_table(id,connected_table, value) }}
+        {% elif input == "treeView" and value %}
+            {{ read.treeView(id, connected_table, value) }}
+        {% elif input == "tagsInput" %}
+            {{ read.tagsInput(id, connected_table, value) }}
+        {% elif input == "incompletedate" %}
+        {{ read.incompletedate(id, value) }}
+        {% elif input == "date" %}
+            {{ read.date(id, value) }}
+        {% elif input == "image" %}
+            {{ read.imageExport(id, value) }}
+        {% elif input == "email" %}
+            {{ read.email(id, value) }}
+        {% else %}
+            {{ read.default(id, value) }}
+        {% endif %}
+
+{% endmacro %}
+
+{% macro fieldTableRead(field,record) %}
+    {% set value = record|safe_getattr(field.id) %}
+    {% set input = field.input %}
+    {% set label = field.label %}
+    {% set id = field.id %}
+    {% set required = field.required %}
+    {% set options = field.select_options %}
+    {% set connected_table = field.connected_table %}
+    <td class="border-0">
+        {% if input == "boolean"%}
+            {{ read.boolean(id, value) }}
+        {% elif input == "checkbox" %}
+            {{ read.checkbox(id,options, value) }}
+        {% elif input == "radio" %}
+            {{ read.radio(id,options, value) }}
+        {% elif input == "money" %}
+            {{ read.money(id,value) }}
+        {% elif input == "number"  or input == "float" %}
+            {{ read.number(id, value) }}
+        {% elif input == "integer" %}
+            {{ read.integer(id, value) }}
+        {% elif input == "textarea" %}
+            {{ read.textarea(id,value) }}
+        {% elif input == "select" %}
+            {{ read.select(id,options, value) }}
+        {% elif input == "connected_table" and value %}
+            {{ read.connected_table(id,connected_table, value) }}
+        {% elif input == "treeView" and value %}
+            {{ read.treeView(id, connected_table, value) }}
+        {% elif input == "tagsInput" %}
+            {{ read.tagsInput(id, connected_table, value) }}
+        {% elif input == "incompletedate" %}
+        {{ read.incompletedate(id, value) }}
+        {% elif input == "date" %}
+            {{ read.date(id, value) }}
+        {% elif input == "image" %}
+            {{ read.image(id, value) }}
+        {% elif input == "blob" %}
+            {{ read.blob(id, value) }}
+        {% elif input == "email" %}
+            {{ read.email(id, value) }}
+        {% else %}
+            {{ read.default(id, value) }}
+        {% endif %}
+    </td>
+{% endmacro %}
+
+{% macro fieldTableEdit(field, record=False, origin=False) %}
+    {% if record %}
+        {% set value = record|safe_getattr(field.id) %}
+    {% else %}
+        {% set value = None %}
+    {% endif %}
+    {% set input = field.input %}
+    {% set label = field.label %}
+    {% set id = field.id %}
+    {% set required = field.required %}
+    {% set options = field.select_options %}
+    {% set connected_table = field.connected_table %}
+    <td class="border-0">
+    {% if input == "boolean"%}
+        {{ edit.boolean(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "checkbox" %}
+        {{ edit.checkbox(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "radio" %}
+        {{ edit.radio(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "money" %}
+        {{ edit.money(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "number"  or input == "float" %}
+        {{ edit.number(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "integer" %}
+        {{ edit.integer(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "textarea" %}
+        {{ edit.textarea(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "select" %}
+        {{ edit.select(input, label, id, required, options, connected_table, value) }} 
+    {% elif input == "tagsInput" %}
+        {{ edit.tagsInput(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "treeView" %}
+        {{ edit.treeView(input, label, id, required, options, connected_table, value) }}
+    {% elif id == origin["fieldName"] %}
+        {{ edit.connected_table(input, label, id, required, options, connected_table, origin["value"]) }}
+    {% elif input == "connected_table" %}
+        {{ edit.connected_table(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "incompletedate" %}
+        {{ edit.incompletedate(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "date" %}
+        {{ edit.date(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "image" %}
+        {{ edit.image(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "imageOld" %}
+        {{ edit.imageOld(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "blob" %}
+        {{ edit.blob(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "email" %}
+        {{ edit.email(input, label, id, required, options, connected_table, value) }}
+    {% else %}
+        {{ edit.text(input, label, id, required, options, connected_table, value) }}
+    {% endif %}
+    </td>
+{% endmacro %}
+
+{% macro rowEdit(table_id,fields,tableFields,record=False, origin=False) %}
+    {% if record %}
+        {% set uuid = record['id'] %}
+    {% else %}
+        {% set uuid = uuid %}
+    {% endif %}
+    <tr id="row-record-{{table_id}}-{{uuid}}" data-form-id="form-record-{{uuid}}" data-action="{{ url_for('application.save_row')}}">
+        <td class="border-0">
+            <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" id="clazznameRecord" name="clazznameRecord" value="{{ table_id }}">
+            <input type="hidden" id="id" name="id" value="{{record['id']}}">
+            {% if origin is defined and origin and origin.get("fieldName") %}
+            <input type="hidden" id="{{origin['fieldName']}}" name="{{origin['fieldName']}}" value="{{origin['value'].id}}">
+            {% endif %}
+            {% if origin is defined and origin and origin.get("fieldName") %}
+            <input type="hidden" id="origin" name="origin" value="{{origin['fieldName']}}:{{origin['value'].id}}:{{origin['tableId']}}">
+            {% endif %}
+        </td>
+        <td class="border-0">
+            <button type="button" 
+                    class="btn btn-outline-secondary btn-sm p-1 me-2 btn-save-ajax"
+                    data-form-id="form-record-{{uuid}}"
+                    {%if fields is defined and fields %}
+                    data-table-fields="{{ fields | join(',') }}"
+                    {%endif%}
+                    > 
+                <span class="material-icons align-middle text-success">save</span>
+            </button>
+            <button type="button" 
+                    class="btn btn-outline-secondary btn-sm p-1 me-2 btn-stop-ajax"
+                    data-record-id="{{record['id']}}"
+                    data-table-id="{{table_id}}"
+                    {% if origin is defined and origin %}
+                    data-origin="{{origin['fieldName']}}:{{origin['value'].id}}:{{origin['tableId']}}"
+                    {% endif %}
+                    {%if fields is defined and fields %}
+                    data-table-fields="{{ fields | join(',') }}"
+                    {%endif%}
+                    > 
+                <span class="material-icons align-middle text-secondary">stop</span>
+            </button>
+            {% if record["id"] != None %}
+                <input type="hidden" name="id" value='{{ record["id"] }}'>
+            {% endif %}
+        </td>
+        {% if fields %}
+            {% for field in fields %}
+
+                    {% set fieldDisplay = tableFields[field] %}
+                    {% if fieldDisplay.readOnly == False %}
+                        {{ fieldTableEdit(fieldDisplay, record,origin=origin) }}
+                    {% else %}
+                        {{ fieldTableRead(fieldDisplay, record) }}
+                    {% endif %}
+            {% endfor %}
+        {% else %}
+            {% for key,field in tableFields.items() %}
+                {% if field.readOnly == False %}
+                    {{ fieldTableEdit(field, record, origin=origin) }}
+                {% else %}
+                    {{ fieldTableRead(field, record) }}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        <td></td>
+    </tr>
+
+{%endmacro%}
+
+{% macro rowRead(fields,tableFields, record,table_id,origin) %}
+    <tr id="row-record-{{table_id}}-{{record['id']}}">
+        <td class="border-0">
+            <div class="form-check form-switch row-switch"> <input 
+                class="form-check-input" 
+                type="checkbox" 
+                name="rowId" 
+                value="{{record['id']}}" 
+                form="export-form">
+            </div>
+        </td>
+        <td class="border-0">
+            <div class="btn-group" role="group">
+                <a class="btn btn-outline-secondary btn-sm p-1" href="{{ record|get_view_url }}">
+                    <span class="material-icons align-middle" style="font-size: 1rem;">arrow_forward</span>
+                </a>
+                <button type="button" class="btn btn-outline-secondary btn-sm p-1 edit-row-btn" {%if fields is defined and fields %} data-table-fields='{{ fields | join(',') }}' {%endif%} {% if origin is defined and origin%}data-origin="{{origin}}" {%endif%} data-form-id="form-record-{{record['id']}}" data-record-id="{{record['id']}}" data-table-id="{{table_id}}">
+                    <span class="material-icons align-middle" style="font-size: 1rem;">edit</span>
+                </button>
+            </div>
+            
+        </td>
+        {% if fields %}
+            {% for field in fields %}
+                    {% set fieldDisplay = tableFields[field] %}
+                    {{ fieldTableRead(fieldDisplay,record) }}
+            {% endfor %}
+        {% else %}
+            {% for key,field in tableFields.items() %}
+                {{ fieldTableRead(field,record) }}
+            {% endfor %}
+        {% endif %}
+        <td class="border-0">
+            <button type="button" class="btn btn-outline-danger btn-sm p-1 delete-row-btn" data-record-id="{{record['id']}}" data-table-id="{{table_id}}">
+                <span class="material-icons align-right" style="font-size: 1rem;">delete</span>
+            </button>
+        </td>
+    </tr>
+{%endmacro%}
+
+{% macro connectedTable(fields,table_id, records, origin=False) %}
+{% set tableFields = table_id|get_clazz_fields %}
+<div class="table-responsive">
+    <table class="table align-middle" id="connected-table-{{ table_id }}">
+        <thead class="table-light">
+            <tr>
+                <th class="border-0" scope="col">
+                <div class="form-check form-switch">
+                    <input class="form-check-input master-switch-checkbox" type="checkbox" role="switch">
+                </div>
+                </th>
+                <th class="border-0" scope="col"></th>
+                {% if fields %}
+                    {% for field in fields %}
+                            <th class="border-0" scope="col">{{ tableFields[field].label }}</th>
+                    {% endfor %}
+                {% else %}
+                    {% for field in tableFields %}
+                        <th class="border-0" scope="col">{{ tableFields[field].label }}</th>
+                    {% endfor %}
+                {% endif %}
+                <th class="border-0" scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if records is defined %}
+                {% for record in records %}
+                    {{ rowRead(fields,tableFields,record,table_id,origin) }}
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<button type="button" class="btn btn-primary add-row-btn" data-table-id="{{ table_id }}" {%if fields is defined and fields %}data-table-fields="{{ fields | join(',') }}" {%endif%} data-origin="{{ origin }}">
+    + Añadir fila
+</button>
+
+{% endmacro %}
+
+{% macro newRow(fields,table_id,origin=False) %}
+    {% set tableFields = table_id|get_clazz_fields %}
+    {{ rowEdit(table_id,fields,tableFields, record=False, origin=origin)  }}
+{%endmacro%}
+
+{% macro editRow(record,fields,table_id,origin=False) %}
+    {% set tableFields = table_id|get_clazz_fields %}
+    {{ rowEdit(table_id,fields=fields,tableFields=tableFields, record=record, origin=origin)  }}
+{%endmacro%}
+
+{% macro getSearchField(searchField,clazzDetails,args)%}
+    {% set tableFields = clazzDetails.get("id")|get_clazz_fields %}
+    {% if tableFields.get(searchField)%}
+        {% set field = tableFields.get(searchField) %}
+        {% set input = field.get("input")%}
+        {% set id = field.get('name') %}
+        {% set options = field.get('select_options') %}
+        {% set connected_table = field.get('connected_table') %}
+        {% set name = field.get('name') %}
+        {% if args.get(name)%}
+            {% set value = args.get(name) %}
+        {% elif args.get('start-' + name)%}
+                {% set valueStart = args.get('start-' + name) %}
+            {% if args.get('until-' + name)%}
+                {% set valueUntil = args.get('until-' + name) %}
+            {% endif %}
+        {% else %}
+            {% set value = None %}
+            {% set valueStart = None %}
+            {% set valueUntil = None %}
+        {% endif %}
+        
+            <label for="{{field.get('name')}}" class="col-sm-4 text-sm-end"><b>{{field.get("label")}}</b></label>
+            <div class="col-sm-8">
+                {% if input == "boolean"%}
+                    {{ search.boolean(id, value) }}
+                {% elif input == "checkbox" %}
+                    {{ search.checkbox(id,options, value) }}
+                {% elif input == "radio" %}
+                    {{ search.radio(id,options, value) }}
+                {% elif input == "money" %}
+                    {{ search.money(id,value) }}
+                {% elif input == "number"  or input == "float" %}
+                    {{ search.number(id, value) }}
+                {% elif input == "integer" %}
+                    {{ search.integer(id, valueStart, valueUntil) }}
+                {% elif input == "select" %}
+                    {{ search.select(id,options, value) }}
+                {% elif input == "connected_table" %}
+                    {{ search.connected_table(id,connected_table=connected_table, value=value) }}
+                {% elif input == "treeView"%}
+                    {{ search.treeView(id, connected_table, value) }}
+                {% elif input == "tagsInput" %}
+                    {{ search.tagsInput(id, connected_table, value) }}
+                {% elif input == "date" %}
+                    {{ search.date(id, value) }}
+                {% elif input == "email" %}
+                    {{ search.email(id, value) }}
+                {% else %}
+                    {{ search.text(id, value) }}
+                {% endif %}
+            </div>
+    {% endif %}
+{%endmacro%}
+
+{% macro getTable(classid,args,table)%}
+
+        {% set clazzDetails = classid|get_clazz_details %}
+        {% set tableFields = classid|get_clazz_fields %}
+        {% set fieldStr = clazzDetails.get("table_fields") %}
+        {% if  fieldStr is defined %}
+            {% set fieldsDisplay = fieldStr|split_table_fields_definition %}
+        {%endif%}
+        {% set sortField = clazzDetails.get("sort_field_results")|split_string("|") %}
+        {% set current_sort_field = args.get('sort_field', sortField[0]) %}
+        {% set current_sort_dir = args.get('sort_dir', sortField[1]) %}
+        {% set ajax_url = url_for('routing.list_record', classid=classid, page=1) %}
+        <div id="table-container-{{ classid }}">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if table.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for(request.endpoint, classid=classid, page=table.prev_num, **request.args.to_dict()) }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for p in table.iter_pages() %}
+                    {% if p %}
+                        {% if p == table.page %}
+                            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for(request.endpoint, classid=classid,  page=p, **request.args.to_dict()) }}">{{ p }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                {% if table.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for(request.endpoint, classid=classid,  page=table.next_num, **request.args.to_dict()) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>  
+        <small class="mb-2">Resultados: {{ table.total }}</small>
+        <br>
+        <div class="row mt-2 mb-2">
+            <form id="export-form" action="{{url_for('application.get_action')}}" method="GET">                    
+                <button type="submit" class="btn btn-primary" name="export" value="{{clazzDetails.name}}">
+                    Exportar
+                </button>
+                <input type="hidden" name="classid" value="{{classid}}">
+                <input type="hidden" name="total" value="{{ table.total }}">
+            </form>
+        </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle sortable-table" data-base-url="{{ ajax_url }}"  id="table-{{classid}}">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="form-check form-switch">
+                                {#<input class="form-check-input master-switch-checkbox" type="checkbox" role="switch">#}
+                                </div>
+                            </th>
+                            <th></th>
+                            {%set orderValid = ["String",
+                                "Integer",
+                                "Money",
+                                "Boolean",
+                                "Date",
+                                "Time",
+                                "DateTime",
+                                "Text",
+                                "blob",
+                                "connected_table",
+                                "selfParent",
+                                "createdby",
+                                "modifiedby",
+                                "creationDate",
+                                "modificationDate"]%}
+                            {% if fieldsDisplay is defined and fieldsDisplay.get("labels")|length > 0 %}
+                                {% for field in fieldsDisplay.get("labels") %}
+                                    {%if tableFields.get(field[1]).get("type") in orderValid%}
+                                        {% if tableFields.get(field[1]).get("type") == "connected_table" or tableFields.get(field[1]).get("type") == "blob" %}
+                                            {% set name = field[1] + '_id'%}
+                                        {% else %}
+                                            {% set name = field[1]%}
+                                        {% endif %}
+                                        
+                                        <th data-field="{{name}}" class="sort-header {% if current_sort_field == field[1] %}sorted-{{ current_sort_dir }}{% endif %}">
+                                            {{ field[0] }}
+                                            {% if current_sort_field == field[1] %}
+                                                {% if current_sort_dir == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                                            {% endif %}
+                                        </th>
+                                    {%else%}
+                                        <th >
+                                            {{ field[0] }}
+                                        </th>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% for field, value in tableFields.items() %}
+                                    {%if tableFields.get(value.get("name")).get("type") in orderValid %}
+                                        {% if tableFields.get(value.get("name")).get("type") == "connected_table" or tableFields.get(value.get("name")).get("type") == "blob" %}
+                                                {% set name = value.get("name") + '_id'%}
+                                            {% else %}
+                                                {% set name = value.get("name")%}
+                                            {% endif %}
+                                        <th data-field="{{name}}" class="sort-header {% if current_sort_field == value.get('name') %}sorted-{{ current_sort_dir }}{% endif %}">
+                                            {{ value.get("label") }}
+                                            {% if current_sort_field == value.get("name") %}
+                                                {% if current_sort_dir == 'asc' %} ▲ {% else %} ▼ {% endif %}
+                                            {% endif %}
+                                        </th>
+                                    {%else%}
+                                        <th >
+                                            {{ value.get("label") }}
+                                        </th>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-{{ classid }}">
+                        {%- if fieldsDisplay.get("fields") is defined and fieldsDisplay.get("fields")|length > 0 -%}
+                            {%- set fields = fieldsDisplay.get("fields")-%}
+                        {%- endif -%}
+                        {%- for record in table.items -%}
+                            {{ rowRead(fields,tableFields, record,classid) }}
+                        {%- endfor -%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+                
+{%endmacro%}
+
+
+
+{% macro fieldSurvey(field,record=False,origin=False,label=False) %}
+    {% if record %}
+        {% set value = record|safe_getattr(field.id) %}
+    {% else %}
+        {% set value = None %}
+    {% endif %}
+    {% set input = field.input %}
+    {% if label %}
+        {% set label = label %}
+    {% else %}
+        {% set label = field.label %}
+    {% endif%}
+    {% set id = field.id %}
+    {% set required = field.required %}
+    {% set options = field.select_options %}
+    {% set connected_table = field.connected_table %}
+<div class="row mb-3">
+    <label class="mb-2" for="{{id}}">{{ label }}</label>
+    <div class="">
+    {% if input == "boolean"%}
+        {{ edit.boolean(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "checkbox" %}
+        {{ edit.checkbox(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "radio" %}
+        {{ edit.radio(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "money" %}
+        {{ edit.money(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "number"  or input == "float" %}
+        {{ edit.number(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "integer" %}
+        {{ edit.integer(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "textarea" %}
+        {{ edit.textarea(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "select" %}
+        {{ edit.select(input, label, id, required, options, connected_table, value) }} 
+    {% elif input == "tagsInput" %}
+        {{ edit.tagsInput(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "treeView" %}
+        {{ edit.treeView(input, label, id, required, options, connected_table, value) }}
+    {% elif id == origin["fieldName"] %}
+        {{ edit.connected_table(input, label, id, required, options, connected_table, origin["value"]) }}
+    {% elif input == "connected_table" %}
+        {{ edit.connected_table(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "incompletedate" %}
+        {{ edit.incompletedate(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "date" %}
+        {{ edit.date(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "image" %}
+        {{ edit.image(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "imageOld" %}
+        {{ edit.imageOld(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "blob" %}
+        {{ edit.blob(input, label, id, required, options, connected_table, value) }}
+    {% elif input == "email" %}
+        {{ edit.email(input, label, id, required, options, connected_table, value) }}
+    {% else %}
+        {{ edit.text(input, label, id, required, options, connected_table, value) }}
+    {% endif %}
+    </div>
+</div>
+{% endmacro %}

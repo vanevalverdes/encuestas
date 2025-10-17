@@ -1,6 +1,6 @@
 from models.develop.relevant import Relevant, get_fields
 
-from utils.methods import application, session
+from utils.packages import application, session
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from utils.db import db
 from werkzeug.utils import secure_filename

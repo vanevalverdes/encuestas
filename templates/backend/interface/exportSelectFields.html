@@ -1,0 +1,221 @@
+{% extends "backend/custom/surround.html" %}
+
+{% block title %}Exportar{% endblock %}
+
+{% block content %}
+
+<div class="container mt-3">
+    <div class="row d-flex align-items-center vh-100">
+        <div class="col-sm-12 mx-auto my-auto">
+            <form method="post" id="exportForm">
+                <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" id="classid" name="classid" value="{{classid}}">
+                <input type="hidden" id="rowList" name="rowList" value="{{rowList}}">
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <span class="material-icons align-middle me-2">file_download</span>
+                        Opciones de Exportación
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <p class="card-text text-muted mb-4">
+                                ¿Qué datos deseas incluir en el archivo exportado?
+                            </p>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="export_scope" id="scopeSelected" value="selected_items" {% if list_size == 0 %} disabled {% endif %} >
+                                    <label class="form-check-label" for="scopeSelected">
+                                        <strong class="text-primary">Solo los ítems seleccionados ({{list_size}})</strong>
+                                        <span class="text-muted d-block small">(Exportar solo las filas marcadas.)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="export_scope" id="scopeAll" value="all_data" checked>
+                                    <label class="form-check-label" for="scopeAll">
+                                        <strong>Toda la tabla ({{table_size}})</strong>
+                                        <span class="text-muted d-block small">(Exportar todos los registros visibles.)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <small>Seleccione los campos que quiere exportar (presiones ctrl o shift, o arrastre el cursor para seleccionar varias) y añádalos al cuadro siguiente.</small>
+                            <br>
+                            <br>
+
+                            <div class="col-sm-4">
+                                    <div class="form-group">
+                                    <label for="sel2">Campos:</label><br>
+                                    <select multiple class="form-control " id="sel2" style="height: auto;min-height: 255px;border: 1px solid #cccccc;width:100%;" name="allFields">
+                                        {% for field, value in classfields.items() %}
+                                            <option value="{{ value.get('name') }}">
+                                                {{ value.get("label") }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    </div>
+                            </div>
+                            <div class="col-sm-1">
+                                    <br>
+                                    <br>
+                                    <button class="btn btn-outline-secondary" id="mover" onclick="event.preventDefault();">Añadir >></button>
+                                    <br>
+                                    <br>
+                                    <button class="btn btn-outline-secondary" id="quitar" onclick="event.preventDefault();"><< Quitar</button>
+
+                            </div>
+                            <div class="col-sm-4">
+                                    <label for="sel1">Seleccionados:</label><br>
+                                    <select multiple class="form-control" id="sel1" style="height: auto;min-height: 255px;border: 1px solid #cccccc;width:100%;"  name="addedFields">
+                                        <option value="id">Id</option>
+                                    </select>
+                            </div>
+                            <div class="col-sm-1">
+                                    <br>
+                                    <br>
+                                    <button class="btn btn-outline-secondary" id="moveUpButton" onclick="event.preventDefault();">Arriba</button>
+                                    <br>
+                                    <br>
+                                    <button id="moveDownButton" class="btn btn-outline-secondary" onclick="event.preventDefault();">Abajo</button>
+                                    <br>
+                                    <br>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <p class="card-text text-muted mb-4">
+                                Formato de exportación:
+                            </p>                           
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="format" id="formatCSV" value="csv">
+                                    <label class="form-check-label" for="format">
+                                        <strong class="text-primary">CSV (separado por comas)</strong>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="format" id="formatPdf" value="pdf" checked>
+                                    <label class="form-check-label" for="format">
+                                        <strong>PDF</strong>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn btn-success">
+                            <span class="material-icons align-middle me-1" style="font-size: 1.2em;">file_download</span>
+                            Exportar Datos
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- Referencias ---
+    const select1 = document.getElementById('sel2'); // Campos disponibles
+    const select2 = document.getElementById('sel1'); // Campos seleccionados
+    const exportForm = document.getElementById('exportForm');
+    
+    // Botones de Mover/Quitar/Ordenar (La lógica anterior se mantiene)
+    const botonAdd = document.getElementById('mover');
+    const botonDelete = document.getElementById('quitar');
+    const moveUpButton = document.getElementById('moveUpButton');
+    const moveDownButton = document.getElementById('moveDownButton');
+
+    // =========================================================
+    // LÓGICA DE MOVER/QUITAR/ORDENAR (SIN CAMBIOS)
+    // =========================================================
+    
+    function moverOpciones() {
+        const opcionesSeleccionadas = Array.from(select1.selectedOptions);
+        opcionesSeleccionadas.forEach(opcion => {
+            select2.appendChild(opcion);
+        });
+    }
+
+    function quitarOpciones() {
+        const opcionesSeleccionadas = Array.from(select2.selectedOptions);
+        opcionesSeleccionadas.forEach(opcion => {
+            select1.appendChild(opcion);
+        });
+    }
+
+    botonAdd.addEventListener('click', moverOpciones);
+    botonDelete.addEventListener('click', quitarOpciones);
+
+    if (select2) {
+        moveUpButton.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevenir el click predeterminado (ya lo tienes en el HTML)
+            const selectedOptions = Array.from(select2.selectedOptions);
+            selectedOptions.forEach(option => {
+                select2.insertBefore(option, option.previousElementSibling);
+            });
+        });
+        
+        moveDownButton.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevenir el click predeterminado (ya lo tienes en el HTML)
+            const selectedOptions = Array.from(select2.selectedOptions).reverse();
+            selectedOptions.forEach(option => {
+                const nextSibling = option.nextElementSibling;
+                if (nextSibling) {
+                    select2.insertBefore(option, nextSibling.nextElementSibling);
+                }
+            });
+        });
+    }
+
+    // =========================================================
+    // LÓGICA CRÍTICA: PREVENTSUBMIT + HIDDEN INPUTS
+    // =========================================================
+
+    if (exportForm && select2) {
+        exportForm.addEventListener('submit', function(event) {
+            
+            // 1. Detener el envío del formulario inmediatamente
+            event.preventDefault(); 
+            
+            // 2. Eliminar cualquier input oculto anterior (para evitar duplicados si se re-envía)
+            const oldHiddenInputs = this.querySelectorAll('input[name="addedFields_hidden"]');
+            oldHiddenInputs.forEach(input => input.remove());
+
+            // 3. Iterar sobre TODAS las opciones en el select de "Seleccionados" (sel1)
+            Array.from(select2.options).forEach(option => {
+                
+                // Crear un nuevo input oculto para cada campo
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                
+                // 💡 IMPORTANTE: Usar un nuevo nombre para evitar conflictos con el select
+                hiddenInput.name = 'addedFields_hidden'; 
+                
+                // El valor es el mismo que el valor de la opción (ej: 'name', 'id')
+                hiddenInput.value = option.value;
+                
+                // Añadir el input oculto al formulario
+                this.appendChild(hiddenInput);
+            });
+
+            // 4. Forzar el envío del formulario con los nuevos inputs ocultos
+            this.submit(); 
+        });
+    }
+});
+</script>
+
+{% endblock %}

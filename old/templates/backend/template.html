@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Sistema de Información Remota{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="{{ url_for('static', filename='backend/css/style.css') }}" rel="stylesheet">
+  </head>
+  <body>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('application.index') }}"><img src="{{ url_for('static', filename='opol1.webp') }}" style="height: 50px; margin-right: 20px;"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if current_user.usergroup.id == 1 %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Estructura
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('clazz.list_record') }}">Clases</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('user.list_record') }}">Usuarios</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('usergroup.list_record') }}">Grupo de Usuarios</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('clazz.migrate') }}">Recargar Clases</a></li>
+              </ul>
+            </li>            
+            {% endif %}
+            {% if current_user.usergroup.id == 2%}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('rounting.report', record_id=18) }}" id="">
+                  Ver Reporte General - Octubre
+              </a>
+            </li>
+            {% set states = [
+              'alajuela', 'cartago', 'guanacaste', 'heredia', 'limon', 'puntarenas', 'san-jose'
+              ] %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Reporte por Provincia - Octubre
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for state in states %}
+                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=18) }}?state={{ state }}">{{ state }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=18) }}" id="">
+                  Ir a Formulario de Encuesta - Septiembre
+              </a>
+            </li>
+            {% endif %}
+            {#
+            {% if current_user.usergroup.id == 2%}
+            {% set countys = [
+              'Alajuelita','Cañas','Cartago','Curridabat','Desamparados','Escazú','Goicoechea','Grecia','Guacimo','Guapiles','Heredia','Liberia','Limón','Mora','Moravia','Naranjo','Nicoya','Oreamuno','Osa','Palmares','Paraíso','Pérez Zeledón','Puntarenas','San Carlos','San José','San Rafael','San Ramón','Santo Domingo','Sarapiquí','Siquirres','Tibas','Tres Ríos','Turrialba','Upala'
+              ] %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Reporte Encuesta - Alcaldes
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% for county in countys %}
+                  <li><a class="dropdown-item" href="{{ url_for('rounting.report', record_id=15) }}?county={{ county }}">{{ county }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% endif %}
+            #}
+            {% if current_user.usergroup.id == 3%}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('rounting.survey', record_id=18) }}" id="">
+                  Ir a Formulario de Encuesta
+              </a>
+            </li>
+            {% endif %}
+            {% if class_names and current_user.usergroup.id == 1%}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Clases desarrollo
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                {% for class_id, class_name in class_names %}
+                  <li><a class="dropdown-item" href="{{ url_for('rounting.list_record', classid=class_id,page=1) }}">{{ class_name }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            {% endif %}
+          </ul>
+          <small>Version: 3.2.2</small>&nbsp; Usuario: {{current_user.email}} &nbsp;
+          <a style="color:grey" href="{{ url_for('application.logout') }}"> Salir</a>
+        </div>
+      </div>
+    </nav>
+    {% endif %}
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        <div class="container mt-3">
+          <div class="row d-flex align-items-center">
+              <div class="alert alert-info">{{ message }}</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endwith %}
+        
+    {% block content %}    {% endblock %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    {% block bottomScripts %}{% endblock %}
+
+  </body>
+</html>

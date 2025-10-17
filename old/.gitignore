@@ -1,0 +1,42 @@
+#/utils/exporter.py
+#/static/uploads
+#/static/qrcodes
+
+# Excluye el entorno virtual
+/venv
+
+# Excluye archivos y directorios de configuración de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# Excluye archivos de configuración de entorno y secretos
+.env
+*.env
+*.env.*
+
+# Excluye archivos de log
+*.log
+
+# Excluye archivos de configuración de IDEs
+.vscode/
+.idea/
+*.iml
+
+# Excluye archivos y directorios de construcción de Docker
+docker-compose.yml
+.dockerignore
+docker-compose.*
+
+# Excluye otros directorios de entornos virtuales
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Excluye Migrations
+#migrations/
+#/migrations

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from werkzeug.security import generate_password_hash
 from flask_login import UserMixin
 from utils.db import db
@@ -12,6 +13,10 @@ class User(UserMixin,db.Model):
     _password_hash = db.Column(db.String(255))
     usergroup_id = db.Column(db.Integer, db.ForeignKey('usergroup.id'))
     usergroup = db.relationship('Usergroup', backref='users')
+    __table_args__ = {
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci",
+    }
 
     def __repr__(self) -> str:
         return f"{self.email}"
@@ -20,8 +25,57 @@ class User(UserMixin,db.Model):
         self._password_hash = generate_password_hash(password)
 
 
+def get_fields_form():
+    from utils.packages import application
+    clazzes = application.getAllUsergroups()
+    options = [{"label": usergroup.name, "value": usergroup.id} for usergroup in clazzes if usergroup.id != 1]
+    fields = {
+            "id": {
+                "id": "id", 
+                "type": "Integer", 
+                "maxlength": "", 
+                "label": "Id", 
+                "input": "integer",
+                "class":""
+            },
+            "name": {
+                "id": "name", 
+                "type": "String", 
+                "maxlength": "100", 
+                "label": "Nombre", 
+                "input": "text",
+                "class":""
+            },
+            "lastname": {
+                "id": "lastname", 
+                "type": "String", 
+                "maxlength": "100", 
+                "label": "Apellido", 
+                "input": "text",
+                "class":""
+            },
+            "email": {
+                "id": "email", 
+                "type": "String", 
+                "maxlength": "100", 
+                "label": "Usuario", 
+                "input": "text",
+                "class":""
+            },
+            "usergroup_id": {
+                "id": "usergroup_id", 
+                "type": "Integer", 
+                "maxlength": "", 
+                "label": "Tipo de Usuario", 
+                "input": "select",
+                "class":"",
+                "options":options
+            }
+        }
+    return fields
+
 def get_fields():
-    from utils.methods import application
+    from utils.packages import application
     clazzes = application.getAllUsergroups()
     options = [{"label": usergroup.name, "value": usergroup.id} for usergroup in clazzes if usergroup.id != 1]
     fields = {

@@ -1,19 +1,18 @@
-from models.develop.field import Field, get_fields
+# -*- coding: utf-8 -*- 
+from models.develop.field import Field, get_fields, get_fields_form
 
-from utils.methods import application, session
+from utils.packages import application, session
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from utils.db import db
 from werkzeug.utils import secure_filename
 from flask_login import login_required
 import os
-from utils.methods.engine import traceError
+from utils.packages.engine import traceError
 
 classname = "field"
 Record = Field
 
 blueprintname = Blueprint("field", __name__)
-
-
 
 @blueprintname.route(f'/develop/{classname}/new/', methods=["GET","POST"])
 @traceError
@@ -22,13 +21,13 @@ def create_record():
     class_names = application.list_class_names()
     parent = request.args.get('parent')
     containers = get_fields(parent)
+    fields = get_fields_form()
     backlink = request.args.get("backlink")
     if request.method == "GET":
         return render_template("backend/base/new_base.html", containers=containers,classname=classname, class_names=class_names,backlink=backlink)
     elif request.method == "POST":
-
         new_institution = Record()
-        session.saveForm(new_institution,containers)
+        session.saveForm(new_institution,fields)
         db.session.add(new_institution)
         db.session.commit()
 
@@ -40,8 +39,8 @@ def create_record():
 def view_record(record_id):
     class_names = application.list_class_names()
     institution = Record.query.get_or_404(record_id)
-    parent = institution.container_id
-    containers = get_fields(parent)
+    #parent = institution.container_id
+    containers = get_fields()
     backlink = request.args.get("backlink")
     return render_template('backend/base/view_field.html', institution=institution, containers=containers,classname=classname, class_names=class_names,backlink=backlink)
 
@@ -51,13 +50,14 @@ def view_record(record_id):
 def edit_record(record_id):
     class_names = application.list_class_names()
     institution = Record.query.get_or_404(record_id)
-    parent = institution.container_id
-    containers = get_fields(parent)
+    #parent = institution.container_id
+    containers = get_fields()
+    fields = get_fields_form()
     backlink = request.args.get("backlink")
     if request.method == 'POST':
-        session.saveForm(institution,containers)
+        session.saveForm(institution,fields)
         db.session.commit()
-        flash('La institución ha sido actualizada exitosamente.', 'success')
+        flash('Campo ha sido actualizado exitosamente.', 'success')
         return render_template('backend/base/edit_base.html', institution=institution, containers=containers,classname=classname, class_names=class_names,backlink=backlink)
     return render_template('backend/base/edit_base.html', institution=institution,containers=containers,classname=classname, class_names=class_names,backlink=backlink)
 
@@ -70,7 +70,7 @@ def delete_record(record_id):
     backlink = request.args.get("backlink")
     db.session.delete(institution)
     db.session.commit()
-    flash('La institución ha sido eliminada exitosamente.', 'success')
+    flash('Campo ha sido eliminado exitosamente.', 'success')
     return redirect(url_for('.list_record'))  # Asumiendo que existe una ruta para listar instituciones
 
 @blueprintname.route(f'/develop/{classname}/all/')

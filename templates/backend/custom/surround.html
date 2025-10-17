@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{% block title %}Opol Consultores{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/themes/default/style.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='backend/css/style.css') }}" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstree@3.3.12/dist/jstree.min.js"></script>
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .nav-tabs .nav-link {
+            border: 1px solid transparent;
+            border-top-left-radius: .25rem;
+            border-top-right-radius: .25rem;
+            color: #4b4b4b;
+            font-size: 0.85rem;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #bb3726;
+            background-color: #e9ecef;
+            border-color: #dee2e6 #dee2e6 #fff;
+        }
+        .nav-pills .nav-link:not(.active):hover {
+            background: #f3f3f3;
+            color: #333436;
+            border-color: #dee2e6;
+        }
+        .nav-pills .nav-link {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.9rem;
+            border-radius: 0.2rem;
+            background: transparent;
+            color: #495057;
+            border: 1px solid transparent;
+            transition: background 0.2s, color 0.2s, border 0.2s;
+        }
+
+        .nav-pills .nav-link.active,
+        .nav-pills .show>.nav-link {
+            color: #fff;
+            background-color: #495057;
+            border-color: #495057;
+        }
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #e9ecef;
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-text {
+            display: flex;
+            align-items: center;
+        }
+
+        .material-icons {
+            font-size: 1rem;
+            margin: 0.25rem;
+        }
+
+        .btn-light {
+            border: 1px solid #dee2e6;
+        }
+
+        .table-sortable tbody tr {
+            cursor: grab;
+        }
+    </style>
+</head>
+
+<body class="bg-light" style="padding-top:0;margin-top:0;">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm rounded-0 px-3 w-100" style="margin-bottom:0;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('application.index') }}"><img src="{{ url_for('static', filename='opol1.webp') }}" style="height: 50px; margin-right: 20px;"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+                    {% if current_user.is_authenticated and current_user.usergroup.id == 2 %}
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold" href="{{ url_for('custom.stat', classid=1) }}">Ver estadísticas</a>
+                    </li>
+                    {% endif %}
+                    {% if current_user.is_authenticated%}
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.survey', classid=1) }}">Nueva encuesta</a>
+                    </li>
+                    {% endif %}
+                    
+                </ul>
+                <div class="d-flex align-items-center gap-2 ms-lg-3">
+                    <a class="nav-link p-2" href="#"><span
+                            class="material-icons text-secondary">notifications</span></a>
+                    <!-- Dropdown para Mi Cuenta en el icono -->
+                    <div class="nav-item dropdown">
+                        <a class="nav-link p-2 dropdown-toggle" href="#" id="accountDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-icons text-secondary">account_circle</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                            <li><a class="dropdown-item disabled disabled" href="#">Perfil</a></li>
+                            <li><a class="dropdown-item disabled" href="#">Configuración</a></li>
+                            <li><a class="dropdown-item disabled" href="#">Cambiar contraseña</a></li>
+                            <li><a class="dropdown-item disabled" href="#">Preferencias</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('application.logout') }}">Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+     {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        <div class="container mt-3">
+          <div class="row d-flex align-items-center">
+              <div class="alert alert-info">{{ message }}</div>
+          </div>
+        </div>
+        {% endfor %}
+        {% endwith %}
+    <div class="container py-4">
+        <main>
+            {% block content %}    {% endblock %}
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
+    <script>
+        function initializeTomSelects() {
+            // Selecciona todos los elementos con la clase 'select-searchable'
+            document.querySelectorAll('.select-searchable').forEach(selectElement => {
+                if (!selectElement.tomselect) {
+                    new TomSelect(selectElement, {
+                        // Configuración básica para búsqueda
+                        create: false, // No permitir crear nuevas opciones
+                        sortField: {
+                            field: "text",
+                            direction: "asc"
+                        },
+                        placeholder: 'Buscar o seleccionar una opción...'
+                    });
+                    
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeTomSelects();
+        });
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const el = document.getElementById('sortable-table');
+            const sortable = Sortable.create(el, {
+                animation: 150,
+                ghostClass: 'table-active',
+                onEnd: function (evt) {
+                    updatePositions();
+                }
+            });
+            function updatePositions() {
+                const rows = document.querySelectorAll('#sortable-table .table-row');
+                rows.forEach((row, index) => {
+                    row.dataset.position = index;
+                    const positionInput = row.querySelector('.position-input');
+                    if (positionInput) {
+                        positionInput.value = index;
+                    }
+                });
+            }
+        });
+    </script>
+
+<script>
+    // Asignar el token a una variable JavaScript global
+    const CSRF_TOKEN = '{{ csrf_token() }}';
+
+    // Deshabilita la detección automática para evitar que Dropzone se inicialice solo
+    // y para poder controlarlo manualmente.
+    Dropzone.autoDiscover = false;
+
+    // Función de utilidad para inicializar Dropzone y sus controladores en un elemento específico.
+    // Esta función replica la lógica de tu script de Jinja, pero de forma dinámica.
+    function initializeDropzoneOnElement(element) {
+        if (!element) {
+            console.error("Error: Elemento para inicializar Dropzone no encontrado.");
+            return;
+        }
+
+        const dropzoneContainer = element.querySelector('.dropzone');
+        const dropzoneId = dropzoneContainer.getAttribute("data-id");
+        const dropzoneType = dropzoneContainer.getAttribute("data-type");
+        const recordId = dropzoneId.replace('dropzone-', '');
+
+        if (dropzoneContainer) {
+            if (dropzoneType == "image") {
+                acceptedType = "image/*";
+                errorMsg = "Solo se permiten imágenes (jpg, png, gif, tiff).";
+            } else {
+                acceptedType = null;
+                errorMsg = "Solo se permiten archivos";
+            }
+            const dropzoneInstance = new Dropzone(dropzoneContainer, {
+                url: "/application/upload",
+                maxFiles: 1,
+                paramName: "file",
+                headers: {
+                    "X-CSRFToken": document.querySelector(`[name="csrf_token"]`).value
+                },
+                acceptedFiles: acceptedType,
+                dictInvalidFileType: errorMsg,
+
+                success: function(file, response) {
+                    // 1. Asigna el ID de la respuesta al elemento de formulario
+                    element.querySelector(`#${recordId}`).value = response.id;
+                    
+                    // 2. Define el ID del contenedor de la imagen de previsualización para usarlo múltiples veces
+                    const previewImageId = `#img-preview-${recordId}`;
+                    const previewContainerId = `#image-preview-${recordId}`;
+                    const dropzoneContainerId = `#dropzone-${recordId}-container`;
+
+                    // Función para verificar si el archivo es TIFF o similar
+                    const isSupportedImage = (file) => {
+                        // Verifica si el tipo MIME es 'image/tiff' O si el nombre termina en '.tiff' (más robusto)
+                        return file.name.toLowerCase().endsWith('.jpg') || file.name.toLowerCase().endsWith('.jpeg') || file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.gif') || file.name.toLowerCase().endsWith('.webp');
+                    };
+
+                    if (isSupportedImage(file)) {
+
+                        // --- CÓDIGO ORIGINAL PARA ARCHIVOS SOPORTADOS (JPG, PNG, etc.) ---
+                        
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            console.log(e.target.result);
+                            
+                            // Carga la previsualización real (Data URL)
+                            element.querySelector(previewImageId).src = e.target.result;
+                            
+                            // Muestra la previsualización y oculta el dropzone
+                            element.querySelector(previewContainerId).style.display = "block";
+                            element.querySelector(dropzoneContainerId).style.display = "none";
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // --- CÓDIGO PARA ARCHIVOS NO SOPORTADOS (TIFF) ---
+                        
+                        // Define la URL del ícono genérico (¡Asegúrate de que esta ruta sea correcta!)
+                        const genericIconUrl = '/static/assets/img/document.png'; 
+                        
+                        // Carga el ícono genérico
+                        element.querySelector(previewImageId).src = genericIconUrl;
+                        
+                        // Muestra la previsualización y oculta el dropzone
+                        element.querySelector(previewContainerId).style.display = "block";
+                        element.querySelector(dropzoneContainerId).style.display = "none";
+
+                    }
+                },
+
+                error: function(file, message) {
+                    const errorBox = element.querySelector(`#dropzone-error-${recordId}`);
+                    errorBox.textContent = message;
+                    errorBox.style.display = "block";
+
+                    setTimeout(function() {
+                        errorBox.style.display = "none";
+                    }, 4000);
+
+                    this.removeFile(file);
+                }
+            });
+
+            const replaceButton = element.querySelector(`#replace-image-btn-${recordId}`);
+            if (replaceButton) {
+                replaceButton.addEventListener("click", function() {
+                    element.querySelector(`#${recordId}`).value = "";
+                    element.querySelector(`#img-preview-${recordId}`).src = "";
+                    element.querySelector(`#image-preview-${recordId}`).style.display = "none";
+                    element.querySelector(`#dropzone-${recordId}-container`).style.display = "block";
+                    dropzoneInstance.removeAllFiles(true);
+                });
+            }
+            
+            console.log(`Dropzone inicializado en el elemento: dropzone-${recordId}`);
+        } else {
+            console.error(`Error: No se encontró el elemento con ID: dropzone-${recordId}`);
+        }
+    }
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Select all buttons with the class .add-row-btn
+    document.querySelectorAll(".add-row-btn").forEach(function(button) {
+        // Attach the event listener to each button individually
+        button.addEventListener("click", function() {
+            let tableId = this.getAttribute("data-table-id");
+            let fieldsString = this.getAttribute("data-table-fields"); 
+            let fields = [];
+            if (fieldsString) {
+                fields = fieldsString.split(',');
+            } else {
+                fields = [];
+            }
+            console.log(fields);
+            let origin = this.getAttribute("data-origin");
+            let tableBody = document.querySelector("#connected-table-" + tableId + " tbody");
+            
+            // Si la tabla no tiene cuerpo, no hacemos nada
+            if (!tableBody) return;
+
+            fetch(`/application/new-row?_ts=${new Date().getTime()}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    table_id: tableId,
+                    origin: origin,
+                    fields: fields
+                })
+            })
+            .then(response => response.text())
+            .then(html => {
+                tableBody.insertAdjacentHTML('beforeend', html);
+
+                // Encuentra la nueva fila que acabas de insertar
+                const newRow = tableBody.lastElementChild;
+                console.log("Nueva fila insertada:", newRow)
+                if (newRow && newRow.querySelector('.dropzone')) {
+                    initializeDropzoneOnElement(newRow); 
+                    initializeTomSelects();
+                }
+            })
+            .catch(error => console.error('Error fetching new row:', error));
+        });
+    });
+});
+document.addEventListener("DOMContentLoaded", function() {
+    const fetchUrl = '/application/edit-row';
+    const fetchDeleteUrl = '/application/delete-row';
+    
+    function showBootstrapToast(message, type = 'success') {
+        // Contenedor principal para los toasts (si no existe, lo crea)
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            // Clases de posicionamiento de Bootstrap (bottom-0 end-0 para esquina inferior derecha)
+            toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            document.body.appendChild(toastContainer);
+        }
+
+        const toastElement = document.createElement('div');
+        // Usa `fade` y `show` para la animación inicial, aunque Bootstrap JS lo maneja
+        toastElement.className = `toast align-items-center text-white bg-${type} border-0`;
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+        // Establece un tiempo de espera para que se oculte (ej: 5000ms o false para manual)
+        toastElement.setAttribute('data-bs-delay', '5000'); 
+        
+        toastElement.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toastElement);
+
+        // *** PASO CLAVE: Inicializar el Toast con JavaScript de Bootstrap ***
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+        
+        // Limpia el DOM después de que se oculta para no acumular elementos
+        toastElement.addEventListener('hidden.bs.toast', () => {
+            toastElement.remove();
+        });
+    }
+    
+    // --- DELEGACIÓN PARA BOTONES DE EDICIÓN (.edit-row-btn) ---
+    // Adjuntamos el listener a todo el documento (o al contenedor principal)
+    document.addEventListener('click', (e) => {
+        // Usamos .closest() para encontrar si el clic fue dentro de un .edit-row-btn
+        const button = e.target.closest('.edit-row-btn'); 
+        
+        if (button) {
+            e.preventDefault(); 
+            
+            // --- LÓGICA DE SPINNER Y DESHABILITAR ---
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cargando...';
+
+            // Obtener IDs y el elemento objetivo
+            let recordId = button.getAttribute("data-record-id");
+            let tableId = button.getAttribute("data-table-id");
+            let origin = button.getAttribute("data-origin");
+            let fields = [];
+            // 1. Obtener la cadena del atributo (ejemplo con un botón que tiene data-fields)
+            let fieldsString = button.getAttribute("data-table-fields"); 
+            if (fieldsString) {
+                fields = fieldsString.split(',');
+            } else {
+                fields = [];
+            }
+            console.log(fields);
+
+            let targetRow = document.querySelector("#row-record-" + tableId + "-" + recordId); 
+            
+            
+
+            if (!targetRow) {
+                console.error("Error: Elemento objetivo (#row-record-" + tableId + "-" + recordId + ") no encontrado.");
+                return;
+            }
+
+            fetch(`${fetchUrl}?_ts=${new Date().getTime()}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}' 
+                },
+                body: JSON.stringify({
+                    table_id: tableId,
+                    record_id: recordId,
+                    origin: origin,
+                    fields: fields,
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(html => {
+                targetRow.outerHTML = html; 
+                let newRow = document.querySelector("#row-record-" + tableId + "-" + recordId);
+                console.log("Fila editada y reemplazada:", newRow);
+                if (newRow && newRow.querySelector('.dropzone')) {
+                    initializeDropzoneOnElement(newRow);
+                    initializeTomSelects();
+                }
+            })
+            .catch(error => console.error('Error al obtener o procesar la edición de fila:', error));
+        }
+    });
+    document.addEventListener('click', (e) => {
+        const button = e.target.closest('.delete-row-btn'); 
+        
+        if (button) {
+            e.preventDefault(); 
+            
+            let recordId = button.getAttribute("data-record-id");
+            let tableId = button.getAttribute("data-table-id");
+            let targetRow = document.querySelector("#row-record-" + tableId + "-" + recordId); 
+            console.log("Intentando eliminar fila ID:", recordId, "en tabla ID:", tableId);
+            // 1. CONFIRMACIÓN DE USUARIO
+            if (!confirm(`¿Estás seguro de que quieres eliminar el registro ID ${recordId}? Esta acción es irreversible.`)) {
+                return; // Detener si el usuario cancela
+            }
+
+            // --- LÓGICA DE SPINNER Y DESHABILITAR ---
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Eliminando...';
+
+            if (!targetRow) {
+                console.error("Error: Elemento objetivo (#row-record-" + tableId + "-" + recordId + ") no encontrado.");
+                button.disabled = false;
+                button.innerHTML = originalContent;
+                return;
+            }
+
+            // 2. PETICIÓN FETCH para la eliminación
+            fetch(`${fetchDeleteUrl}?_ts=${new Date().getTime()}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}' 
+                },
+                body: JSON.stringify({
+                    table_id: tableId,
+                    record_id: recordId,
+                })
+            })
+            .then(response => {
+                // El backend debería responder con un estado 200 o 204 si la eliminación fue exitosa
+                if (!response.ok) {
+                    // Lee el mensaje de error del backend si existe
+                    return response.text().then(text => { 
+                        throw new Error(`Error ${response.status}: ${text || 'Falló la eliminación en el servidor.'}`);
+                    });
+                }
+                // Si la respuesta es exitosa (ej. 200/204), procedemos
+                return response.text(); 
+            })
+            .then(() => {
+                // 3. ÉXITO: Eliminar la fila del DOM
+                targetRow.remove();
+                console.log(`Fila ID ${recordId} eliminada exitosamente.`);
+                showBootstrapToast(`Registro ID ${recordId} eliminado exitosamente.`, 'success');
+            })
+            .catch(error => {
+                // 4. FRACASO: Restaurar el botón y mostrar el error
+                console.error('Error al intentar eliminar la fila:', error);
+                button.disabled = false;
+                button.innerHTML = originalContent;
+                alert('No se pudo eliminar el registro: ' + error.message);
+            });
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('click', (e) => {
+        const button = e.target.closest('.btn-save-ajax');
+        
+        if (button) {
+            e.preventDefault(); 
+
+            // 1. Identifica la fila y la URL de acción
+            const currentRow = button.closest('tr');
+            if (!currentRow) return;
+
+            const formAction = currentRow.getAttribute('data-action');
+            let fieldsString = button.getAttribute("data-table-fields"); 
+            let fields_in_request
+            if (fieldsString) {
+                fields_in_request = fieldsString.split(',');
+            }
+            if (!formAction) return;
+
+            // CONSTRUYE FormData manualmente desde TODOS los inputs de la fila
+            const formData = new FormData();
+            
+            // Selecciona todos los <input>, <select> y <textarea> dentro de la fila
+            const inputs = currentRow.querySelectorAll('input, select, textarea');
+
+            inputs.forEach(input => {
+                const isCheckboxOrRadio = input.type === 'checkbox' || input.type === 'radio';
+                
+                // Manejo especial para Checkboxes y Radios
+                if (isCheckboxOrRadio && !input.checked) {
+                    return; 
+                }
+                
+                // Manejo general para el resto de inputs (incluidos los checked)
+                if (input.name) {
+                    // Para inputs tipo text, hidden, select, y checkboxes/radios MARCADO
+                    formData.append(input.name, input.value);
+                }
+            });
+            if (fields_in_request) {            
+                formData.append('fields_in_request', fields_in_request); 
+            }
+
+            const csrfTokenInput = currentRow.querySelector('[name="csrf_token"]');
+            const csrfTokenValue = csrfTokenInput ? csrfTokenInput.value : null;
+
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
+
+            // Petición FETCH
+            fetch(formAction, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfTokenValue 
+                },
+                body: formData 
+            })
+
+            .then(response => {
+                if (!response.ok) {
+                    // Para errores HTTP (4xx, 5xx), lee el cuerpo como texto y lanza error
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                // Lee el cuerpo de la respuesta como TEXTO (HTML)
+                return response.text(); 
+            })
+            .then(htmlContent => {
+                
+                // Verificamos que el contenido HTML no esté vacío
+                if (htmlContent) {
+                    // Reemplaza la fila original con el nuevo HTML recibido
+                    currentRow.insertAdjacentHTML('afterend', htmlContent);
+                    currentRow.remove();
+                    
+                    // Opcional: Deshabilita el spinner y restaura el botón si no se hace en el catch
+                    button.disabled = false;
+                    button.innerHTML = originalContent; 
+
+                } else {
+                    console.error('Respuesta exitosa, pero no se recibió HTML para la fila.');
+                }
+            })
+            .catch(error => {
+                alert('Error al guardar: ' + error.message);
+                console.error("Error en la petición:", error);
+                
+                // Restaura el botón si hay un error
+                button.disabled = false;
+                button.innerHTML = originalContent;
+            });
+        }
+    });
+    
+document.addEventListener('click', (e) => {
+        const button = e.target.closest('.btn-stop-ajax');
+        
+        if (button) {
+            e.preventDefault(); 
+
+            // 1. Identifica la fila y extrae los datos de los atributos del botón
+            const currentRow = button.closest('tr');
+            if (!currentRow) return;
+
+            const tableId = button.getAttribute('data-table-id');
+            const recordId = button.getAttribute('data-record-id');
+            const fieldsString = button.getAttribute('data-table-fields');
+            const originValue = button.getAttribute('data-origin');
+            // Nota: Si 'origin' fuera necesario, tendrías que obtenerlo de otro atributo de datos.
+            
+            if (!tableId || !recordId) {
+                console.error("Faltan data-table-id o data-record-id en el botón.");
+                return;
+            }
+
+            // 2. CONSTRUYE la URL que usa Flask con los IDs y los parámetros de consulta (Query Strings)
+            let readActionUrl = `/application/get-row/${tableId}/${recordId}`;
+            let params = [];
+
+            // Añadir 'fields_in_request' si existe
+            if (fieldsString) {
+                params.push(`fields_in_request=${encodeURIComponent(fieldsString)}`);
+            }
+            
+             if (originValue) {
+                params.push(`origin=${encodeURIComponent(originValue)}`);
+            }
+
+            // Añadir todos los parámetros a la URL
+            if (params.length > 0) {
+                readActionUrl += '?' + params.join('&');
+            }
+
+            // --------------------------------------------------------------------
+            
+            // Prepara el estado del botón (spinner)
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Recargando...';
+
+            // Petición FETCH (GET)
+            // Se usa la URL construida: /application/get-row/123/456?fields_in_request=a,b
+            fetch(readActionUrl, {
+                method: 'GET', // Usar GET para recargar el recurso
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Para errores HTTP (4xx, 5xx), lee el cuerpo como texto y lanza error
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                // Lee el cuerpo de la respuesta como TEXTO (HTML de la fila en modo lectura)
+                return response.text(); 
+            })
+            .then(htmlContent => {
+                
+                if (htmlContent) {
+                    // Reemplaza la fila de edición con el nuevo HTML de la fila en modo lectura
+                    currentRow.insertAdjacentHTML('afterend', htmlContent);
+                    currentRow.remove();
+                } else {
+                    alert('Operación exitosa, pero no se recibió HTML para la fila. Intente recargar la página.');
+                    console.error('Respuesta exitosa, pero no se recibió HTML para la fila.');
+                    
+                    button.disabled = false;
+                    button.innerHTML = originalContent; 
+                }
+            })
+            .catch(error => {
+                alert('Error al detener la edición: ' + error.message);
+                console.error("Error en la petición:", error);
+                
+                // Restaura el botón si hay un error de red o HTTP
+                button.disabled = false;
+                button.innerHTML = originalContent;
+            });
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Escucha clics en cualquier parte de la página
+    document.addEventListener('click', (e) => {
+        // Usa .closest() para encontrar el encabezado con la clase 'sort-header'
+        const header = e.target.closest('.sort-header');
+        
+        if (header) {
+            e.preventDefault(); 
+            
+            // 1. Encontrar la etiqueta <table> (debe tener la clase 'sortable-table')
+            const table = header.closest('.sortable-table');
+            if (!table) return;
+
+            // ⭐ CLAVE: Obtener el ID del contenedor padre.
+            // Asumimos que el contenedor padre es el que tiene el ID que necesitamos.
+            // Si el contenedor tiene un ID como 'table-container-1', y la tabla es su hija.
+            const container = table.parentNode.parentNode;
+            
+            // Verificamos que el contenedor existe y tiene un ID válido.
+            // Si el contenedor SIEMPRE envuelve solo la tabla, puedes usar table.parentNode.id.
+            if (!container || !container.id) {
+                console.error("Error: No se pudo encontrar el contenedor padre de la tabla con ID.");
+                return;
+            }
+
+            const containerId = container.id; 
+            // ------------------------------------
+
+            const baseUrl = table.getAttribute('data-base-url');
+            const newSortField = header.getAttribute('data-field');
+            
+            // Determinar la dirección de ordenación actual y la nueva dirección
+            let currentSortDir = '';
+            if (header.classList.contains('sorted-asc')) {
+                currentSortDir = 'asc';
+            } else if (header.classList.contains('sorted-desc')) {
+                currentSortDir = 'desc';
+            }
+            
+            let newSortDir;
+            if (currentSortDir === 'desc') { // Cambiado de 'asc' a 'desc' para alternar
+                newSortDir = 'asc';
+            } else {
+                // Si la columna es nueva o estaba ascendente, ordena descendente
+                newSortDir = 'desc'; 
+            }
+            
+            // 1. Obtener los parámetros de consulta existentes (ej: paginación, filtros)
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // 2. Aplicar los nuevos parámetros de ordenación
+            urlParams.set('sort_field', newSortField);
+            urlParams.set('sort_dir', newSortDir);
+            
+            // Si usas paginación, es común volver a la primera página al reordenar
+            // Esto es importante para que la ordenación se aplique a todo el dataset.
+            //urlParams.set('page', '1'); 
+
+            // 3. LLAMADA PARA ACTUALIZAR VÍA AJAX 
+            const newUrl = `${baseUrl}?${urlParams.toString()}`;
+            
+            // Usamos el ID del contenedor padre que envuelve toda la tabla y paginación.
+            fetchAndUpdateTable(newUrl, containerId); 
+
+            // Opcional: Actualizar el historial del navegador sin recargar
+            window.history.pushState({}, '', newUrl); 
+        }
+    });
+});
+function fetchAndUpdateTable(url, containerId) {
+    // containerId es ahora el ID del DIV padre completo (ej: 'table-container-1')
+    const oldContainer = document.getElementById(containerId); 
+
+    if (!oldContainer) {
+        console.error(`Error: Contenedor con ID '${containerId}' no encontrado.`);
+        return;
+    }
+    
+    // Opcional: Mostrar estado de carga en el contenedor antiguo
+    oldContainer.style.opacity = 0.5;
+
+    // ... (Lógica de Fetch para obtener la respuesta HTML)
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(html => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        const newContainer = tempDiv.querySelector(`#${containerId}`);
+        
+        if (newContainer) {
+            oldContainer.replaceWith(newContainer);
+            initializeTomSelects();
+        } else {
+            console.error("Fallo al extraer la nueva etiqueta <div> contenedora. HTML recibido:", html);
+            // Si el parseo falla, elimina la opacidad y muestra un error
+            oldContainer.style.opacity = 1;
+            oldContainer.innerHTML = '<p style="color: red;">Error: No se pudo cargar el contenedor.</p>';
+        }
+    })
+    .catch(error => {
+        console.error('Error al actualizar el contenedor vía AJAX:', error);
+        oldContainer.style.opacity = 1;
+        oldContainer.innerHTML = '<p style="color: red;">Error al cargar datos.</p>';
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    
+    document.addEventListener('change', function(event) {
+        
+        const target = event.target;
+
+        // ----------------------------------------------------
+        // 1. MANEJO DEL SWITCH MAESTRO (AHORA CON CLASE)
+        // ----------------------------------------------------
+        if (target.matches('.master-switch-checkbox')) { // <-- USAMOS LA CLASE
+            
+            // Encuentra la tabla más cercana (el contenedor padre)
+            const table = target.closest('table');
+            if (!table) return; 
+
+            const isChecked = target.checked;
+            
+            // Encuentra todos los switches de las filas dentro *de esta tabla*
+            const rowSwitches = table.querySelectorAll('.row-switch');
+            
+            rowSwitches.forEach(function(rowSwitch) {
+                rowSwitch.checked = isChecked;
+            });
+        } 
+        
+        // ----------------------------------------------------
+        // 2. MANEJO DE SWITCHES DE FILAS
+        // ----------------------------------------------------
+        else if (target.matches('.row-switch')) {
+            const table = target.closest('table');
+            if (!table) return; 
+
+            // Encuentra el switch maestro *dentro de esta tabla*
+            const masterSwitch = table.querySelector('.master-switch-checkbox'); // <-- USAMOS LA CLASE
+            if (!masterSwitch) return; 
+
+            const rowSwitches = table.querySelectorAll('.row-switch');
+            
+            const allChecked = Array.from(rowSwitches).every(sw => sw.checked);
+            
+            masterSwitch.checked = allChecked;
+        }
+    });
+});
+</script>
+</body>
+<footer>
+    <div id="version-info">
+        Versión {{ version }} 
+        </div>
+</footer>
+</html>

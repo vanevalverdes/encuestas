@@ -1,0 +1,112 @@
+{% extends "backend/template.html" %}
+
+{% block content %}
+
+<div class="container mt-3">
+    <!-- Inicia Botonera -->
+    {% if backlink %}
+        <a href="{{ backlink }}" class="btn btn-secondary">Regresar</a>
+        <!-- Botón de cancelación -->
+        <a href="{{ url_for('.view_record', record_id=institution.id, classid=classid, backlink=backlink) }}" type="button" class="btn btn-secondary">Cancelar</a>
+        <!-- Botón para borrar -->
+        <form action="{{ url_for('.delete_record', record_id=institution.id, classid=classid, backlink=backlink) }}" method="post"
+        style="display: inline;"><input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger"
+        onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+        </form>
+    {% else %}
+        <button onclick="window.history.back();" class="btn btn-secondary">Regresar</button>
+        <a href="{{ url_for('.view_record', record_id=institution.id, classid=classid) }}" type="button" class="btn btn-secondary">Cancelar</a>
+        <!-- Botón para borrar -->
+        <form action="{{ url_for('.delete_record', record_id=institution.id, classid=classid, backlink=backlink) }}" method="post"
+        style="display: inline;"><input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger"
+        onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
+        </form>
+    {% endif %}
+    <!-- Finaliza Botonera -->
+    <h2>Editar {{ classname }}: {{institution.id}}</h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    {% for container_name, container_data in containers.items() %}
+                    <div class="{{ container_data.class }}">
+                        {% if container_data.title %}<h3>{{ container_data.title }}</h3>{% endif %}
+                        {% for key, value in container_data.fields.items() %}
+                        {% set field_value = institution|safe_getattr(value.id) %}
+                        <div class="mb-3  {{ value.class }}">
+                            <label for="{{ value.id }}" class="form-label">{{ value.label }}</label>
+                            {% if value.input == "checkbox" %}
+                            <input class="form-check-input" type="checkbox" id="{{ value.id }}" name="{{ value.id }}" {%
+                                if field_value %} checked {% endif %}>
+                            {% elif value.input == "integer" or value.input == "float" %}
+                            <input class="form-control" {% if value.id=="id" %} disabled {% endif %} type="number"
+                                id="{{ value.id }}" name="{{ value.id }}" value="{{ field_value }}" {% if
+                                value.input=="float" %} step="0.01" {% else %} step="1" {% endif %}>
+                            {% elif value.input == "textarea" %}
+                            <textarea class="form-control" id="{{ value.id }}" name="{{ value.id }}"
+                                maxlength="{{ value.maxlength }}">{{ field_value }}</textarea>
+                            {% elif value.input == "select" %}
+                            <select class="form-control" id="{{ value.id }}" name="{{ value.id }}">
+                                {% for option in value.options %}
+                                <option value="{{ option.value }}" {% if option.value==field_value %} selected {% endif %}>
+                                    {{ option.label }}</option>
+                                {% endfor %}
+                            </select>
+                            {% elif value.input == "image" %}
+                            <img id="preview-{{ value.id }}"
+                                src="{{ url_for('static', filename='uploads/' ~ field_value) }}" width="200">
+                            <!-- Checkbox para decidir si eliminar la imagen actual -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="delete-{{ value.id }}"
+                                    name="delete-{{ value.id }}">
+                                <label class="form-check-label" for="delete-{{ value.id }}">
+                                    Eliminar imagen actual
+                                </label>
+                            </div>
+                            <!-- Input para subir una nueva imagen, solo se muestra si el usuario selecciona eliminar la imagen actual -->
+                            <input class="form-control" type="file" id="{{ value.id }}" name="{{ value.id }}"
+                                accept=".png, .jpg, .jpeg, .gif" style="display: none;">
+                            <script>
+                                // JavaScript para manejar la visibilidad del input de archivo en función del checkbox
+                                document.getElementById('delete-{{ value.id }}').onchange = function () {
+                                    var fileInput = document.getElementById('{{ value.id }}');
+                                    if (this.checked) {
+                                        fileInput.style.display = 'block'; // Muestra el input si el checkbox está marcado
+                                    } else {
+                                        fileInput.style.display = 'none'; // Oculta el input si el checkbox no está marcado
+                                    }
+                                };
+                                // Previsualización de la imagen cargada
+                                document.getElementById('{{ value.id }}').onchange = function (evt) {
+                                    var output = document.getElementById('preview-{{ value.id }}');
+                                    output.src = URL.createObjectURL(evt.target.files[0]);
+                                    output.onload = function () {
+                                        URL.revokeObjectURL(output.src); // Liberar memoria
+                                    }
+                                };
+                            </script>
+                            {% elif value.input == "email" %}
+                            <input class="form-control" type="email" id="{{ value.id }}" name="{{ value.id }}"
+                                value="{{ field_value }}" maxlength="{{ value.maxlength }}">
+                            {% else %}
+                            <input class="form-control" type="text" id="{{ value.id }}" name="{{ value.id }}"
+                                value="{{ field_value }}" maxlength="{{ value.maxlength }}">
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor%}
+                </div>
+                <div>
+                    <label for="password" class="form-label">Contraseña (dejar en blanco si no quiere cambiarla)</label>
+                    <input class="form-control" type="password" id="password" name="password">
+                </div>
+                <!-- Botón de envío -->
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </form>
+    {% endblock %}

@@ -1,6 +1,6 @@
-from models.develop.usergroup import Usergroup, get_fields
+from models.develop.usergroup import Usergroup, get_fields, get_fields_form
 
-from utils.methods import application, session
+from utils.packages import application, session
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from utils.db import db
 from werkzeug.utils import secure_filename
@@ -18,26 +18,26 @@ def authorization():
         return True
     return False
 
-@blueprintname.route(f'/develop/{classname}/new/', methods=["GET","POST"])
+@blueprintname.route(f'/admin/{classname}/new/', methods=["GET","POST"])
 @login_required
 def create_record():
     class_names = application.list_class_names()
+    fields = get_fields_form()
     containers = get_fields()
-    print(containers)
     
     if request.method == "GET":
         return render_template("backend/base/new_base.html", containers=containers,classname=classname, class_names=class_names)
     elif request.method == "POST":
 
         new_institution = Record()
-        session.saveForm(new_institution,containers) 
+        session.saveForm(new_institution,fields) 
 
         db.session.add(new_institution)
         db.session.commit()
 
         return redirect(url_for('.view_record', record_id=new_institution.id,classname=classname, class_names=class_names))
     
-@blueprintname.route(f'/develop/{classname}/<int:record_id>')
+@blueprintname.route(f'/admin/{classname}/<int:record_id>')
 @login_required
 def view_record(record_id):
     class_names = application.list_class_names()
@@ -46,7 +46,7 @@ def view_record(record_id):
 
     return render_template('backend/base/view_base.html', institution=institution, containers=containers,classname=classname,  class_names=class_names)
 
-@blueprintname.route(f'/develop/{classname}/<int:record_id>/edit/', methods=['GET', 'POST'])
+@blueprintname.route(f'/admin/{classname}/<int:record_id>/edit/', methods=['GET', 'POST'])
 @login_required
 def edit_record(record_id):
     class_names = application.list_class_names()
@@ -60,7 +60,7 @@ def edit_record(record_id):
         return render_template('backend/base/edit_base.html', institution=institution, containers=containers,classname=classname, class_names=class_names)
     return render_template('backend/base/edit_base.html', institution=institution,containers=containers,classname=classname, class_names=class_names)
 
-@blueprintname.route(f'/develop/{classname}/<int:record_id>/delete/', methods=['POST'])
+@blueprintname.route(f'/admin/{classname}/<int:record_id>/delete/', methods=['POST'])
 @login_required
 def delete_record(record_id):
     institution = Record.query.get_or_404(record_id)
@@ -69,7 +69,7 @@ def delete_record(record_id):
     flash('La institución ha sido eliminada exitosamente.', 'success')
     return redirect(url_for('.list_record'))  # Asumiendo que existe una ruta para listar instituciones
 
-@blueprintname.route(f'/develop/{classname}/all/')
+@blueprintname.route(f'/admin/{classname}/all/')
 @login_required
 def list_record():
     class_names = application.list_class_names()

@@ -22,6 +22,7 @@
         <button type="submit" class="btn btn-danger"
             onclick="return confirm('¿Estás seguro de que quieres eliminar esta institución?');">Borrar</button>
     </form>
+    <a href="{{ url_for('field.create_record', parent=institution.clazz_id, backlink=backlink) }}" class="btn btn-success mb-3">Crear Field</a>
 
     <h2>{{ classname }}: {{institution.id}}</h2>
     <div class="card">
@@ -34,26 +35,7 @@
                     {% set field_value = institution|safe_getattr(value.id) %}
                     <div class="{{ value.class }}">
                         <p>
-                            <b>{{ value.label }}:</b>
-                            {% if value.input == "checkbox" and value.type == "boolean" %}
-                                {% if field_value %} Sí {% else %} No {% endif %}
-                            {% elif value.input == "checkbox" and value.type != "boolean" %}
-                                {% for option in value.options %}
-                                    {% if option.value in field_value %} <br>{{ option.label }} {% endif %}
-                                {% endfor %}
-                            {% elif value.input == "integer" or value.input == "float" %}
-                            {{ field_value }}
-                            {% elif value.input == "textarea" %}
-                            {{ field_value }}
-                            {% elif value.input == "select" %}
-                            {% for option in value.options %}
-                            {% if option.value == field_value %} {{ option.label }} {% endif %}
-                            {% endfor %}
-                            {% elif value.input == "image" %}
-                            <img src="{{ url_for('static', filename='uploads/' ~ field_value) }}" width="200" />
-                            {% else %}
-                            {{ field_value }}
-                            {% endif %}
+                            <b>{{ value.label }}:</b> {{field_value}}
                         </p>
                     </div>
                     {% endfor %}

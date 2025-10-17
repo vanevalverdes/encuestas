@@ -62,35 +62,7 @@
             </div>
         </div>
     </div>
-    <div class="card my-3">
-        <div class="card-body">
-            <h5 class="card-title">Contenedores</h5>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for container in clazz_containers %}
-                    <tr>
-                        <td>{{ container.name }}</td>
-                        <td>
-                            <a href="{{ url_for('container.view_record', record_id=container.id, backlink=url_for('.view_record', record_id=institution.id, classid=classid)) }}" class="btn btn-primary">Editar</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    <tfoot>
-                        <tr>
-                            <td><a href="{{ url_for('container.create_record', parent=institution.id, backlink=url_for('.view_record', record_id=institution.id, classid=classid)) }}" class="btn btn-success mb-3">Crear container</a></td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </tbody>
-            </table>
-        </div>
-    </div>
+
     <div class="card my-3">
         <div class="card-body">
             <h5 class="card-title">All Fields</h5>
@@ -98,6 +70,11 @@
                 <thead>
                     <tr>
                         <th>Nombre</th>
+                        <th>Etiqueta</th>
+                        <th>Tipo DB</th>
+                        <th>Input</th>
+                        <th>Archivo</th>
+                        <th>Función</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -105,6 +82,11 @@
                     {% for relevant in clazz_fields %}
                     <tr>
                         <td>{{ relevant.name }}</td>
+                        <td>{{ relevant.label }}</td>
+                        <td>{{ relevant.type }}</td>
+                        <td>{{ relevant.input }}</td>
+                        <td>{{ relevant.calculate_file }}</td>
+                        <td>{{ relevant.calculate_function }}</td>
                         <td>
                             <a href="{{ url_for('field.view_record', record_id=relevant.id,backlink=url_for('.view_record', record_id=institution.id, classid=classid)) }}" class="btn btn-primary">Editar</a>
                         </td>

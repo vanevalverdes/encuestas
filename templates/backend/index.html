@@ -1,0 +1,9 @@
+{% if current_user.is_authenticated and current_user.usergroup.id == 1 %}
+    {% extends "backend/template.html" %}
+{% elif current_user.is_authenticated %}
+    {% extends "backend/custom/surround.html" %}
+{%endif%}
+
+{% block content %}
+
+{%endblock%}

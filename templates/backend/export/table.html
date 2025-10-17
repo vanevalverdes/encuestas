@@ -1,0 +1,93 @@
+{% import "backend/snippets/snippets.html" as snippets %}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            /* Define el tamaño A4 y la orientación horizontal */
+            size: a4 landscape; 
+            /* También puedes definir márgenes aquí */
+            margin: 1cm;
+        /*
+        * 1. Estilos generales de la tabla y celdas
+        * ----------------------------------------
+        */
+        table {
+            /* Ocupa todo el ancho disponible */
+            width: 100%; 
+            /* Colapsa los bordes para una apariencia limpia */
+            border-collapse: collapse; 
+            /* Evita la separación de la tabla al inicio o final de la página */
+            -pdf-keep-with-next: true; 
+        }
+
+        th, td {
+            /* Borde sutil: 1px sólido de color gris claro */
+            border: 1px solid #dddddd; 
+            /* Espaciado interno para el contenido de la celda */
+            padding: 8px; 
+            /* Alineación de texto por defecto */
+            text-align: left; 
+            /* Alineación vertical del contenido */
+            vertical-align: top; 
+        }
+
+        /*
+        * 2. Manejo de contenido que no quepa en una página
+        * ------------------------------------------------
+        */
+
+        /* Propiedad para intentar mantener una fila entera junta, si es posible */
+        tr {
+            -pdf-keep-with-next: true;
+        }
+
+        /* Propiedad específica para xhtml2pdf: cómo manejar celdas que son más largas que la página */
+        /* 'shrink' es el valor por defecto: intenta reducir el contenido. */
+        /* Otros valores: 'error', 'overflow', 'truncate' */
+        td {
+            -pdf-keep-in-frame-mode: shrink; 
+        }
+
+        /*
+        * 3. Encabezado de la tabla (para que se repita en cada página)
+        * -----------------------------------------------------------
+        */
+        thead {
+            /* CUALQUIER fila dentro de thead se repetirá en la parte superior de las páginas */
+            display: table-header-group; 
+        }
+
+        /* Estilo para el encabezado */
+        th {
+            background-color: #f2f2f2; /* Color de fondo ligero */
+            font-weight: bold;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+<table>
+    <thead>
+        <tr>
+            {%for header in headers%}
+                <th>
+                    {{ header }}
+                </th>
+            {%endfor%}
+        </tr>
+    </thead>
+    <tbody>
+        {%for record in table%}
+        <tr>
+            {%for field in fields%}
+                {%set tablefield = classfields[field]%}
+                {{ snippets.fieldTableRead(tablefield,record)}}
+            {%endfor%}
+        </tr>
+        {%endfor%}
+     </tbody>
+</table>
+
+</body>
+</html>

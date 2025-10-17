@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 # Define las convenciones de nombres
 convention = {
@@ -15,3 +17,12 @@ metadata = MetaData(naming_convention=convention)
 
 # Pasa el metadata a SQLAlchemy
 db = SQLAlchemy(metadata=metadata)
+
+# Habilita claves foráneas en SQLite
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    from sqlite3 import Connection as SQLite3Connection
+    if isinstance(dbapi_connection, SQLite3Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()

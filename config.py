@@ -1,10 +1,18 @@
+# MIT License
+# Copyright (c) 2025 Nible Tecnología en Desarrollo LTDA
+# See LICENSE file for more details.
+
 from pathlib import Path
+from dotenv import load_dotenv
 import os
 
+# Cargar variables del .env
+load_dotenv()
+
 develop = True
-databaseType = "mysql"
-applicationName = "Opol Sistema"
-adminMail = "vane@nibletecnologia.com"
+databaseType = os.getenv("DATABASE_TYPE")
+applicationName = os.getenv("APPLICATION_NAME")
+adminMail = os.getenv("ADMIN_MAIL")
 
 
 base_dir = str(Path(__file__).parent.resolve())
@@ -28,36 +36,40 @@ else:
     
     url = "http://143.244.187.247"
 
-# Ruta del sitio
 
+# Construir la URI de la base de datos
+# Construir la URI de la base de datos
+MYSQL_USER = f'{os.getenv("MYSQL_USER")}'
+MYSQL_PASSWORD = f'{os.getenv("MYSQL_PASSWORD")}'
+MYSQL_HOST = f'{os.getenv("MYSQL_HOST")}'
+MYSQL_PORT = f'{os.getenv("MYSQL_PORT")}'
+MYSQL_DB = f'{os.getenv("MYSQL_DB")}'
 class Config:
     if develop:
-        # En caso de usar SQLite
-        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://encuestas25opol_root:^tXoz7BvetJx@23.235.193.87:3306/encuestas25opol_production'
-        #SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://mapavrtx_mapuso:qhQh%9YBy8NM@158.69.145.101:3306/mapavrtx_dbmapu?charset=utf8mb4'
-        #SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://ilamdocs24_mapuso:CFiCc*NadFnJ@198.46.85.8:3306/ilamdocs24_mapu?charset=utf8mb4'
-        MAIL_SERVER = 'smtp.hostinger.com'
-        MAIL_PORT = 465
+        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+        MAIL_SERVER = os.getenv("MAIL_SERVER")
+        MAIL_PORT = int(os.getenv("MAIL_PORT"))
         MAIL_USE_TLS = False
         MAIL_USE_SSL = True
-        MAIL_USERNAME = 'noreply@nibletecnologia.com'
-        MAIL_PASSWORD = 'TwinPeaks2024.'
-        MAIL_DEFAULT_SENDER = ('Pruebas NGDO', 'noreply@nibletecnologia.com')
+        MAIL_USERNAME = os.getenv("MAIL_USERNAME")
+        MAIL_PASSWORD = f'{os.getenv("MAIL_PASSWORD")}'
+        MAIL_DEFAULT_SENDER = ('UC-LAC - Uni-Co CMS', MAIL_USERNAME)
     else:
-        SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://encuestas25opol_root:^tXoz7BvetJx@23.235.193.87:3306/encuestas25opol_production'
-        MAIL_SERVER = 'smtp.hostinger.com'
-        MAIL_PORT = 465
+        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+        MAIL_SERVER = os.getenv("MAIL_SERVER")
+        MAIL_PORT = int(os.getenv("MAIL_PORT"))
         MAIL_USE_TLS = False
         MAIL_USE_SSL = True
-        MAIL_USERNAME = 'noreply@nibletecnologia.com'
-        MAIL_PASSWORD = 'TwinPeaks2024.'
-        MAIL_DEFAULT_SENDER = ('Pruebas NGDO', 'noreply@nibletecnologia.com')
+        MAIL_USERNAME = os.getenv("MAIL_USERNAME")
+        MAIL_PASSWORD = f'{os.getenv("MAIL_PASSWORD")}'
+        MAIL_DEFAULT_SENDER = ('Reservaciones', MAIL_USERNAME)
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_POOL_RECYCLE = 1800 
     SQLALCHEMY_ENGINE_OPTIONS = {'pool_pre_ping': True}
-    SECRET_KEY = 'lghaasdñas5654132aa35r..*'
-    UPLOAD_FOLDER = 'static/uploads'
-    MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MB
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
+    STATIC_FOLDER = os.getenv("STATIC_FOLDER")
+    MAX_CONTENT_LENGTH = 500 * 1024 * 1024  # 100 MB
 
     

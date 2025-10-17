@@ -1,0 +1,500 @@
+
+    {% macro boolean(input, label, id, required, options, connected_table, value)%}
+        <input class="form-check-input" type="checkbox" id="{{id}}" name="{{id}}" {% if value %}checked{% endif %} {% if required %} required {% endif %}>
+    {% endmacro %}
+    
+    {% macro checkbox(input, label, id, required, options, connected_table, value) %}
+        {% if options is string %}
+            {% set options = options|from_json %}
+            {% for label, checkvalue in options.items() %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="{{id}}-{{ loop.index }}" name="{{id}}[]" value="{{ checkvalue }}"{% if required %} required {% endif %}>
+                <label class="form-check-label" for="{{id}}-{{ loop.index }}">
+                    {{ label }}
+                </label>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endmacro %}
+
+    {% macro radio(input, label, id, required, options, connected_table, value) %}
+        {% for label, checkvalue in options.items() %}
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="{{ id }}-{{ loop.index }}" name="{{ id }}" value="{{ checkvalue }}"{% if required %} required {% endif %}{% if checkvalue == value %} checked {% endif %}>
+            <label class="form-check-label" for="{{ id }}-{{ loop.index }}">
+                {{ label }}
+            </label>
+        </div>
+        {% endfor %}
+    {% endmacro %}
+
+    {% macro money(input, label, id, required, options, connected_table, value) %}
+        <input class="form-control" type="number"
+            id="{{id}}" name="{{id}}" value='{% if value %}{{ value | money_format }}{% endif %}' step="0.01" placeholder="0.00" min="0" {% if required %} required {% endif %}>
+    {% endmacro %}
+
+    {% macro number(input, label, id, required, options, connected_table, value) %}
+        <input class="form-control" type="number"
+            id="{{ id }}" name="{{ id }}" value="{% if value %}{{ value }}{% endif %}" step="1" {% if required %} required {% endif %}>
+    {% endmacro %}
+
+    {% macro float(input, label, id, required, options, connected_table, value) %}
+        <input class="form-control" type="number" 
+            id="{{ id }}" name="{{ id }}" value="{% if value %}{{ value }}{%  endif %}" step="0.01" {% if required %} required {% endif %}>
+    {% endmacro %}
+
+    {% macro integer(input, label, id, required, options, connected_table, value) %}
+    <input class="form-control" type="number" id="{{id}}" name="{{id}}" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
+    {% endmacro %}
+
+    {% macro textarea(input, label, id, required, options, connected_table, value) %}
+    <textarea class="form-control" id="{{id}}" name="{{id}}" {% if required %} required {% endif %}>{% if value %} {{value}} {% endif %}</textarea>
+    {% endmacro %}
+
+    {% macro select(input, label, id, required, options, connected_table, value) %}
+    <select class="form-select" id="{{id}}" name="{{id}}"{% if required %} required {% endif %}>
+        {% if options is string %}
+            {% set options = options|from_json %}
+            <option ></option>
+            {% for label, valueOption in options.items() %}
+            <option {% if value|string == valueOption|string %} selected {% endif %} value="{{ valueOption }}">
+                {{ label }}</option>
+            {% endfor %}
+        {% endif %}
+    </select>
+    {%endmacro%}
+
+    {% macro tagsInput(input, label, id, required, options, connected_table, value) %}
+        {% set tags = connected_table|get_table_options %}
+        <div class="tags-container" id="tagsContainer-{{ id }}">
+            <input type="text" id="tagInput-{{ id }}" class="tag-input" placeholder="Escribe para buscar...">
+        </div>
+        <input type="hidden" name="{{ id }}" id="tagsValue-{{ id }}" {% if required %}data-required="true"{% endif %}>
+        <div id="suggestions-{{ id }}" class="suggestions" style="display: none;"></div>
+
+        <script>
+            (function() {
+                const data = {{ tags|tojson }};  // { "nombre": id }
+                // Construir diccionario inverso { id: "nombre" }
+                const reverseData = Object.fromEntries(Object.entries(data).map(([k,v]) => [v,k]));
+
+                const tagsContainer = document.getElementById('tagsContainer-{{ id }}');
+                const tagInput = document.getElementById('tagInput-{{ id }}');
+                const tagsValue = document.getElementById('tagsValue-{{ id }}');
+                const suggestionsBox = document.getElementById('suggestions-{{ id }}');
+
+                let selectedTags = [];
+
+                // --- Preload de valores ---
+                {% if value %}
+                    tagsPreloaded = [];
+                    {% for item in value %}
+                        tagsPreloaded.push({{ item.id }});
+                    {%endfor%}
+                    selectedTags = tagsPreloaded;
+                    selectedTags.forEach(id => {
+                        const name = reverseData[id];
+                        if (name) addTagElement(name, id);
+                    });
+                    tagsValue.value = selectedTags.join(",");
+                {% endif %}
+                // --- Fin Preload de valores ---
+
+                tagInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase();
+                    suggestionsBox.innerHTML = '';
+
+                    if (query) {
+                        const filteredTags = Object.keys(data).filter(tag =>
+                            tag.toLowerCase().includes(query) && !selectedTags.includes(data[tag])
+                        );
+                        if (filteredTags.length > 0) {
+                            suggestionsBox.style.display = 'block';
+                            filteredTags.forEach(tag => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.textContent = tag;
+                                div.addEventListener('click', () => selectTag(tag));
+                                suggestionsBox.appendChild(div);
+                            });
+                        } else {
+                            suggestionsBox.style.display = 'none';
+                        }
+                    } else {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+
+                function selectTag(tag) {
+                    const id = data[tag];
+                    if (!selectedTags.includes(id)) {
+                        addTagElement(tag, id);
+                        selectedTags.push(id);
+                        updateHiddenInput();
+                    }
+                    tagInput.value = '';
+                    suggestionsBox.style.display = 'none';
+                }
+
+                function addTagElement(name, id) {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'tag';
+                    tagElement.innerHTML = `${name} <span class="remove-tag">&times;</span>`;
+                    tagElement.querySelector('.remove-tag').addEventListener('click', () => removeTag(tagElement, id));
+                    tagsContainer.insertBefore(tagElement, tagInput);
+                }
+
+                function removeTag(element, id) {
+                    tagsContainer.removeChild(element);
+                    selectedTags = selectedTags.filter(tagId => tagId !== id);
+                    updateHiddenInput();
+                }
+
+                function updateHiddenInput() {
+                    tagsValue.value = selectedTags.join(",");
+                }
+
+                // --- Validación required ---
+                if (tagsValue.dataset.required === "true") {
+                    tagsValue.form.addEventListener('submit', function(e) {
+                        if (selectedTags.length === 0) {
+                            e.preventDefault();
+                            tagsContainer.style.borderColor = "red";
+                            alert("El campo '{{ label }}' es obligatorio.");
+                        }
+                    });
+                }
+
+                document.addEventListener('click', (e) => {
+                    if (!tagsContainer.contains(e.target)) {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+            })();
+        </script>
+    {% endmacro %}
+
+    {% macro treeView(input, label, id, required, options, connected_table, value) %}
+        {% set tree_json = connected_table | treeView %}
+        
+        {%if value%}
+            {% set idsvalues = value|get_values("id") %}
+            {% set valuesforinput = idsvalues|join(',') %}
+        {%endif%}
+        {{temp_string}}
+        <div class="d-flex align-items-center mb-3">
+            <input type="text" id="{{id}}-{{connected_table}}-selected-ids" name="{{id}}" hidden {% if required %} data-required="true" {% endif %}
+            value="{% if value %}{{valuesforinput}}{% endif %}">
+            <input type="text" class="form-control" id="{{id}}-{{connected_table}}-display-name" value="{% if value %}{{ value|join(',') }}{% endif %}" disabled placeholder="Haz clic en la lupa para seleccionar...">
+            <button type="button" class="btn btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#tree-modal-{{id}}-{{connected_table}}">
+                <i class="material-icons">search</i>
+            </button>
+        </div>
+        <div class="modal fade" id="tree-modal-{{id}}-{{connected_table}}" tabindex="-1" aria-labelledby="treeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="treeModalLabel">Seleccionar {{label}}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="tree-{{ id }}-{{connected_table}}"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+                let treeInitialized = false;
+                $('#tree-modal-{{id}}-{{connected_table}}').on('shown.bs.modal', function () {
+                    if (!treeInitialized) {
+                        
+                        // 1. RE-INTRODUCIR: Obtener los IDs del input oculto
+                        let initialSelectedIds = $('#{{id}}-{{connected_table}}-selected-ids').val();
+                        let initialSelectedArray = initialSelectedIds ? initialSelectedIds.split(',').map(String) : [];
+                        // Nota: jstree usa IDs como strings por defecto, map(String) es más seguro aquí.
+                        
+                        // La variable stateKey ya no es necesaria, se puede eliminar si no se usa.
+                        
+                        $('#tree-{{ id }}-{{connected_table}}').jstree({
+                            'core': {
+                                'data': {{ tree_json|tojson }}
+                            },
+                            'plugins': ["checkbox", "types"], // 1. Lista de plugins
+                            
+                            // 2. Configuración del plugin 'types' (al mismo nivel que 'core' y 'plugins')
+                            'types': {
+                                'default': {
+                                    'icon': 'material-icons icon-folder'
+                                },
+                                'file': {
+                                    'icon': 'material-icons icon-file'
+                                }
+                            } 
+                            // 3. Cierre del objeto principal de configuración de jstree
+                        });
+                        
+                        // 2. APLICAR SELECCIÓN INICIAL: Usar el evento ready.jstree
+                        // Esto asegura que la selección se aplique solo una vez que el árbol esté completamente cargado.
+                        $('#tree-{{ id }}-{{connected_table}}').on('ready.jstree', function () {
+                            // Obtener la instancia y seleccionar los nodos
+                            let treeInstance = $(this).jstree(true);
+                            if (initialSelectedArray.length > 0) {
+                                treeInstance.select_node(initialSelectedArray);
+                                // Opcional: Abrir los nodos padre para que la selección sea visible
+                                treeInstance.open_node(treeInstance.get_parent(initialSelectedArray[0]));
+                            }
+                        });
+                        
+                        // Maneja el evento de cambio de selección (MANTENER)
+                        $('#tree-{{ id }}-{{connected_table}}').on('changed.jstree', function(e, data) {
+                            let selectedIds = data.selected;
+                            let idString = selectedIds.join(',');
+                            $('#{{id}}-{{connected_table}}-selected-ids').val(idString);
+                            
+                            let selectedNames = data.instance.get_selected(true).map(function(node) {
+                                return node.text;
+                            });
+                            $('#{{id}}-{{connected_table}}-display-name').val(selectedNames.join(', '));
+                        });
+                        
+                        treeInitialized = true;
+                    }
+                });
+
+                // Opcional: Para evitar problemas de scroll en móviles
+                $('#tree-modal-{{id}}-{{connected_table}}').on('hidden.bs.modal', function () {
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+                });
+            });
+        </script>
+    {%endmacro%}
+
+    {% macro connected_table(input, label, id, required, options, connected_table, value)%}
+    {{connected_table}}
+    <select class="form-select select-searchable" id="{{id}}" name="{{id}}"{% if required %} required {% endif %}>
+        {% set options = connected_table|get_table_options %}
+        
+            <option ></option>
+            {% for label, valueOption in options.items() %}
+            <option {% if value.id|string == valueOption|string %} selected {% endif %} value="{{ valueOption }}">
+                {{ label }}</option>
+            {% endfor %}
+    </select>
+    {%endmacro%}
+
+    {% macro date(input, label, id, required, options, connected_table, value) %}
+        <input  class="form-control" id="{{id}}" name="{{id}}" type="date" {% if value %} value="{{value}}" {% endif %} {% if required %} required {% endif %}/>
+    {%endmacro%}
+
+    {% macro incompletedate(input, label, id, required, options, connected_table, value) %}
+        {%if value%}    
+            {%set format = value | format_incomplete_date%}
+        {%endif%}
+            <div style="display: flex;" id="{{id}}_incomplete_date">
+                    <input 
+                        type="number" 
+                        class="form-control me-2" 
+                        id="{{id}}_day" 
+                        placeholder="DD" 
+                        min="0" 
+                        max="31"
+                        style="max-width: fit-content;"
+                        {%if format%}value="{{format[2]}}"{%endif%}
+                        size="2" maxlength="2"
+                    >
+                    <select 
+                        class="form-select me-2" 
+                        id="{{id}}_month" 
+                        style="max-width: fit-content;"
+                        {%if format%}value="{{format[1]}}"{%endif%}
+                    >
+                        <option value="" selected>MM</option>
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Mayo</option>
+                        <option value="06">Junio</option>
+                        <option value="07">Julio</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="{{id}}_year" 
+                        placeholder="YYYY" 
+                        min="0" 
+                        max="2100" {%if format%}value="{{format[0]}}"{%endif%}
+                        size="4" maxlength="4"
+                        style="max-width: fit-content;"
+                    >
+                <input type="hidden" name="{{id}}" id="{{id}}" value="{{value}}">
+            </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const yearInput = document.getElementById('{{id}}_year');
+                const monthInput = document.getElementById('{{id}}_month');
+                const dayInput = document.getElementById('{{id}}_day');
+                const hiddenInput = document.querySelector('input[type="hidden"][name="{{id}}"]');
+
+                /**
+                 * Lee los valores de los campos y los concatena en un string YYYY-MM-DD.
+                 * Aplica padding para el mes y día si están presentes.
+                 * Realiza una validación simple: si hay día, debe haber mes.
+                 */
+                function updateHiddenFieldValue() {
+                    const year = yearInput.value.trim();
+                    const month = monthInput.value.trim();
+                    const day = dayInput.value.trim();
+
+                    let finalDate = '';
+                    
+                    // 1. Concatenación
+                    if (year) {
+                        finalDate = year; // YYYY
+
+                        if (month) {
+                            const paddedMonth = month.padStart(2, '0');
+                            finalDate += paddedMonth; // YYYY-MM
+
+                            if (day) {
+                                const paddedDay = day.padStart(2, '0');
+                                finalDate += paddedDay; // YYYY-MM-DD
+                            }
+                        }
+                    }
+                    
+                    // Actualizar el campo oculto
+                    hiddenInput.value = finalDate;
+                    
+                    // Opcional: Para depuración (puedes borrar esta línea)
+                    // console.log("Fecha concatenada:", hiddenInput.value);
+
+                    // 2. Validación (Feedback visual básico de error)
+                    const dayParent = dayInput.closest('.col-4');
+
+                    if (day && !month) {
+                        // Si el usuario pone día sin mes, marcamos el día como inválido
+                        dayInput.classList.add('is-invalid');
+                        dayParent.querySelector('.form-text').textContent = "Se requiere el mes.";
+                    } else {
+                        // Si la validación es correcta, limpiamos el estado
+                        dayInput.classList.remove('is-invalid');
+                        dayParent.querySelector('.form-text').textContent = "Día";
+                    }
+                }
+
+                // --- Event Listeners ---
+                
+                // El evento 'input' se dispara cuando el valor de un campo (text/number) cambia.
+                yearInput.addEventListener('input', updateHiddenFieldValue);
+                dayInput.addEventListener('input', updateHiddenFieldValue);
+                
+                // El evento 'change' es mejor para elementos <select>.
+                monthInput.addEventListener('change', updateHiddenFieldValue);
+
+                // Inicializar el campo oculto con los valores por defecto (si los hay)
+                updateHiddenFieldValue();
+            });
+        </script>
+    {%endmacro%}
+
+    {% macro image(input, label, id, required, options, connected_table, value) %}
+    <div id="dropzone-{{id}}-superior" >
+        <div id="dropzone-{{id}}-container" {% if value %}style="display:none"{% endif %}>
+            <div data-id="dropzone-{{id}}" data-type="image" class="dropzone"></div>
+        </div>
+
+        <input type="hidden" name="{{id}}" id="{{id}}" {% if value %} value="{{value.id}}" {% endif %} {% if required %} required {% endif %}>
+
+        <div id="image-preview-{{id}}" style="margin-top:10px; display: -webkit-inline-box;{% if not value %}display:none{% endif %}">
+            <img id="img-preview-{{id}}" style="display: inline-flex;"
+                {% if value %} src="{{ url_for('application.get_thumbnail', blob_id=value.id) }}" {% endif %}
+                style="max-width:200px; max-height:200px; display:block; margin-bottom:10px;" />
+            <button type="button" class="" id="replace-image-btn-{{id}}">
+                <span class="material-icons align-middle">delete</span>
+            </button>
+            
+        </div>
+
+        <div id="dropzone-error-{{id}}" style="color:red; font-size:0.9em; margin-top:5px; display:none;"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('dropzone-{{id}}-superior'); 
+            
+            if (container) {
+                        initializeDropzoneOnElement(container);
+            }
+        });
+    </script>
+    {% endmacro %}
+
+
+    {% macro imageOld(input, label, id, required, options, connected_table, value) %}
+        <input class="form-control" type="file" id="{{id}}" name="{{id}}"
+            accept=".png, .jpg, .jpeg, .gif" {% if required %} required {% endif %}>
+        <img id="preview" width="200">
+        <script>
+            document.getElementById('{{id}}').onchange = function (evt) {
+                var output = document.getElementById('preview');
+                source = URL.createObjectURL(evt.target.files[0]);
+                if (source) {
+                    output.src = source;
+                }
+                output.onload = function () {
+                    URL.revokeObjectURL(output.src) // Liberar memoria
+                }
+            };
+        </script>
+    {%endmacro%}
+
+    {% macro blob(input, label, id, required, options, connected_table, value) %}
+    <div id="dropzone-{{id}}-superior" >
+        <div id="dropzone-{{id}}-container" {% if value %}style="display:none"{% endif %}>
+            <div data-id="dropzone-{{id}}" data-type="all" class="dropzone"></div>
+        </div>
+
+        <input type="hidden" name="{{id}}" id="{{id}}" {% if value %} value="{{value.id}}" {% endif %} {% if required %} required {% endif %}>
+
+        <div id="image-preview-{{id}}" style="margin-top:10px; display: -webkit-inline-box;{% if not value %}display:none{% endif %}">
+            <img id="img-preview-{{id}}" style="display: inline-flex;"
+                {% if value %} src="{{ url_for('application.get_thumbnail', blob_id=value.id) }}" {% endif %}
+                style="max-width:200px; max-height:200px; display:block; margin-bottom:10px;" />
+            <button type="button" class="" id="replace-image-btn-{{id}}">
+                <span class="material-icons align-middle">delete</span>
+            </button>
+            
+        </div>
+
+        <div id="dropzone-error-{{id}}" style="color:red; font-size:0.9em; margin-top:5px; display:none;"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('dropzone-{{id}}-superior'); 
+            
+            if (container) {
+                        initializeDropzoneOnElement(container);
+            }
+        });
+    </script>
+    {%endmacro%}
+
+    {% macro email(input, label, id, required, options, connected_table, value) %}
+    <input class="form-control" type="email" id="{{id}}" name="{{id}}"
+        maxlength="{{ value.maxlength }}" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}>
+    {%endmacro%}
+
+    {% macro text(input, label, id, required, options, connected_table, value) %}
+        <input class="form-control" name="{{id}}" id="{{id}}" type="text" {% if value %} value="{{value}}" {% endif %}{% if required %} required {% endif %}/>
+    {% endmacro %}
+

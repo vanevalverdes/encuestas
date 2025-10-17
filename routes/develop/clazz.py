@@ -1,21 +1,23 @@
-from models.develop.clazz import Clazz, get_fields
+# -*- coding: utf-8 -*- 
+from models.develop.clazz import Clazz, get_fields, get_fields_form
 from models.develop.container import Container
 from utils.generate_class import generate_model_class, ensure_import_exists,clear_file_content
 from utils.migrate_class import migrateClass
-from utils.methods import application, session, engine
-from utils.view_class_container_fields import get_clazz_fields_migration
+from utils.packages import application, session, engine
+from utils.view_class_container_fields import get_clazz_fields_migration, get_clazz_relevants_migration
 import os
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from utils.db import db
 from werkzeug.utils import secure_filename
 from flask_login import login_required
 import traceback
-from utils.methods.engine import traceError
+from utils.packages.engine import traceError
 
 classname = "clazz"
 Record = Clazz
 
 containers = get_fields()
+fields = get_fields_form()
 blueprintname = Blueprint("clazz", __name__)
 
 @blueprintname.route(f'/develop/{classname}/new/', methods=["GET","POST"])
@@ -28,7 +30,7 @@ def create_record():
     elif request.method == "POST":
 
         institution = Record()
-        session.saveForm(institution,containers)
+        session.saveForm(institution,fields)
         db.session.add(institution)
         db.session.commit()
         return redirect(url_for('.view_record', record_id=institution.id,classname=classname, class_names=class_names))
@@ -38,24 +40,33 @@ def create_record():
 @login_required
 def view_record(record_id):
     class_names = application.list_class_names()
-    institution = application.getClazzDetails(record_id)
-    clazz_containers = institution.getContainers()
-    clazz_relevants = institution.getRelevants()
-    clazz_fields = institution.getFields()
+    institution = application.getClazzDevelop(record_id)
+    clazz_containers = institution.containers
+    clazz_relevants = institution.relevants
+    institution.fields.sort(key=lambda field: field.name) 
+    clazz_fields = institution.fields 
     
     # Consulta para obtener solo los campos `id` y `name`
     #containers_list = db.session.query(Container.id, Container.name).filter_by(clazz_id=record_id).all()
 
     # Convertir el resultado en una lista de diccionarios (opcional)
-    clazz_containers = [{"id": container.id, "name": container.name} for container in clazz_containers]
+    #clazz_containers = [{"id": container.id, "name": container.name} for container in clazz_containers]
     # Convertir el resultado en una lista de diccionarios (opcional)
     clazz_relevants = [{"id": relevant.id, "name": repr(relevant)} for relevant in clazz_relevants]
     
     # Convertir el resultado en una lista de diccionarios (opcional)
-    clazz_fields = [{"id": relevant.id, "name": repr(relevant)} for relevant in clazz_fields]
+    clazz_fields = [{"id": relevant.id,
+                     "name": repr(relevant) or "",
+                     "type": relevant.type or "",
+                     "input": relevant.input or "",
+                     "label": relevant.label or "",
+                     "options":relevant.select_options or "",
+                     "calculate_file":relevant.calculate_file or "",
+                     "calculate_function":relevant.calculate_function or ""
+                     } for relevant in clazz_fields]
     
     #print(containers)
-    return render_template('backend/base/view_clazz.html', institution=institution,clazz_fields=clazz_fields, containers=containers,classname=classname, clazz_containers=clazz_containers, clazz_relevants=clazz_relevants, class_names=class_names)
+    return render_template('backend/base/view_clazz.html', institution=institution,clazz_fields=clazz_fields, containers=containers,classname=classname, clazz_containers=None, clazz_relevants=clazz_relevants, class_names=class_names)
 
 @blueprintname.route(f'/develop/{classname}/<int:record_id>/edit/', methods=['GET', 'POST'])
 @traceError
@@ -64,7 +75,7 @@ def edit_record(record_id):
     class_names = application.list_class_names()
     institution = Record.query.get_or_404(record_id)
     if request.method == 'POST':
-        session.saveForm(institution,containers) 
+        session.saveForm(institution,fields) 
                 
         db.session.commit()
         flash('La institución ha sido actualizada exitosamente.', 'success')
@@ -93,20 +104,34 @@ def migrate():
     # Borrar listado en produccion
     #file_path_statement = '../production/models/clazzlist.py'
     #clear_file_content(file_path_statement)
+    with open(file_path_statement, 'a', encoding='utf-8') as file:
+        file.write("# -*- coding: utf-8 -*- \n")
 
-
+    list_by_name = {}
+    list_by_id = {}
     for clazz in table:
         institution = clazz
         fields = get_clazz_fields_migration(clazz.id)
+        relevants = get_clazz_relevants_migration(clazz.id)
+        id = institution.id
         name = institution.name
+        label = institution.label
+        tag = institution.tag
+        treeView = institution.treeView
+        template = institution.template
         plural = institution.plural
+        sort_field_results = institution.sort_field_results
+        table_fields = institution.table_fields
+        search_fields = institution.search_fields
+        clazz_representation = institution.clazz_representation
+
         classname = format_classname(name)
         filename = format_filename(f"{name}.py")
         #print(fields, name, plural, classname,filename)
 
         # Crea migration en develop
         directory = "models/production"
-        response = generate_model_class(fields, classname, filename,directory,plural)
+        response = generate_model_class(fields, classname, filename,directory,plural,relevants)
         #print("llega aca")
         
         # Crea migration en production
@@ -114,7 +139,39 @@ def migrate():
         #response = generate_model_class(fields, classname, filename,directory,plural)
         
         if response:
-            import_statement = f'from . import {name.lower()}'
+            nameImport = format_filename(f"{name}")
+            list_by_name[nameImport] = {
+                "id": id,
+                "name": nameImport,
+                "classname": classname,
+                "filename": filename,
+                "label": label,
+                "tag": tag,
+                "treeView": treeView,
+                "template": template,
+                "plural": plural,
+                "sort_field_results": sort_field_results,
+                "table_fields": table_fields,
+                "search_fields": search_fields,
+                "clazz_representation": clazz_representation,
+            }
+            list_by_id[id] = {
+                "id": id,
+                "name": nameImport,
+                "classname": classname,
+                "filename": filename,
+                "label": label,
+                "tag": tag,
+                "treeView": treeView,
+                "template": template,
+                "plural": plural,
+                "sort_field_results": sort_field_results,
+                "table_fields": table_fields,
+                "search_fields": search_fields,
+                "clazz_representation": clazz_representation,
+            }
+            
+            import_statement = f'from . import {nameImport}'
             
             # Crea Class List en Develop
             file_path_statement = 'models/production/clazzlist.py'
@@ -128,6 +185,17 @@ def migrate():
             flash(f'{response}', 'success')
         else:
             flash(f'Error', 'danger')
+
+    # Crea funciones de listado en clazzlist.py
+    file_path_statement = 'models/production/clazzlist.py'
+    with open(file_path_statement, 'a', encoding='utf-8') as file:
+        file.write('\n\ndef get_list_by_name():\n')
+        file.write('    return ' + str(list_by_name) + '\n')
+        file.write('\n\ndef get_list_by_id():\n')
+        file.write('    return ' + str(list_by_id) + '\n')
+        print(f"'{list_by_name}' fue agregado al archivo.")
+        print(f"'{list_by_id}' fue agregado al archivo.")
+
     migrateClass()
     return redirect(url_for(".list_record"))
   except Exception as e:

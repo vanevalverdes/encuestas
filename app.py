@@ -1,3 +1,7 @@
+# MIT License
+# Copyright (c) 2025 Nible Tecnología en Desarrollo LTDA
+# See LICENSE file for more details.
+
 from flask import Flask
 
 from utils.db import db
@@ -7,14 +11,16 @@ from config import Config
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from models.develop.user import User
-from models.develop.historial import Historial
 from models.production import clazzlist
+from models.develop import requestlog
 
 
 # Importa las Rutas de clases
 from routes import routing
+from routes import api
+from routes import custom
 from routes import webhook
-
+import uuid
 
 # Define Login Manager 
 login_manager = LoginManager()
@@ -29,6 +35,9 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
     csrf = CSRFProtect(app)
+
+
+    ## Desactiva protección csfr para el webhook
     csrf.exempt(webhook.blueprintname)
     login_manager.init_app(app)
 
@@ -41,6 +50,8 @@ def create_app():
     app.register_blueprint(relevant.blueprintname)
     app.register_blueprint(usergroup.blueprintname)
     app.register_blueprint(routing.blueprintname)
+    app.register_blueprint(api.blueprintname)
+    app.register_blueprint(custom.blueprintname)
 
 
     return app

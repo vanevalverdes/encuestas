@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 from utils.db import db
+from sqlalchemy.orm import backref
 
 
 class Container(db.Model):
@@ -9,15 +11,30 @@ class Container(db.Model):
     type = db.Column(db.String(255))
     connected_table = db.Column(db.Integer)
     connected_table_fields = db.Column(db.Text)
-    clazz_id = db.Column(db.Integer, db.ForeignKey('clazz.id'))
-    clazz = db.relationship('Clazz', backref='containers')
+    clazz_id = db.Column(
+        db.Integer,
+        db.ForeignKey('clazz.id', ondelete='CASCADE')
+    )
+
+    clazz = db.relationship(
+        'Clazz',
+        backref=backref(
+            'containers',
+            cascade='all, delete-orphan',
+            passive_deletes=True
+        )
+    )
+    __table_args__ = {
+        "mysql_charset": "utf8mb4",
+        "mysql_collate": "utf8mb4_unicode_ci",
+    }
     
     def __repr__(self) -> str:
         return f"{self.name}"    
     
     
 def get_fields(parent):
-    from utils.methods import application
+    from utils.packages import application
     clazzes = application.list_class_names()
     options = [{"label": "Ninguna", "value": ""}] + [{"label": name, "value": id} for id, name in clazzes]
     if parent:

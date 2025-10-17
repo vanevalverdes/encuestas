@@ -1,4 +1,4 @@
-.btn-primary, .btn-danger {
+.btn-primary, .btn-danger, .btn-success, .btn-warning, .btn-info, .btn-light, .btn-dark{
     --bs-btn-color: #fff;
     --bs-btn-bg: #6c757d;
     --bs-btn-border-color: #6c757d;
@@ -18,8 +18,8 @@
 .active>.page-link, .page-link.active {
     z-index: 3;
     color: var(--bs-pagination-active-color);
-    background-color: #26428b;
-    border-color: #26428b;
+    background-color: #6c757d;
+    border-color: #6c757d;
 }
 
 .page-link {
@@ -27,7 +27,7 @@
     display: block;
     padding: var(--bs-pagination-padding-y) var(--bs-pagination-padding-x);
     font-size: var(--bs-pagination-font-size);
-    color: #26428b;
+    color: #6c757d;
     text-decoration: none;
     background-color: var(--bs-pagination-bg);
     border: var(--bs-pagination-border-width) solid var(--bs-pagination-border-color);
@@ -39,9 +39,74 @@
     padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
     font-size: var(--bs-nav-link-font-size);
     font-weight: var(--bs-nav-link-font-weight);
-    color: #26428b;
+    color: #6c757d;
     text-decoration: none;
     background: 0 0;
     border: 0;
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+}
+.tags-container { display: flex; flex-wrap: wrap; gap: 5px; padding: 5px; border: var(--bs-border-width) solid var(--bs-border-color); border-radius: 5px; width: 100%;}
+.tag { background-color: #007bff; color: white; padding: 5px 10px; border-radius: 3px; display: flex; align-items: center; }
+.tag .remove-tag { margin-left: 5px; cursor: pointer; font-weight: bold; }
+.tag-input { border: none; outline: none; flex: 1; min-width: 150px; }
+.suggestions { border: 1px solid #ccc; border-top: none; max-height: 150px; overflow-y: auto; position: relative; background: white; width: 100%; z-index: 10; }
+.suggestion-item { padding: 5px; cursor: pointer; }
+.suggestion-item:hover { background-color: #f0f0f0; }
+.dropzone {
+border-style: dashed;
+max-width: 200px;
+}
+
+    #version-info {
+    position: fixed; 
+    bottom: 10px;    /* Distancia desde el borde inferior */
+    right: 10px;     /* Distancia desde el borde derecho */
+    font-size: 0.8em; /* Tamaño de letra más pequeño */
+    color: #6c757d;   /* Color gris para discreción */
+    padding: 3px 5px; /* Espacio interno */
+    z-index: 1000;    /* Asegura que esté encima de otros elementos */
+}
+a {color: #f3685f;}
+
+/* ------------------------------------------------------------------- */
+/* SOLUCIÓN: Sobrescribir estilos de jsTree para usar Material Icons */
+/* ------------------------------------------------------------------- */
+
+/* 1. Resetear el fondo/sprite por defecto de jstree para el icono */
+.jstree-icon.material-icons {
+    background: none !important;
+    vertical-align: top;
+}
+
+/* 2. Definir el contenido y la familia de fuentes usando el pseudoelemento ::before */
+.jstree-icon.material-icons::before {
+    /* Forzar la fuente y el estilo de Material Icons */
+    font-family: 'Material Icons' !important;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px; /* Ajusta el tamaño si es necesario */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    /* Evita que el contenido de jstree-icon anule el nuestro */
+    content: attr(class) !important; 
+}
+
+/* 3. Definir el icono específico para cada tipo (usando el código Unicode) */
+/* Usamos el pseudoelemento ::before y el código Unicode específico del icono */
+
+/* Icono para 'default' (ejemplo: carpeta) */
+.jstree-icon.icon-folder::before {
+    content: "\e2c7" !important; /* Código Unicode para 'folder' */
+    color: #6c757d; /* Color de carpeta */
+}
+
+/* Icono para 'file' (ejemplo: archivo) */
+.jstree-icon.icon-file::before {
+    content: "\e24d" !important; /* Código Unicode para 'insert_drive_file' */
+    color: #4CAF50; /* Color de archivo */
 }

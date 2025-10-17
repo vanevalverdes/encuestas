@@ -2,5 +2,5 @@
 deployment:
   tasks:
     - export FLASK_APP=index.py
-    - /bin/bash -c 'source /home/encuestas25opol/public_html/application/venv/bin/activate && pip install -r requirements.txt'
-    - touch /home/encuestas25opol/public_html/tmp/restart.txt
+    - /bin/bash -c 'source /home/CPANEL_ACCOUNT_NAME/FOLDER_NAME_PATH/venv/bin/activate && pip install -r requirements.txt'
+    - touch /home/CPANEL_ACCOUNT_NAME/FOLDER_NAME_PATH/tmp/restart.txt

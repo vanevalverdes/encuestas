@@ -1,137 +1,77 @@
-<script>
-    window.location.href = "/admin/login";
-</script>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+    <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="author" content="Nible Tecnología" />
     <meta name="description" content="NGDO">
     <link rel="icon" type="image/png" href="images/favicon.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- Document title -->
-    <title>{% block title %} LANDING {%endblock%}</title>
-    <!-- Stylesheets & Fonts -->
-    <link href="{{ url_for('static', filename='assets/css/plugins.css') }}" rel="stylesheet">
+    <title>{% block title %}Landing inicial{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='dist/css/style.css') }}" rel="stylesheet">
-
-    {% block extrascripts %}{%endblock%}
-</head>
-
-<body>
-    <!-- Body Inner -->
-    <div class="body-inner">
-        <!-- Topbar -->
-        <div id="topbar" class="topbar-fullwidth d-none d-lg-block">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <ul class="top-menu">
-                            <li><a href="#">Tel.: +  </a></li>
-                            <li><a href="#">Email: </a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6 d-none d-sm-block">
-                        <div class="social-icons social-icons-colored-hover">
-                            <ul>
-                                <li class="social-facebook"><a href="https://facebook.com/"><i class="fab fa-facebook-f"></i></a></li>
-                                <li class="social-twitter"><a href="https://x.com/"><i class="fab fa-twitter"></i></a></li>
-                                <li class="social-linkedin"><a href="https://www.linkedin.com/"><i class="fab fa-linkedin"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+    </head>
+    <body>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('frontend.index') }}"><img src="{{ url_for('static', filename='ngo.png') }}" style="height: 50px; margin-right: 20px;"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if current_user.usergroup.id == 1 %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Estructura
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('clazz.list_record') }}">Clases</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('user.list_record') }}">Usuarios</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('usergroup.list_record') }}">Grupo de Usuarios</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('clazz.migrate') }}">Recargar Clases</a></li>
+                </ul>
+            </li>            
+            {% endif %}
+            
+            {% if class_names and current_user.usergroup.id == 1%}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Clases desarrollo
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                {% for class_id, class_name in class_names %}
+                    <li><a class="dropdown-item" href="{{ url_for('routing.list_record', classid=class_id,page=1) }}">{{ class_name }}</a></li>
+                {% endfor %}
+                </ul>
+            </li>
+            {% endif %}
+            </ul>
+            <small>Version: 3.2.2</small>&nbsp; Usuario: {{current_user.email}} &nbsp;
+            <a style="color:grey" href="{{ url_for('application.logout') }}"> Salir</a>
+        </div>
+        </div>
+    </nav>
+    {% endif %}
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+        <div class="container mt-3">
+            <div class="row d-flex align-items-center">
+                <div class="alert alert-info">{{ message }}</div>
             </div>
         </div>
-        <!-- end: Topbar -->
-        <!-- Header -->
-        <header id="header" data-fullwidth="true">
-          <div class="header-inner">
-              <div class="container">
-                  <!--Logo-->
-                  <div id="logo">
-                      <a href="{{ url_for('application.index') }}">
-                          
-                          <span class="logo-default"><img src="{{ url_for('static', filename='ngo.png') }}" style="max-width: 120px;"></span>
-                          <span class="logo-dark"><img src="{{ url_for('static', filename='ngo.png') }}" style="max-width: 120px;"></span>
-                      </a>
-                  </div>
-                  <!--End: Logo-->
-                  <!-- Search -->
-                  <div id="search"><a id="btn-search-close" class="btn-search-close" aria-label="Close search form"><i class="icon-x"></i></a>
-                      <form class="search-form" action="/search/" method="get">
-                          <input class="form-control" name="str-title" type="text" placeholder="Buscar" />
-                          <span class="text-muted">Digita un título o término</span>
-                      </form>
-                  </div>
-                  <!-- end: search -->
-                  <!--Header Extras-->
-                  <div class="header-extras">
-                      <ul>
-                          <li>
-                              <a id="btn-search" href="#"> <i class="icon-search"></i></a>
-                          </li>
-                      </ul>
-                  </div>
-                  <!--end: Header Extras-->
-                  <!--Navigation Resposnive Trigger-->
-                  <div id="mainMenu-trigger">
-                      <a class="lines-button x"><span class="lines"></span></a>
-                  </div>
-                  <!--end: Navigation Resposnive Trigger-->
-                  <!--Navigation-->
-                  <div id="mainMenu">
-                      <div class="container">
-                          <nav>
-                              <ul>
-                                  <li><a href=""></a></li>
-                                  <li class="dropdown"><a href="#">Menu</a>
-                                      <ul class="dropdown-menu">
-                                        <li><a href="">
-                                          <div>Submenuu</div>
-                                        </a></li>
-                                      </ul>
-                                  </li>
-                                  <li >
-                                    <a href="#">Link</a>
-                                  </li>
-                              </ul>
-                          </nav>
-                      </div>
-                  </div>
-                  <!--END: NAVIGATION-->
-              </div>
-          </div>
-        </header>
-        <!-- end: Header -->
+        {% endfor %}
+        {% endwith %}
+        
+    {% block content %}    {% endblock %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-  <main style="min-height: 80vh;">
-      <!--Section: Content-->
-      {% block content %}
-
-      {%endblock%}
-
-  </main>  
- <!--Main layout-->
- <footer id="footer" class="bg-dark py-5">
-  <div class="container">
-    <div class="row">
-    </div>
-  </div>
-
-</footer>
-    <!-- end: Body Inner -->
-    <!-- Scroll top -->
-    <a id="scrollTop"><i class="icon-chevron-up"></i><i class="icon-chevron-up"></i></a>
-    <!--Plugins-->
-    <script src="{{ url_for('static', filename='assets/js/jquery.js') }}"></script>
-    <script src="{{ url_for('static', filename='assets/js/plugins.js') }}"></script>
-    <!--Template functions-->
-    <script src="{{ url_for('static', filename='assets/js/functions.js') }}"></script>
-</body>
+    {% block bottomScripts %}{% endblock %}
+    </body>
 </html>
+    
