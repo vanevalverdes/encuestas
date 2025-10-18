@@ -128,6 +128,47 @@
 {% endmacro %}
 
 {% block content %}
+<div class="container my-5 table-responsive">
+    <h2 class="mb-5 text-center text-primary">Reporte por usuario al (HOY)</h2>
+    <table class="table table-bordered table-striped table-responsive">
+        <thead class="table-light">
+            <tr>
+                <th>Género / Usuario</th>
+                
+                {% for user_id in sorted_user_ids %}
+                    <th class="text-center">Usuario {{ user_id }}</th>
+                {% endfor %}
+                
+                <th class="text-center bg-danger text-white">TOTAL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Hombres ({{ CLAVE_HOMBRES }})</th>
+                {% for user_id in sorted_user_ids %}
+                    <td class="text-center">{{ data_by_user[user_id]['hombres'] }}</td>
+                {% endfor %}
+                <td class="text-center font-weight-bold bg-danger text-white">{{ grand_total['hombres'] }}</td>
+            </tr>
+
+            <tr>
+                <th>Mujeres ({{ CLAVE_MUJERES }})</th>
+                {% for user_id in sorted_user_ids %}
+                    <td class="text-center">{{ data_by_user[user_id]['mujeres'] }}</td>
+                {% endfor %}
+                <td class="text-center font-weight-bold bg-danger text-white">{{ grand_total['mujeres'] }}</td>
+            </tr>
+
+            <tr class="table-secondary">
+                <th class="bg-secondary">TOTAL</th>
+                {% for user_id in sorted_user_ids %}
+                    <td class="text-center font-weight-bold">{{ data_by_user[user_id]['total'] }}</td>
+                {% endfor %}
+                <td class="text-center font-weight-bold bg-danger">{{ grand_total['total'] }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 {% if results and field_definitions %}
     {# AHORA LLAMAMOS AL MACRO CON AMBAS VARIABLES #}
     {{ render_stats_panel(results, field_definitions) }}
