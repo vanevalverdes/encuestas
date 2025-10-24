@@ -3,6 +3,14 @@
 Todas las versiones importantes del proyecto están documentadas aquí.  
 
 
+## [3.4.42] - 2025-10-24
+
+### Añadido
+
+- Encuesta octubre
+
+---
+
 ## [3.4.40] - 2025-10-15
 
 ### Añadido
