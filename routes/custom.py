@@ -11,6 +11,9 @@ import os
 import requests
 import hashlib
 from utils.db import db
+from models.develop.user import User
+from werkzeug.security import generate_password_hash
+
 
 blueprintname = Blueprint("custom", __name__)
 slug = "c"
@@ -63,7 +66,7 @@ def survey(classid):
     classname = application.getClazzName(classid)
 
     if request.method == "GET":
-        return render_template("backend/custom/october.html", fields=fields)
+        return render_template("backend/custom/octobertwo.html", fields=fields)
 
     elif request.method == "POST":
         modelClass = session.getClazz(classname)
@@ -73,7 +76,7 @@ def survey(classid):
         db.session.add(Record)
         db.session.commit()
         flash('Encuesta enviada exitosamente.', 'success')
-        return render_template("backend/custom/october.html", fields=fields)
+        return render_template("backend/custom/octobertwo.html", fields=fields)
     
 @blueprintname.route(f'/{slug}/resultados/<int:classid>')
 @login_required
@@ -85,6 +88,7 @@ def stat(classid):
     #print(fieldsclass)
     classname = application.getClazzName(classid)
     query = session.newQuery(classname)
+    #query.addFilter("createdby_id", "!=", 6)
     rawResults = query.getMultiFieldStats(fields,"gender")
 
 
@@ -231,3 +235,189 @@ def stat(classid):
 
     #return "hola"
     return render_template("backend/custom/stats.html", results=results, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+
+@blueprintname.route(f'/{slug}/resultados/<int:classid>/user/<int:user_id>')
+@login_required
+def statbyuser(classid,user_id):
+    from utils.view_class_container_fields import get_clazz_fields
+    
+    fieldsclass = get_clazz_fields(classid)
+    fields = [item for item in fieldsclass]
+    #print(fieldsclass)
+    classname = application.getClazzName(classid)
+    query = session.newQuery(classname)
+    query.addFilter("createdby_id", "==", user_id)
+    rawResults = query.getMultiFieldStats(fields,"gender")
+
+
+   # --- Definición de claves (¡Crucial para la robustez!) ---
+    CLAVE_HOMBRES = 'A. Masculino'
+    CLAVE_MUJERES = 'B. Femenino'
+
+    countUserDayQ = session.newQuery(classname)
+    #countUserDayQ.filterByToday()
+    countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
+    #print(countUserDay)
+
+    # Diccionario para almacenar los totales: {user_id: {'hombres': N, 'mujeres': M, 'total': T}}
+    data_by_user = {}
+    user_ids_list = set()
+
+    # El unpacking de la tupla se corrige a (user_id, gender, count)
+    for user_id, gender, count in countUserDay:
+        
+        # 1.1 Inicializar el usuario si es nuevo
+        if user_id not in data_by_user:
+            data_by_user[user_id] = {'hombres': 0, 'mujeres': 0, 'total': 0}
+            user_ids_list.add(user_id)
+            
+        # 1.2 Sumar el conteo por género
+        if gender == CLAVE_HOMBRES:
+            data_by_user[user_id]['hombres'] += count
+        elif gender == CLAVE_MUJERES:
+            data_by_user[user_id]['mujeres'] += count
+            
+        # 1.3 Sumar al total general del usuario
+        data_by_user[user_id]['total'] += count
+
+    # --- 2. Preparar el Resultado Final y Totales Generales ---
+
+    # IDs de usuario ordenados para la tabla
+    sorted_user_ids = sorted(list(user_ids_list))
+
+    # Calcular los totales generales de Hombres, Mujeres y General
+    grand_total = {
+        'hombres': sum(data_by_user[uid]['hombres'] for uid in sorted_user_ids),
+        'mujeres': sum(data_by_user[uid]['mujeres'] for uid in sorted_user_ids),
+        'total': sum(data_by_user[uid]['total'] for uid in sorted_user_ids),
+    }
+
+    # -------------------------------------------------------------------
+    # Impresión para verificar (coincide con el ejemplo que enviaste: 297)
+    # -------------------------------------------------------------------
+
+    #print("\n--- Resultado por Usuario (Ejemplo) ---")
+    for uid in sorted_user_ids:
+        print(f"Usuario {uid}: Hombres={data_by_user[uid]['hombres']}, "
+            f"Mujeres={data_by_user[uid]['mujeres']}, "
+            f"Total={data_by_user[uid]['total']}")
+
+    #print("\n--- Totales Generales (Ejemplo) ---")
+    #print(f"Gran Total Hombres: {grand_total['hombres']}")
+    #print(f"Gran Total Mujeres: {grand_total['mujeres']}")
+    #print(f"Gran Total General: {grand_total['total']}")
+        
+
+    fieldsView = [
+        "gender",
+        "createdby_id",
+        "age",
+        "religion",
+        "education",
+        "county",
+        "state",
+        "party",
+        "nationalElection",
+        "congress",
+        "support"
+    ]
+
+    results = {}
+
+    # 1. Bucle principal para calcular VALORES ABSOLUTOS y TOTALES GENERALES
+    for field in fieldsView:
+        values_by_option = rawResults.get(field, {}) 
+        
+        totalField = 0
+        totalHombres = 0
+        totalMujeres = 0
+        
+        fieldData = {}  # Almacena los valores ABSOLUTOS por opción
+        
+        # Primera pasada: Calcular absolutos y totales generales del campo
+        for option_value, groups_dict in values_by_option.items():
+            
+            # 1.1. Absolutos de la opción (usamos .get(clave, 0) para seguridad)
+            opcionHombres = groups_dict.get(CLAVE_HOMBRES, 0)
+            opcionMujeres = groups_dict.get(CLAVE_MUJERES, 0)
+            totalOpcion = opcionHombres + opcionMujeres
+
+            # 1.2. Acumular totales generales del campo
+            totalHombres += opcionHombres
+            totalMujeres += opcionMujeres
+            totalField += totalOpcion
+
+            # 1.3. Almacenar datos absolutos
+            data_abs = {}
+            data_abs["H"] = opcionHombres
+            data_abs["M"] = opcionMujeres
+            data_abs["T"] = totalOpcion
+            fieldData[option_value] = data_abs
+
+        # 2. SEGUNDA PASADA: Calcular PORCENTAJES (usando los totales calculados)
+        fieldPctData = {}
+        
+        # Los denominadores para los porcentajes de género (evitar división por cero)
+        div_H = totalHombres if totalHombres > 0 else 1
+        div_M = totalMujeres if totalMujeres > 0 else 1
+        div_T = totalField if totalField > 0 else 1
+
+        for option_value, data_abs in fieldData.items():
+            data_pct = {}
+            
+            # Porcentaje del Total General del Campo (T)
+            data_pct["T"] = round((data_abs["T"] / div_T) * 100, 1)
+
+            # Porcentaje Específico por Género (Columna)
+            # H: Cuántos de los HOMBRES eligieron esta opción
+            data_pct["H"] = round((data_abs["H"] / div_H) * 100, 1)
+            
+            # M: Cuántas de las MUJERES eligieron esta opción
+            data_pct["M"] = round((data_abs["M"] / div_M) * 100, 1)
+            
+            fieldPctData[option_value] = data_pct
+
+        # 3. Almacenar el resultado final
+        results[field] = {
+            # Totales Generales (Absolutos)
+            "Total_General_T": totalField,
+            "Total_General_H": totalHombres,
+            "Total_General_M": totalMujeres,
+            
+            # Datos por Opción
+            "data": fieldData,       # Valores Absolutos
+            "pct_data": fieldPctData  # Porcentajes
+        }
+
+    #print(results)
+
+    #return "hola"
+    return render_template("backend/custom/stats.html", results=results, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+
+'''
+@blueprintname.route(f'/c/user/reset/all/')
+@login_required
+def manage_user():
+    class_names = application.list_class_names()
+    Record = User
+    for id in range(22,41):
+        new = Record()
+        item = f"encuestador{id}@opolconsultores.com"
+        setattr(new, "id", id)
+        setattr(new, "name", item)
+        setattr(new, "lastname", item)
+        setattr(new, "email", item)
+        setattr(new, "usergroup_id", 2)
+        db.session.add(new)
+    db.session.commit()
+    
+    #institutions = Record.query.all() 
+    institutions = Record.query.filter(Record.usergroup_id != 1).all()
+    for item in institutions:
+        password = str(engine.random(6))
+        hashed_password = generate_password_hash(password)
+        setattr(item, "_password_hash", hashed_password)
+        db.session.commit()
+        print(f"Usuario: {item.email} / Contraseña: {password}")
+    return render_template('backend/base/list_user.html', institutions=institutions,classname="user", class_names="")
+'''

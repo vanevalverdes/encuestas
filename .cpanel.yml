@@ -1,6 +1,18 @@
 ---
 deployment:
   tasks:
-    - export FLASK_APP=index.py
-    - /bin/bash -c 'source /home/CPANEL_ACCOUNT_NAME/FOLDER_NAME_PATH/venv/bin/activate && pip install -r requirements.txt'
-    - touch /home/CPANEL_ACCOUNT_NAME/FOLDER_NAME_PATH/tmp/restart.txt
+    # 1. Exporta la ruta base de despliegue. 
+    # Sustituye /home/example/public_html/ por la RUTA REAL de tu aplicación 
+    # (la que viste en el Application Manager de cPanel).
+    - export DEPLOYPATH=/home/k4luzun1cocms/unicocms/
+
+    # 2. Copia tus archivos al DEPLOYPATH (ESTO YA DEBERÍA ESTAR EN TU ARCHIVO)
+    # Ejemplo, si tu código fuente está en una carpeta 'src':
+    - /bin/cp -R src/* $DEPLOYPATH
+    
+    # 3. COMANDO DE REINICIO CRÍTICO:
+    # Toca el archivo restart.txt en el directorio 'tmp' del directorio de despliegue.
+    - /usr/bin/touch $DEPLOYPATH/tmp/restart.txt 
+    
+    # OPCIONAL: Mensaje de confirmación (usando echo)
+    - /bin/echo "Reiniciando aplicación web de Phusion Passenger..."
