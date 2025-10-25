@@ -88,7 +88,7 @@ def stat(classid):
     #print(fieldsclass)
     classname = application.getClazzName(classid)
     query = session.newQuery(classname)
-    #query.addFilter("createdby_id", "!=", 6)
+    query.addFilter("gender", "isnotnull")
     rawResults = query.getMultiFieldStats(fields,"gender")
 
 
@@ -97,6 +97,7 @@ def stat(classid):
     CLAVE_MUJERES = 'B. Femenino'
 
     countUserDayQ = session.newQuery(classname)
+    query.addFilter("gender", "isnotnull")
     countUserDayQ.filterByToday()
     countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
     #print(countUserDay)
