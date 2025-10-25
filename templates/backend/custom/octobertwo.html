@@ -131,7 +131,8 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                         </div>
                     </div>
                 </div>
-                <div class="card mb-4" style="display: none;" id="surveyForm">
+                <div  style="display: none;" id="surveyForm">
+                <div class="card mb-4">
                     <div class="card-header bg-light fw-semibold">
                         Datos de la encuesta
                     </div>
@@ -142,8 +143,6 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                                 {{ macros.fieldFormSurvey(fields["age"],record,editable)}}
                             </div>
                         </div>
-                    </div>
-                    <div class="card-body">
                         <div class="row g-4">
                             <div class="col-md-12">
                             <!-- Cantón y Provincia -->
@@ -289,27 +288,40 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                                 </script>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-body">
                         <div class="row g-4">
                             <div class="col-md-12">
                                 {{ macros.fieldFormSurvey(fields["education"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["religion"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["party"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["willvote"],record,editable)}}
                             </div>
+                            <script>
+                                toggleDivOnSelectValue("willvote", "willvote-div", "Sí");
+                            </script>
                         </div>
                     </div>
+                </div>
+                <div class="card mb-4" style="display: none;" id="willvote-div">
                     <div class="card-body">
                         <div class="row g-4">
                             <div class="col-md-12">
                                 {{ macros.fieldFormSurvey(fields["nationalElection"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["congress"],record,editable)}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-12">
                                 {{ macros.fieldFormSurvey(fields["ebais"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["contact"],record,editable)}}
                             </div>
                         </div>
                     </div>
                 </div>
+                </div> 
                 <button type="submit" class="btn btn-sm btn-secondary" form="form-record"><span class="material-icons align-middle">save</span>Guardar</button>
             </form>
 {% endblock %}
