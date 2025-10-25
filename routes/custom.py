@@ -160,9 +160,10 @@ def stat(classid):
         "county",
         "state",
         "party",
+        "willvote",
         "nationalElection",
         "congress",
-        "support"
+        "ebais"
     ]
 
     results = {}
