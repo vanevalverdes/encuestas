@@ -172,6 +172,7 @@
 {% if results and field_definitions %}
     {# AHORA LLAMAMOS AL MACRO CON AMBAS VARIABLES #}
     {{ render_stats_panel(results, field_definitions) }}
+    {{ render_stats_panel(willvoteresults, field_definitions) }}
 {% else %}
     <div class="alert alert-warning text-center m-5">
         No hay datos estadísticos para mostrar o faltan las definiciones de campos.

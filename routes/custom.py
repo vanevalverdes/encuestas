@@ -18,6 +18,79 @@ from werkzeug.security import generate_password_hash
 blueprintname = Blueprint("custom", __name__)
 slug = "c"
 
+def getResults(fieldsView,rawResults):
+    CLAVE_HOMBRES = 'A. Masculino'
+    CLAVE_MUJERES = 'B. Femenino'
+    results = {}
+
+    # 1. Bucle principal para calcular VALORES ABSOLUTOS y TOTALES GENERALES
+    for field in fieldsView:
+        values_by_option = rawResults.get(field, {}) 
+        
+        totalField = 0
+        totalHombres = 0
+        totalMujeres = 0
+        
+        fieldData = {}  # Almacena los valores ABSOLUTOS por opción
+        
+        # Primera pasada: Calcular absolutos y totales generales del campo
+        for option_value, groups_dict in values_by_option.items():
+            
+            # 1.1. Absolutos de la opción (usamos .get(clave, 0) para seguridad)
+            opcionHombres = groups_dict.get(CLAVE_HOMBRES, 0)
+            opcionMujeres = groups_dict.get(CLAVE_MUJERES, 0)
+            totalOpcion = opcionHombres + opcionMujeres
+
+            # 1.2. Acumular totales generales del campo
+            totalHombres += opcionHombres
+            totalMujeres += opcionMujeres
+            totalField += totalOpcion
+
+            # 1.3. Almacenar datos absolutos
+            data_abs = {}
+            data_abs["H"] = opcionHombres
+            data_abs["M"] = opcionMujeres
+            data_abs["T"] = totalOpcion
+            fieldData[option_value] = data_abs
+
+        # 2. SEGUNDA PASADA: Calcular PORCENTAJES (usando los totales calculados)
+        fieldPctData = {}
+        
+        # Los denominadores para los porcentajes de género (evitar división por cero)
+        div_H = totalHombres if totalHombres > 0 else 1
+        div_M = totalMujeres if totalMujeres > 0 else 1
+        div_T = totalField if totalField > 0 else 1
+
+        for option_value, data_abs in fieldData.items():
+            data_pct = {}
+            
+            # Porcentaje del Total General del Campo (T)
+            data_pct["T"] = round((data_abs["T"] / div_T) * 100, 1)
+
+            # Porcentaje Específico por Género (Columna)
+            # H: Cuántos de los HOMBRES eligieron esta opción
+            data_pct["H"] = round((data_abs["H"] / div_H) * 100, 1)
+            
+            # M: Cuántas de las MUJERES eligieron esta opción
+            data_pct["M"] = round((data_abs["M"] / div_M) * 100, 1)
+            
+            fieldPctData[option_value] = data_pct
+
+        # 3. Almacenar el resultado final
+        results[field] = {
+            # Totales Generales (Absolutos)
+            "Total_General_T": totalField,
+            "Total_General_H": totalHombres,
+            "Total_General_M": totalMujeres,
+            
+            # Datos por Opción
+            "data": fieldData,       # Valores Absolutos
+            "pct_data": fieldPctData  # Porcentajes
+        }
+
+    return results
+
+
 @blueprintname.route(f'/{slug}/')
 def index():
     return "Custom URLs"
@@ -86,10 +159,8 @@ def stat(classid):
     fieldsclass = get_clazz_fields(classid)
     fields = [item for item in fieldsclass]
     #print(fieldsclass)
+
     classname = application.getClazzName(classid)
-    query = session.newQuery(classname)
-    query.addFilter("gender", "isnotnull")
-    rawResults = query.getMultiFieldStats(fields,"gender")
 
 
    # --- Definición de claves (¡Crucial para la robustez!) ---
@@ -97,7 +168,7 @@ def stat(classid):
     CLAVE_MUJERES = 'B. Femenino'
 
     countUserDayQ = session.newQuery(classname)
-    query.addFilter("gender", "isnotnull")
+    countUserDayQ.addFilter("category", "==", "1")
     countUserDayQ.filterByToday()
     countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
     #print(countUserDay)
@@ -161,82 +232,27 @@ def stat(classid):
         "state",
         "party",
         "willvote",
-        "nationalElection",
-        "congress",
         "ebais"
     ]
 
-    results = {}
+    query = session.newQuery(classname)
+    query.addFilter("category", "==", "1")
+    query.addFilter("gender", "isnotnull")
+    rawResults = query.getMultiFieldStats(fields,"gender")
+    results = getResults(fieldsView,rawResults)
 
-    # 1. Bucle principal para calcular VALORES ABSOLUTOS y TOTALES GENERALES
-    for field in fieldsView:
-        values_by_option = rawResults.get(field, {}) 
-        
-        totalField = 0
-        totalHombres = 0
-        totalMujeres = 0
-        
-        fieldData = {}  # Almacena los valores ABSOLUTOS por opción
-        
-        # Primera pasada: Calcular absolutos y totales generales del campo
-        for option_value, groups_dict in values_by_option.items():
-            
-            # 1.1. Absolutos de la opción (usamos .get(clave, 0) para seguridad)
-            opcionHombres = groups_dict.get(CLAVE_HOMBRES, 0)
-            opcionMujeres = groups_dict.get(CLAVE_MUJERES, 0)
-            totalOpcion = opcionHombres + opcionMujeres
-
-            # 1.2. Acumular totales generales del campo
-            totalHombres += opcionHombres
-            totalMujeres += opcionMujeres
-            totalField += totalOpcion
-
-            # 1.3. Almacenar datos absolutos
-            data_abs = {}
-            data_abs["H"] = opcionHombres
-            data_abs["M"] = opcionMujeres
-            data_abs["T"] = totalOpcion
-            fieldData[option_value] = data_abs
-
-        # 2. SEGUNDA PASADA: Calcular PORCENTAJES (usando los totales calculados)
-        fieldPctData = {}
-        
-        # Los denominadores para los porcentajes de género (evitar división por cero)
-        div_H = totalHombres if totalHombres > 0 else 1
-        div_M = totalMujeres if totalMujeres > 0 else 1
-        div_T = totalField if totalField > 0 else 1
-
-        for option_value, data_abs in fieldData.items():
-            data_pct = {}
-            
-            # Porcentaje del Total General del Campo (T)
-            data_pct["T"] = round((data_abs["T"] / div_T) * 100, 1)
-
-            # Porcentaje Específico por Género (Columna)
-            # H: Cuántos de los HOMBRES eligieron esta opción
-            data_pct["H"] = round((data_abs["H"] / div_H) * 100, 1)
-            
-            # M: Cuántas de las MUJERES eligieron esta opción
-            data_pct["M"] = round((data_abs["M"] / div_M) * 100, 1)
-            
-            fieldPctData[option_value] = data_pct
-
-        # 3. Almacenar el resultado final
-        results[field] = {
-            # Totales Generales (Absolutos)
-            "Total_General_T": totalField,
-            "Total_General_H": totalHombres,
-            "Total_General_M": totalMujeres,
-            
-            # Datos por Opción
-            "data": fieldData,       # Valores Absolutos
-            "pct_data": fieldPctData  # Porcentajes
-        }
-
-    #print(results)
-
+    willvote = [
+        "nationalElection",
+        "congress"
+    ]
+    query = session.newQuery(classname)
+    query.addFilter("category", "==", "1")
+    query.addFilter("gender", "isnotnull")
+    query.addFilter("willvote", "==", "Sí")
+    rawResults2 = query.getMultiFieldStats(fields,"gender")
+    willvoteresults = getResults(willvote,rawResults2)
     #return "hola"
-    return render_template("backend/custom/stats.html", results=results, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+    return render_template("backend/custom/stats.html", results=results,willvoteresults=willvoteresults, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
 
 @blueprintname.route(f'/{slug}/resultados/<int:classid>/user/<int:user_id>')
 @login_required
