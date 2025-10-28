@@ -1,0 +1,122 @@
+{% extends "backend/custom/surround.html" %}
+
+
+{% block content %}
+<!-- 
+    Panel de Visualización de Encuesta (Body) - Basado en Tablas Estáticas (Solo Jinja2)
+    Diseñado para integración en una plantilla de Flask/Jinja2 que ya incluye Bootstrap 5.3.
+    Muestra los datos en formato de tabla responsive SIN NECESIDAD DE JavaScript.
+-->
+<body class="bg-light min-vh-100 d-flex flex-column" style="font-family: 'Inter', sans-serif;">
+    <div class="container my-4 p-4 p-md-5 bg-white rounded-3 shadow">
+        
+        <header class="mb-5 border-bottom pb-3">
+            <h1 class="h3 fw-bold text-dark">Dashboard de Encuesta (Estático)</h1>
+            <p class="text-muted mb-0">Visualización de datos demográficos y preferencias electorales mediante tablas estáticas de Jinja2.</p>
+        </header>
+
+        {% set variableTitles = {
+            'gender': 'Distribución por Género',
+            'age': 'Distribución por Rango de Edad',
+            'education': 'Distribución por Nivel Educativo',
+            'religion': 'Distribución por Religión',
+            'state': 'Distribución por Provincia',
+            'county': 'Distribución por Cantón',
+            'nationalElection': 'Intención de Voto Presidencial',
+            'congress': 'Intención de Voto Congresional',
+            'party': 'Afiliación Partidaria',
+            'support': 'Nivel de Apoyo al Gobierno'
+        } %}
+
+        <!-- Bloque de Métricas Globales (Calculado usando la primera variable disponible) -->
+        {% set first_var_key = results.keys()|first if results else None %}
+        {% if first_var_key %}
+            {% set data = results[first_var_key] %}
+            {% set totalT = data.Total_General_T %}
+            {% set totalH = data.Total_General_H %}
+            {% set totalM = data.Total_General_M %}
+            {% set pctH = (totalH / totalT * 100) | round(1) %}
+            {% set pctM = (totalM / totalT * 100) | round(1) %}
+
+            <div class="row mb-5 border p-3 rounded-3 bg-light-subtle">
+                <h3 class="h5 fw-semibold text-dark border-bottom pb-2 mb-3">Resumen General de la Muestra</h3>
+                <div class="col-md-4">
+                    <div class="card p-3 mb-3 border-0 shadow-sm bg-info-subtle">
+                        <p class="mb-0 fw-bold">Total de Encuestados:</p>
+                        <p class="h4 mb-0 text-info">{{ totalT | int }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-3 mb-3 border-0 shadow-sm bg-primary-subtle">
+                        <p class="mb-0 fw-bold">Hombres (H):</p>
+                        <p class="h5 mb-0 text-primary">{{ totalH | int }} ({{ pctH }}%)</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-3 mb-3 border-0 shadow-sm bg-danger-subtle">
+                        <p class="mb-0 fw-bold">Mujeres (M):</p>
+                        <p class="h5 mb-0 text-danger">{{ totalM | int }} ({{ pctM }}%)</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Bloque de Tablas Dinámicas (Jinja2 Loop) -->
+        {% if results %}
+            {% for variable, data in results.items() %}
+                <div class="mt-5 pt-3 border-top">
+                    <h2 class="h4 text-primary fw-bold mb-3">{{ variableTitles.get(variable, variable) }}</h2>
+
+                    {% set processedData = data.data.items() | list | sort(attribute='1.T', reverse=True) %}
+                    {% set totalT = data.Total_General_T %}
+
+                    <div class="table-responsive shadow-sm rounded-3">
+                        <table class="table table-striped table-hover caption-top align-middle">
+                            <caption class="fw-semibold text-primary">Detalle por Categoría</caption>
+                            <thead class="table-primary">
+                                <tr>
+                                    <th scope="col" class="fw-bold">Categoría</th>
+                                    <th scope="col" class="text-end fw-bold">Hombres (H)</th>
+                                    <th scope="col" class="text-end fw-bold">Mujeres (M)</th>
+                                    <th scope="col" class="text-end fw-bold">Total (T)</th>
+                                    <th scope="col" class="text-end fw-bold">% Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for group, values in processedData %}
+                                    {% set pctT = (data.pct_data[group].T) | round(1) %}
+                                    {% set pctH = (data.pct_data[group].H) | round(1) %}
+                                    {% set pctM = (data.pct_data[group].M) | round(1) %}
+                                <tr>
+                                    <td>{{ group }}</td>
+                                    <td class="text-end">{{ values.H | int }} <span class="badge bg-primary-subtle text-primary">{{ pctH }}%</span></td>
+                                    <td class="text-end">{{ values.M | int }} <span class="badge bg-danger-subtle text-danger">{{ pctM }}%</span></td>
+                                    <td class="text-end fw-semibold">{{ values.T | int }}</td>
+                                    <td class="text-end fw-bold text-success">{{ pctT }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-group-divider">
+                                <tr class="table-secondary">
+                                    <th scope="row" class="text-end">Total General</th>
+                                    <th class="text-end">{{ data.Total_General_H | int }}</th>
+                                    <th class="text-end">{{ data.Total_General_M | int }}</th>
+                                    <th class="text-end">{{ data.Total_General_T | int }}</th>
+                                    <th class="text-end">100.0%</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-danger mt-5" role="alert">
+                Error: La variable 'results' está vacía o no fue inyectada correctamente desde Flask.
+            </div>
+        {% endif %}
+
+    </div>
+</body>
+
+
+{%endblock%}
