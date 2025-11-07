@@ -4,7 +4,7 @@
 
 # Se define un df_analisis_nacional con solo las respuestas de decididos a votar
 df_analisis_nacional <- df %>%
-    filter(category == 1) %>% 
+    filter(category == 1) %>%
     filter(votara == 'Sí') %>% 
     mutate(conglomerado_unico = paste(estrato_provincia, conglomerado_canton, sep = "_")) %>%
     left_join(poblacion_provincia, by = c("provincia" = "estrato_provincia")) %>%

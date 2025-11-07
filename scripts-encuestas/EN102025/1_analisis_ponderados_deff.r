@@ -64,6 +64,7 @@ df <- read_csv("C:\\Users\\vanev\\Downloads\\Opol EN102025\\Base de datos\\surve
 df <- df %>%
     rename(
         sexo_raw = gender,
+        religion = religion,
         conglomerado_canton = county,
         estrato_provincia = state,
         partido_preferente = party,

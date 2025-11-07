@@ -24,8 +24,8 @@
                 {% set panel_title = field_definition.label if field_definition and field_definition.label else field_name | replace('_', ' ') | capitalize %}
 
                 <div class="card shadow-sm mb-5 rounded-3 border-0">
-                    <div class="card-header bg-primary-subtle border-0 py-3">
-                        <h4 class="mb-0 fw-bold h5 text-primary">{{ panel_title }}
+                    <div class="card-header border-0 py-3">
+                        <h4 class="mb-0 fw-bold h5 text-secondary">{{ panel_title }}
                             <span class="badge bg-dark-subtle text-dark ms-3">
                                 Total Respuestas: {{ field_stats['Total_General_T'] | int }}
                             </span>
@@ -38,7 +38,7 @@
 
                             <table class="table table-striped table-hover caption-top align-middle mb-0">
                                 <caption class="fw-semibold text-muted">Detalle de Frecuencias y Distribución por Género</caption>
-                                <thead class="table-primary">
+                                <thead class="table-light">
                                     <tr>
                                         <th scope="col" class="fw-bold">Opción de Respuesta</th>
                                         <th scope="col" class="text-end fw-bold">Hombres (H)</th>
