@@ -115,12 +115,12 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
                     {% if current_user.is_authenticated and current_user.usergroup.id == 2 %}
                     <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="{{ url_for('custom.stat', classid=3) }}">Ver estadísticas</a>
+                        <a class="nav-link fw-semibold" href="{{ url_for('custom.stat', classid=4) }}">Ver estadísticas</a>
                     </li>
                     {% endif %}
                     {% if current_user.is_authenticated%}
                     <li class="nav-item">
-                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.survey', classid=3) }}">Nueva encuesta</a>
+                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.survey', classid=4) }}">Nueva encuesta</a>
                     </li>
                     {% endif %}
                     
