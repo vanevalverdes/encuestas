@@ -187,32 +187,36 @@ def turrialba():
 
     return "Custom URLs"
 
-
+"""
 @blueprintname.route(f'/{slug}/user')
 def create_user():
     from werkzeug.security import generate_password_hash
     from models.develop.user import User
     Record = User
     
+    
     list = [
-        "supervisor1@opolconsultores.com",
-        "supervisor2@opolconsultores.com",
-        "supervisor3@opolconsultores.com",
-        "supervisor4@opolconsultores.com",
-        "supervisor5@opolconsultores.com"    ]
-    password = "octubreOpol*Sup"
-    hashed_password = generate_password_hash(password)
-    #print(hashed_password)
-    for item in list:
-        new = Record()
-        setattr(new, "name", item)
-        setattr(new, "lastname", item)
-        setattr(new, "email", item)
-        setattr(new, "usergroup_id", 2)
-        setattr(new, "_password_hash", hashed_password)
-        db.session.add(new)
+        "encuestador41@opolconsultores.com",
+        "encuestador42@opolconsultores.com",
+        "encuestador43@opolconsultores.com",
+        "encuestador44@opolconsultores.com",
+        "encuestador45@opolconsultores.com",
+        "encuestador46@opolconsultores.com",
+        "encuestador47@opolconsultores.com",
+        "encuestador48@opolconsultores.com",
+        "encuestador49@opolconsultores.com",
+        "encuestador50@opolconsultores.com"
+        ]
+    for item in range(41,51):
+        password = engine.random(6)
+        hashed_password = generate_password_hash(password)
+        user = User.query.filter_by(id=item).first()
+        setattr(user, "_password_hash", hashed_password)
+        print("Usuario: ",user.email,", Contraseña: ",password)
     db.session.commit()
-    """   
+    return "listo"
+"""
+"""   
     password = "opolOctubre25*"
     hashed_password = generate_password_hash(password)
     institutions = Record.query.all() 
@@ -221,7 +225,7 @@ def create_user():
         setattr(item, "_password_hash", hashed_password)
         db.session.commit()
     return "Custom URLs"
-    """
+"""
 @blueprintname.route(f'/{slug}/encuesta/<int:classid>', methods=['GET', 'POST'])
 @login_required
 def survey(classid):
@@ -560,119 +564,122 @@ def stat_three(classid):
 @blueprintname.route(f'/{slug}/resultados/<int:classid>')
 @login_required
 def stat(classid):
-    from utils.view_class_container_fields import get_clazz_fields
-    
-    user = request.args.get('user', None)
-
-    fieldsclass = get_clazz_fields(classid)
-    fields = [item for item in fieldsclass]
-    #print(fieldsclass)
-
-    classname = application.getClazzName(classid)
-
-
-   # --- Definición de claves (¡Crucial para la robustez!) ---
-    CLAVE_HOMBRES = 'H'
-    CLAVE_MUJERES = 'M'
-
-    countUserDayQ = session.newQuery(classname)
-    countUserDayQ.addFilter("category", "==", "1")
-    if user:
-        user_id = int(user)
-        countUserDayQ.addFilter("createdby_id", "==", user_id)
-    countUserDayQ.filterByToday()
-    countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
-    #print(countUserDay)
-
-    # Diccionario para almacenar los totales: {user_id: {'hombres': N, 'mujeres': M, 'total': T}}
-    data_by_user = {}
-    user_ids_list = set()
-
-    # El unpacking de la tupla se corrige a (user_id, gender, count)
-    for user_id, gender, count in countUserDay:
+    if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
+        from utils.view_class_container_fields import get_clazz_fields
         
-        # 1.1 Inicializar el usuario si es nuevo
-        if user_id not in data_by_user:
-            data_by_user[user_id] = {'hombres': 0, 'mujeres': 0, 'total': 0}
-            user_ids_list.add(user_id)
+        user = request.args.get('user', None)
+
+        fieldsclass = get_clazz_fields(classid)
+        fields = [item for item in fieldsclass]
+        #print(fieldsclass)
+
+        classname = application.getClazzName(classid)
+
+
+    # --- Definición de claves (¡Crucial para la robustez!) ---
+        CLAVE_HOMBRES = 'H'
+        CLAVE_MUJERES = 'M'
+
+        countUserDayQ = session.newQuery(classname)
+        countUserDayQ.addFilter("category", "==", "1")
+        if user:
+            user_id = int(user)
+            countUserDayQ.addFilter("createdby_id", "==", user_id)
+        countUserDayQ.filterByToday()
+        countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
+        #print(countUserDay)
+
+        # Diccionario para almacenar los totales: {user_id: {'hombres': N, 'mujeres': M, 'total': T}}
+        data_by_user = {}
+        user_ids_list = set()
+
+        # El unpacking de la tupla se corrige a (user_id, gender, count)
+        for user_id, gender, count in countUserDay:
             
-        # 1.2 Sumar el conteo por género
-        if gender == CLAVE_HOMBRES:
-            data_by_user[user_id]['hombres'] += count
-        elif gender == CLAVE_MUJERES:
-            data_by_user[user_id]['mujeres'] += count
+            # 1.1 Inicializar el usuario si es nuevo
+            if user_id not in data_by_user:
+                data_by_user[user_id] = {'hombres': 0, 'mujeres': 0, 'total': 0}
+                user_ids_list.add(user_id)
+                
+            # 1.2 Sumar el conteo por género
+            if gender == CLAVE_HOMBRES:
+                data_by_user[user_id]['hombres'] += count
+            elif gender == CLAVE_MUJERES:
+                data_by_user[user_id]['mujeres'] += count
+                
+            # 1.3 Sumar al total general del usuario
+            data_by_user[user_id]['total'] += count
+
+        # --- 2. Preparar el Resultado Final y Totales Generales ---
+
+        # IDs de usuario ordenados para la tabla
+        sorted_user_ids = sorted(list(user_ids_list))
+
+        # Calcular los totales generales de Hombres, Mujeres y General
+        grand_total = {
+            'hombres': sum(data_by_user[uid]['hombres'] for uid in sorted_user_ids),
+            'mujeres': sum(data_by_user[uid]['mujeres'] for uid in sorted_user_ids),
+            'total': sum(data_by_user[uid]['total'] for uid in sorted_user_ids),
+        }
+
+        # -------------------------------------------------------------------
+        # Impresión para verificar (coincide con el ejemplo que enviaste: 297)
+        # -------------------------------------------------------------------
+
+        #print("\n--- Resultado por Usuario (Ejemplo) ---")
+        for uid in sorted_user_ids:
+            print(f"Usuario {uid}: Hombres={data_by_user[uid]['hombres']}, "
+                f"Mujeres={data_by_user[uid]['mujeres']}, "
+                f"Total={data_by_user[uid]['total']}")
+
+        #print("\n--- Totales Generales (Ejemplo) ---")
+        #print(f"Gran Total Hombres: {grand_total['hombres']}")
+        #print(f"Gran Total Mujeres: {grand_total['mujeres']}")
+        #print(f"Gran Total General: {grand_total['total']}")
             
-        # 1.3 Sumar al total general del usuario
-        data_by_user[user_id]['total'] += count
 
-    # --- 2. Preparar el Resultado Final y Totales Generales ---
+        fieldsView = [
+            "gender",
+            "createdby_id",
+            "age",
+            "religion",
+            "education",
+            "county",
+            "state",
+            "party",
+            "willvote",
+            "chavesSupport"
+        ]
 
-    # IDs de usuario ordenados para la tabla
-    sorted_user_ids = sorted(list(user_ids_list))
+        query = session.newQuery(classname)
+        query.addFilter("category", "==", "1")
+        query.addFilter("gender", "isnotnull")
+        #query.addFilter("state", "==", "puntarenas")
+        #query.addFilter("congress", "==", "Social Democrático")
+        if user:
+            user_id = int(user)
+            query.addFilter("createdby_id", "==", user_id)
+        rawResults = query.getMultiFieldStats(fields,"gender")
+        results = getResults(fieldsView,rawResults)
 
-    # Calcular los totales generales de Hombres, Mujeres y General
-    grand_total = {
-        'hombres': sum(data_by_user[uid]['hombres'] for uid in sorted_user_ids),
-        'mujeres': sum(data_by_user[uid]['mujeres'] for uid in sorted_user_ids),
-        'total': sum(data_by_user[uid]['total'] for uid in sorted_user_ids),
-    }
-
-    # -------------------------------------------------------------------
-    # Impresión para verificar (coincide con el ejemplo que enviaste: 297)
-    # -------------------------------------------------------------------
-
-    #print("\n--- Resultado por Usuario (Ejemplo) ---")
-    for uid in sorted_user_ids:
-        print(f"Usuario {uid}: Hombres={data_by_user[uid]['hombres']}, "
-            f"Mujeres={data_by_user[uid]['mujeres']}, "
-            f"Total={data_by_user[uid]['total']}")
-
-    #print("\n--- Totales Generales (Ejemplo) ---")
-    #print(f"Gran Total Hombres: {grand_total['hombres']}")
-    #print(f"Gran Total Mujeres: {grand_total['mujeres']}")
-    #print(f"Gran Total General: {grand_total['total']}")
-        
-
-    fieldsView = [
-        "gender",
-        "createdby_id",
-        "age",
-        "religion",
-        "education",
-        "county",
-        "state",
-        "party",
-        "willvote",
-        "chavesSupport"
-    ]
-
-    query = session.newQuery(classname)
-    query.addFilter("category", "==", "1")
-    query.addFilter("gender", "isnotnull")
-    #query.addFilter("state", "==", "puntarenas")
-    #query.addFilter("congress", "==", "Social Democrático")
-    if user:
-        user_id = int(user)
-        query.addFilter("createdby_id", "==", user_id)
-    rawResults = query.getMultiFieldStats(fields,"gender")
-    results = getResults(fieldsView,rawResults)
-
-    willvote = [
-        "voteScale",
-        "nationalElection",
-        "neverVote",
-        "congress"
-    ]
-    query = session.newQuery(classname)
-    query.addFilter("category", "==", "1")
-    query.addFilter("gender", "isnotnull")
-    query.addFilter("willvote", "==", "Sí")
-    #query.addFilter("state", "==", "puntarenas")
-    #query.addFilter("congress", "==", "Social Democrático")
-    if user:
-        user_id = int(user)
-        query.addFilter("createdby_id", "==", user_id)
-    rawResults2 = query.getMultiFieldStats(fields,"gender")
-    willvoteresults = getResults(willvote,rawResults2)
-    #return "hola"
-    return render_template("backend/custom/stats.html", results=results,willvoteresults=willvoteresults, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+        willvote = [
+            "voteScale",
+            "nationalElection",
+            "neverVote",
+            "congress"
+        ]
+        query = session.newQuery(classname)
+        query.addFilter("category", "==", "1")
+        query.addFilter("gender", "isnotnull")
+        query.addFilter("willvote", "==", "Sí")
+        #query.addFilter("state", "==", "puntarenas")
+        #query.addFilter("congress", "==", "Social Democrático")
+        if user:
+            user_id = int(user)
+            query.addFilter("createdby_id", "==", user_id)
+        rawResults2 = query.getMultiFieldStats(fields,"gender")
+        willvoteresults = getResults(willvote,rawResults2)
+        #return "hola"
+        return render_template("backend/custom/stats.html", results=results,willvoteresults=willvoteresults, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+    else:
+        return "Usted no está autorizado a acceder a esta página."
