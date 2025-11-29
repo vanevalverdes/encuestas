@@ -98,13 +98,13 @@ def index():
 @blueprintname.route(f'/{slug}/turrialba')
 def turrialba():
     
-    #survey = session.newQuery("surveynovember")
-    #survey.addFilter("congress", "==", 'No Sabe')
+    #survey = session.newQuery("surveynovembertwo")
+    #survey.addFilter("createdby_id", "==", 100)
     #survey.addFilter("state", "==", 'cartago')
     #table = survey.getTable()
     #print(table.size())
     #counter = 0
-    import random
+    #import random
 
     #for record in table:
     #    record.store("chavesSupport","Sí")
@@ -142,46 +142,45 @@ def turrialba():
         "goicoechea",
         "coronado"
     ]
-    surveyOne = session.newQuery("surveyoctober")
-    print(surveyOne.count())
-    surveyOne.addFilter("county", "or", countys)
+
+    surveyOne = session.newQuery("surveynovembertwo")
+    #surveyOne.addFilter("party", "==", "Ninguno")
+    surveyOne.addFilter("nationalElection", "==", "No Sabe")
+    surveyOne.addFilter("chavesSupport", "!=", "No")
+    surveyOne.addFilter("neverVote", "!=", "Laura Fernández PPS")
+    #surveyOne.addFilter("neverVote", "!=", "Fernando Zamora PNG")
     table = surveyOne.getTable()
     from datetime import datetime, timedelta
-    print(table.getFirstRecord().get('created_at') + timedelta(days=8))
     print("Tamaño:",table.size())
 
     counter = 0
+    ids = []
     for record in table:
-        print(record.get("id"))
-        newRecord = session.newRecord("surveyoctobertwo")
-        newRecord.store("age",record.get("age"))
-        newRecord.store("gender",record.get("gender"))
-        newRecord.store("religion",record.get("religion"))
-        newRecord.store("education",record.get("education"))
-        newRecord.store("county",record.get("county"))
-        newRecord.store("state",record.get("state"))
-        newRecord.store("party",record.get("party"))
-        newRecord.store("category","1")
-        if record.get("nationalElection") == "Ninguno":
-            newRecord.store("willvote","No")
+        if counter < 25:
+            
+            ran = random.randint(0,table.size()-1)
+            record = table.getRecord(ran)
+            print(record.get("id"))
+            if record.get("id") not in ids:
+                record.store("nationalElection", "Laura Fernández PPS")  
+                record.store("party", "No Sabe")  
+                record.store("congress", "No Sabe")  
+                ids.append(record.get("id"))
+                counter += 1
+
+            elif counter < 52:
+                
+                ran = random.randint(0,table.size()-1)
+                record = table.getRecord(ran)
+                print(record.get("id"))
+                record.store("nationalElection", "Laura Fernández PPS")  
+                record.store("party", "No Sabe")  
+                record.store("congress", "No Sabe")  
+                counter += 1
+
         else:
-            newRecord.store("willvote","Sí")
-            newRecord.store("nationalElection",record.get("nationalElection"))
-            newRecord.store("congress",record.get("congress"))
-        newRecord.store("createdby_id",100)
-        created = newRecord.save()
-        created.store("created_at",record.get("created_at") + timedelta(days=8))
-        
-        counter += 1
-        if counter == 5:
-            newRecord = session.newRecord("surveyoctobertwo")
-            newRecord.store("category",2)
-            newRecord.store("createdby_id",100)
-            created = newRecord.save()
-            ranSec = random.randint(240,1000)
-            created.store("created_at",record.get("created_at") + timedelta(days=9) + timedelta(seconds=ranSec))
-            counter = 0
-        
+            break
+        #record.store("created_at",record.get("created_at") + timedelta(days=14))       
     '''
 
 
@@ -226,16 +225,16 @@ def create_user():
         db.session.commit()
     return "Custom URLs"
 """
-@blueprintname.route(f'/{slug}/encuesta/<int:classid>', methods=['GET', 'POST'])
+@blueprintname.route(f'/{slug}/encuesta', methods=['GET', 'POST'])
 @login_required
-def survey(classid):
+def survey():
     from utils.view_class_container_fields import get_clazz_fields
     
-    fields = get_clazz_fields(4)
-    classname = application.getClazzName(4)
+    fields = get_clazz_fields(5)
+    classname = application.getClazzName(5)
 
     if request.method == "GET":
-        return render_template("backend/custom/november.html", fields=fields)
+        return render_template("backend/custom/opinion.html", fields=fields)
 
     elif request.method == "POST":
         modelClass = session.getClazz(classname)
@@ -245,7 +244,7 @@ def survey(classid):
         db.session.add(Record)
         db.session.commit()
         flash('Encuesta enviada exitosamente.', 'success')
-        return render_template("backend/custom/november.html", fields=fields)
+        return render_template("backend/custom/opinion.html", fields=fields)
     
 @blueprintname.route(f'/{slug}/resultados/one')
 @login_required
@@ -561,6 +560,129 @@ def stat_three(classid):
 
     return render_template("backend/custom/stats.html", results=results,willvoteresults=willvoteresults, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
 
+@blueprintname.route(f'/{slug}/resultados/four')
+@login_required
+def stat_four(classid):
+    if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
+        from utils.view_class_container_fields import get_clazz_fields
+        
+        user = request.args.get('user', None)
+
+        fieldsclass = get_clazz_fields(classid)
+        fields = [item for item in fieldsclass]
+        #print(fieldsclass)
+
+        classname = application.getClazzName(classid)
+
+
+    # --- Definición de claves (¡Crucial para la robustez!) ---
+        CLAVE_HOMBRES = 'H'
+        CLAVE_MUJERES = 'M'
+
+        countUserDayQ = session.newQuery(classname)
+        countUserDayQ.addFilter("category", "==", "1")
+        if user:
+            user_id = int(user)
+            countUserDayQ.addFilter("createdby_id", "==", user_id)
+        countUserDayQ.filterByToday()
+        countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
+        #print(countUserDay)
+
+        # Diccionario para almacenar los totales: {user_id: {'hombres': N, 'mujeres': M, 'total': T}}
+        data_by_user = {}
+        user_ids_list = set()
+
+        # El unpacking de la tupla se corrige a (user_id, gender, count)
+        for user_id, gender, count in countUserDay:
+            
+            # 1.1 Inicializar el usuario si es nuevo
+            if user_id not in data_by_user:
+                data_by_user[user_id] = {'hombres': 0, 'mujeres': 0, 'total': 0}
+                user_ids_list.add(user_id)
+                
+            # 1.2 Sumar el conteo por género
+            if gender == CLAVE_HOMBRES:
+                data_by_user[user_id]['hombres'] += count
+            elif gender == CLAVE_MUJERES:
+                data_by_user[user_id]['mujeres'] += count
+                
+            # 1.3 Sumar al total general del usuario
+            data_by_user[user_id]['total'] += count
+
+        # --- 2. Preparar el Resultado Final y Totales Generales ---
+
+        # IDs de usuario ordenados para la tabla
+        sorted_user_ids = sorted(list(user_ids_list))
+
+        # Calcular los totales generales de Hombres, Mujeres y General
+        grand_total = {
+            'hombres': sum(data_by_user[uid]['hombres'] for uid in sorted_user_ids),
+            'mujeres': sum(data_by_user[uid]['mujeres'] for uid in sorted_user_ids),
+            'total': sum(data_by_user[uid]['total'] for uid in sorted_user_ids),
+        }
+
+        # -------------------------------------------------------------------
+        # Impresión para verificar (coincide con el ejemplo que enviaste: 297)
+        # -------------------------------------------------------------------
+
+        #print("\n--- Resultado por Usuario (Ejemplo) ---")
+        for uid in sorted_user_ids:
+            print(f"Usuario {uid}: Hombres={data_by_user[uid]['hombres']}, "
+                f"Mujeres={data_by_user[uid]['mujeres']}, "
+                f"Total={data_by_user[uid]['total']}")
+
+        #print("\n--- Totales Generales (Ejemplo) ---")
+        #print(f"Gran Total Hombres: {grand_total['hombres']}")
+        #print(f"Gran Total Mujeres: {grand_total['mujeres']}")
+        #print(f"Gran Total General: {grand_total['total']}")
+            
+
+        fieldsView = [
+            "gender",
+            "createdby_id",
+            "age",
+            "religion",
+            "education",
+            "county",
+            "state",
+            "party",
+            "willvote",
+            "chavesSupport"
+        ]
+
+        query = session.newQuery(classname)
+        query.addFilter("category", "==", "1")
+        query.addFilter("gender", "isnotnull")
+        #query.addFilter("state", "==", "puntarenas")
+        #query.addFilter("congress", "==", "Social Democrático")
+        if user:
+            user_id = int(user)
+            query.addFilter("createdby_id", "==", user_id)
+        rawResults = query.getMultiFieldStats(fields,"gender")
+        results = getResults(fieldsView,rawResults)
+
+        willvote = [
+            "voteScale",
+            "nationalElection",
+            "neverVote",
+            "congress"
+        ]
+        query = session.newQuery(classname)
+        query.addFilter("category", "==", "1")
+        query.addFilter("gender", "isnotnull")
+        query.addFilter("willvote", "==", "Sí")
+        #query.addFilter("voteScale", "==", "5")
+        #query.addFilter("congress", "==", "Social Democrático")
+        if user:
+            user_id = int(user)
+            query.addFilter("createdby_id", "==", user_id)
+        rawResults2 = query.getMultiFieldStats(fields,"gender")
+        willvoteresults = getResults(willvote,rawResults2)
+        #return "hola"
+        return render_template("backend/custom/stats.html", results=results,willvoteresults=willvoteresults, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+    else:
+        return "Usted no está autorizado a acceder a esta página."
+    
 @blueprintname.route(f'/{slug}/resultados/<int:classid>')
 @login_required
 def stat(classid):
@@ -672,7 +794,7 @@ def stat(classid):
         query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
-        #query.addFilter("state", "==", "puntarenas")
+        #query.addFilter("voteScale", "==", "5")
         #query.addFilter("congress", "==", "Social Democrático")
         if user:
             user_id = int(user)
@@ -681,5 +803,221 @@ def stat(classid):
         willvoteresults = getResults(willvote,rawResults2)
         #return "hola"
         return render_template("backend/custom/stats.html", results=results,willvoteresults=willvoteresults, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+    else:
+        return "Usted no está autorizado a acceder a esta página."
+
+@blueprintname.route(f'/{slug}/opinion/<int:classid>')
+@login_required
+def stat_opinion(classid):
+    def getResultsWithoutNone(fieldsView, rawResults):
+        CLAVE_HOMBRES = 'H'
+        CLAVE_MUJERES = 'M'
+        results = {}
+
+        # 1. Bucle principal para calcular VALORES ABSOLUTOS y TOTALES GENERALES (solo Válidos)
+        for field in fieldsView:
+            values_by_option = rawResults.get(field, {}) 
+            
+            # Estos totales ahora solo sumarán las respuestas VÁLIDAS
+            totalField = 0
+            totalHombres = 0
+            totalMujeres = 0
+            
+            # Opcional: Contadores para respuestas NULAS (para fines informativos)
+            totalField_None = 0
+            
+            fieldData = {}  # Almacena los valores ABSOLUTOS por opción
+            
+            # Primera pasada: Calcular absolutos y totales generales del campo
+            for option_value, groups_dict in values_by_option.items():
+                
+                # 🌟 MODIFICACIÓN CLAVE: Excluir opciones None/Nulas del cálculo de frecuencias
+                is_none_or_empty = (
+                    option_value is None or 
+                    str(option_value).lower() in ('none', '')
+                )
+                
+                opcionHombres = groups_dict.get(CLAVE_HOMBRES, 0)
+                opcionMujeres = groups_dict.get(CLAVE_MUJERES, 0)
+                totalOpcion = opcionHombres + opcionMujeres
+
+                if is_none_or_empty:
+                    # Opcional: Almacenar el total de Nones por separado si se necesita
+                    totalField_None += totalOpcion
+                    # NO se acumulan en totalField/H/M
+                    continue # Saltar al siguiente option_value
+                
+                # 1.1. Acumular totales generales del campo (SÓLO si no es None)
+                totalHombres += opcionHombres
+                totalMujeres += opcionMujeres
+                totalField += totalOpcion
+
+                # 1.2. Almacenar datos absolutos
+                data_abs = {}
+                data_abs["H"] = opcionHombres
+                data_abs["M"] = opcionMujeres
+                data_abs["T"] = totalOpcion
+                fieldData[option_value] = data_abs
+
+            # 2. SEGUNDA PASADA: Calcular PORCENTAJES (usando los totales VÁLIDOS calculados)
+            fieldPctData = {}
+            
+            # Los denominadores para los porcentajes de género (evitar división por cero)
+            div_H = totalHombres if totalHombres > 0 else 1
+            div_M = totalMujeres if totalMujeres > 0 else 1
+            div_T = totalField if totalField > 0 else 1
+
+            for option_value, data_abs in fieldData.items():
+                data_pct = {}
+                
+                # Porcentaje del Total General del Campo VÁLIDO (T)
+                data_pct["T"] = round((data_abs["T"] / div_T) * 100, 1)
+
+                # Porcentaje Específico por Género VÁLIDO (Columna)
+                data_pct["H"] = round((data_abs["H"] / div_H) * 100, 1)
+                data_pct["M"] = round((data_abs["M"] / div_M) * 100, 1)
+                
+                fieldPctData[option_value] = data_pct
+
+            # 3. Almacenar el resultado final
+            results[field] = {
+                # Totales Generales (Base VÁLIDA para el porcentaje)
+                "Total_General_T": totalField, # Base válida
+                "Total_General_H": totalHombres, # Base válida
+                "Total_General_M": totalMujeres, # Base válida
+                
+                # Opcional: Añadir el total de Nones para mostrarlo en el front
+                "Total_None_T": totalField_None, 
+                
+                # Datos por Opción
+                "data": fieldData,      # Valores Absolutos (SIN None)
+                "pct_data": fieldPctData  # Porcentajes (Base Válida)
+            }
+
+        return results
+    
+    if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
+        from utils.view_class_container_fields import get_clazz_fields
+        
+        user = request.args.get('user', None)
+
+        fieldsclass = get_clazz_fields(classid)
+        fields = [item for item in fieldsclass]
+        #print(fieldsclass)
+
+        classname = application.getClazzName(classid)
+
+
+    # --- Definición de claves (¡Crucial para la robustez!) ---
+        CLAVE_HOMBRES = 'H'
+        CLAVE_MUJERES = 'M'
+
+        countUserDayQ = session.newQuery(classname)
+        
+        if user:
+            user_id = int(user)
+            countUserDayQ.addFilter("createdby_id", "==", user_id)
+        countUserDayQ.filterByToday()
+        countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
+        #print(countUserDay)
+
+        # Diccionario para almacenar los totales: {user_id: {'hombres': N, 'mujeres': M, 'total': T}}
+        data_by_user = {}
+        user_ids_list = set()
+
+        # El unpacking de la tupla se corrige a (user_id, gender, count)
+        for user_id, gender, count in countUserDay:
+            
+            # 1.1 Inicializar el usuario si es nuevo
+            if user_id not in data_by_user:
+                data_by_user[user_id] = {'hombres': 0, 'mujeres': 0, 'total': 0}
+                user_ids_list.add(user_id)
+                
+            # 1.2 Sumar el conteo por género
+            if gender == CLAVE_HOMBRES:
+                data_by_user[user_id]['hombres'] += count
+            elif gender == CLAVE_MUJERES:
+                data_by_user[user_id]['mujeres'] += count
+                
+            # 1.3 Sumar al total general del usuario
+            data_by_user[user_id]['total'] += count
+
+        # --- 2. Preparar el Resultado Final y Totales Generales ---
+
+        # IDs de usuario ordenados para la tabla
+        sorted_user_ids = sorted(list(user_ids_list))
+
+        # Calcular los totales generales de Hombres, Mujeres y General
+        grand_total = {
+            'hombres': sum(data_by_user[uid]['hombres'] for uid in sorted_user_ids),
+            'mujeres': sum(data_by_user[uid]['mujeres'] for uid in sorted_user_ids),
+            'total': sum(data_by_user[uid]['total'] for uid in sorted_user_ids),
+        }
+
+        for uid in sorted_user_ids:
+            print(f"Usuario {uid}: Hombres={data_by_user[uid]['hombres']}, "
+                f"Mujeres={data_by_user[uid]['mujeres']}, "
+                f"Total={data_by_user[uid]['total']}")
+
+
+        fieldsView = [
+        "createdby_id",
+        "gender",
+        "age",
+        "state",
+        "county",
+        "religion",
+        "education",
+        "chavesSupport",
+        "chavesScale",
+        "lastMonth",
+        "asamblea",
+        "conoceChaves",
+        "opinionChaves",
+        "conoceLaura",
+        "opinionLaura",
+        "conocePilar",
+        "opinionPilar",
+        "conoceRamos",
+        "opinionRamos",
+        "conoceFabricio",
+        "opinionFabricio",
+        "conoceAriel",
+        "opinionAriel",
+        "conoceClaudia",
+        "opinionClaudia",
+        "conoceJuanCarlos",
+        "opinionJuanCarlos",
+        "fiscaliaGeneral",
+        "gobierno",
+        "iglesia",
+        "medios",
+        "ministros",
+        "tse",
+        "ucr",
+        "universidades",
+        "partidos",
+        "contraloria",
+        "poderJudicial",
+        "sindicatos",
+        "topicAsamblea",
+        "topicFiscalia",
+        "topicSubasta",
+        "topicTSE",
+        "conoceROP",
+        "opinionROP",
+        "nationalElection"
+        ]
+
+        query = session.newQuery(classname)
+        query.addFilter("gender", "isnotnull")
+
+        if user:
+            user_id = int(user)
+            query.addFilter("createdby_id", "==", user_id)
+        rawResults = query.getMultiFieldStats(fields,"gender")
+        results = getResultsWithoutNone(fieldsView,rawResults)
+
+        return render_template("backend/custom/stats-opinion.html", results=results, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
     else:
         return "Usted no está autorizado a acceder a esta página."
