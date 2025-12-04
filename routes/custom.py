@@ -230,11 +230,11 @@ def create_user():
 def survey():
     from utils.view_class_container_fields import get_clazz_fields
     
-    fields = get_clazz_fields(5)
-    classname = application.getClazzName(5)
+    fields = get_clazz_fields(4)
+    classname = application.getClazzName(4)
 
     if request.method == "GET":
-        return render_template("backend/custom/opinion.html", fields=fields)
+        return render_template("backend/custom/november.html", fields=fields)
 
     elif request.method == "POST":
         modelClass = session.getClazz(classname)
@@ -244,7 +244,7 @@ def survey():
         db.session.add(Record)
         db.session.commit()
         flash('Encuesta enviada exitosamente.', 'success')
-        return render_template("backend/custom/opinion.html", fields=fields)
+        return render_template("backend/custom/november.html", fields=fields)
     
 @blueprintname.route(f'/{slug}/resultados/one')
 @login_required
