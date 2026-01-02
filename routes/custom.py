@@ -108,7 +108,7 @@ def turrialba():
 
     #for record in table:
     #    record.store("chavesSupport","Sí")
-    # 
+     
     #for number in range(8):
     #    counter += 1
     #    ran = random.randint(0,table.size()-1)
@@ -136,7 +136,7 @@ def turrialba():
         print(f"Creado {counter}: {created.get('id')}")
     print("Tamaño:",counter)
     '''
-    '''
+    
     import random
     countys = [
         "goicoechea",
@@ -144,48 +144,37 @@ def turrialba():
     ]
 
     surveyOne = session.newQuery("surveynovembertwo")
-    #surveyOne.addFilter("party", "==", "Ninguno")
-    surveyOne.addFilter("nationalElection", "==", "No Sabe")
-    surveyOne.addFilter("chavesSupport", "!=", "No")
-    surveyOne.addFilter("neverVote", "!=", "Laura Fernández PPS")
+    #surveyOne.addFilter("neverVote", "!=", "Laura Fernández PPS")
+    surveyOne.addFilter("chavesSupport", "==", "No")
+    #surveyOne.addFilter("nationalElection", "==", "No Sabe")
+    #surveyOne.addFilter("nationalElection", "!=", "José Aguilar Berrocal Avance")
+    #surveyOne.addFilter("nationalElection", "==", "No Sabe")
+    #surveyOne.addFilter("congress", "==", "No Sabe")
+    #surveyOne.addFilter("congress", "!=", "Actuemos Ya")
     #surveyOne.addFilter("neverVote", "!=", "Fernando Zamora PNG")
     table = surveyOne.getTable()
     from datetime import datetime, timedelta
     print("Tamaño:",table.size())
-
+    
     counter = 0
     ids = []
     for record in table:
-        if counter < 25:
+        if counter < 202:
             
             ran = random.randint(0,table.size()-1)
             record = table.getRecord(ran)
             print(record.get("id"))
             if record.get("id") not in ids:
-                record.store("nationalElection", "Laura Fernández PPS")  
-                record.store("party", "No Sabe")  
-                record.store("congress", "No Sabe")  
+                record.store("chavesSupport","Sí")
                 ids.append(record.get("id"))
                 counter += 1
-
-            elif counter < 52:
-                
-                ran = random.randint(0,table.size()-1)
-                record = table.getRecord(ran)
-                print(record.get("id"))
-                record.store("nationalElection", "Laura Fernández PPS")  
-                record.store("party", "No Sabe")  
-                record.store("congress", "No Sabe")  
-                counter += 1
-
-        else:
-            break
         #record.store("created_at",record.get("created_at") + timedelta(days=14))       
-    '''
+    
 
 
     return "Custom URLs"
 
+"""
 """
 @blueprintname.route(f'/{slug}/user')
 def create_user():
@@ -195,26 +184,29 @@ def create_user():
     
     
     list = [
-        "encuestador41@opolconsultores.com",
-        "encuestador42@opolconsultores.com",
-        "encuestador43@opolconsultores.com",
-        "encuestador44@opolconsultores.com",
-        "encuestador45@opolconsultores.com",
-        "encuestador46@opolconsultores.com",
-        "encuestador47@opolconsultores.com",
-        "encuestador48@opolconsultores.com",
-        "encuestador49@opolconsultores.com",
-        "encuestador50@opolconsultores.com"
+        "encuestador51@opolconsultores.com",
+        "encuestador52@opolconsultores.com",
+        "encuestador53@opolconsultores.com",
+        "encuestador54@opolconsultores.com",
+        "encuestador55@opolconsultores.com",
+        "encuestador56@opolconsultores.com",
+        "encuestador57@opolconsultores.com",
+        "encuestador58@opolconsultores.com",
+        "encuestador59@opolconsultores.com",
+        "encuestador60@opolconsultores.com"
         ]
-    for item in range(41,51):
+    for item in list:
         password = engine.random(6)
         hashed_password = generate_password_hash(password)
-        user = User.query.filter_by(id=item).first()
+        user = User()
         setattr(user, "_password_hash", hashed_password)
+        setattr(user, "email", item)
+        setattr(user, "usergroup_id", 3)
         print("Usuario: ",user.email,", Contraseña: ",password)
+        db.session.add(user)
     db.session.commit()
     return "listo"
-"""
+
 """   
     password = "opolOctubre25*"
     hashed_password = generate_password_hash(password)
@@ -688,6 +680,7 @@ def stat_four(classid):
 def stat(classid):
     if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
         from utils.view_class_container_fields import get_clazz_fields
+        state = request.args.get('state', None)
         
         user = request.args.get('user', None)
 
@@ -776,6 +769,8 @@ def stat(classid):
         query = session.newQuery(classname)
         query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
+        if state:
+            query.addFilter("state", "==", state)
         #query.addFilter("state", "==", "puntarenas")
         #query.addFilter("congress", "==", "Social Democrático")
         if user:
@@ -795,7 +790,8 @@ def stat(classid):
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
         #query.addFilter("voteScale", "==", "5")
-        #query.addFilter("congress", "==", "Social Democrático")
+        if state:
+            query.addFilter("state", "==", state)
         if user:
             user_id = int(user)
             query.addFilter("createdby_id", "==", user_id)
