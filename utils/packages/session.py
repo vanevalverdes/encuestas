@@ -675,7 +675,7 @@ class Query:
         return table(self.model_class, record_instances)
     
     def getRecords(self, related_ids):
-        # Devuelve una instancia de table con los registros filtrados
+        """ Devuelve una instancia de table con los registros filtrados """
         records = self.model_class.query.filter(self.model_class.id.in_(related_ids)).all()
         return records
     

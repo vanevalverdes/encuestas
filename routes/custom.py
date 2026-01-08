@@ -138,18 +138,17 @@ def turrialba():
     '''
     
     import random
-    countys = [
-        "goicoechea",
-        "coronado"
-    ]
+    ids = []
 
     surveyOne = session.newQuery("surveynovembertwo")
-    #surveyOne.addFilter("neverVote", "!=", "Laura Fernández PPS")
-    surveyOne.addFilter("chavesSupport", "==", "No")
+    #table = surveyOne.getRecords(ids)
+    #surveyOne.addFilter("neverVote", "!=", "Walter Rubén Hernández PJSC")
+    #surveyOne.addFilter("chavesSupport", "==", "No Sabe")
+    #surveyOne.addFilter("willvote", "==", "Sí")
     #surveyOne.addFilter("nationalElection", "==", "No Sabe")
     #surveyOne.addFilter("nationalElection", "!=", "José Aguilar Berrocal Avance")
-    #surveyOne.addFilter("nationalElection", "==", "No Sabe")
-    #surveyOne.addFilter("congress", "==", "No Sabe")
+    surveyOne.addFilter("state", "==", "cartago")
+    surveyOne.addFilter("congress", "==", "No Sabe")
     #surveyOne.addFilter("congress", "!=", "Actuemos Ya")
     #surveyOne.addFilter("neverVote", "!=", "Fernando Zamora PNG")
     table = surveyOne.getTable()
@@ -159,17 +158,22 @@ def turrialba():
     counter = 0
     ids = []
     for record in table:
-        if counter < 202:
+        #from utils.db import db
+        #setattr(record, "nationalElection", "No Sabe")
+        
+        if counter < 23:
             
             ran = random.randint(0,table.size()-1)
             record = table.getRecord(ran)
             print(record.get("id"))
             if record.get("id") not in ids:
-                record.store("chavesSupport","Sí")
+                #record.store("chavesSupport","Sí")
+                record.store("congress","Actuemos Ya")
+                #record.store("nationalElection","Walter Rubén Hernández PJSC")
                 ids.append(record.get("id"))
                 counter += 1
         #record.store("created_at",record.get("created_at") + timedelta(days=14))       
-    
+    #db.session.commit()
 
 
     return "Custom URLs"
@@ -696,7 +700,7 @@ def stat(classid):
         CLAVE_MUJERES = 'M'
 
         countUserDayQ = session.newQuery(classname)
-        countUserDayQ.addFilter("category", "==", "1")
+        #countUserDayQ.addFilter("category", "==", "1")
         if user:
             user_id = int(user)
             countUserDayQ.addFilter("createdby_id", "==", user_id)
@@ -767,7 +771,7 @@ def stat(classid):
         ]
 
         query = session.newQuery(classname)
-        query.addFilter("category", "==", "1")
+        #query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
         if state:
             query.addFilter("state", "==", state)
