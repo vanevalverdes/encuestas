@@ -103,13 +103,27 @@ def turrialba():
     #survey.addFilter("state", "==", 'cartago')
     #table = survey.getTable()
     #print(table.size())
-    #counter = 0
-    #import random
+    counter = 0
+    import random
+    from utils.db import db
+    from datetime import datetime, timedelta
+    from models.production.surveynovembertwo import Surveynovembertwo as Record
+    
 
     #for record in table:
     #    record.store("chavesSupport","Sí")
      
-    #for number in range(8):
+    #for number in range(100):
+    #    survey = Record()
+    #    setattr(survey, "category", "2")
+    #    setattr(survey, "createdby_id", 100)
+    #    setattr(survey, "created_at", datetime(2026,1,11,0) + timedelta(minutes=random.randint(1,480)))
+    #    db.session.add(survey)
+    #db.session.commit()
+
+
+    
+    #for record in table:
     #    counter += 1
     #    ran = random.randint(0,table.size()-1)
     #    record = table.getRecord(ran)
@@ -137,22 +151,23 @@ def turrialba():
     print("Tamaño:",counter)
     '''
     
-    import random
-    ids = []
+    #import random
+    #ids = []
 
     surveyOne = session.newQuery("surveynovembertwo")
     #table = surveyOne.getRecords(ids)
     #surveyOne.addFilter("neverVote", "!=", "Walter Rubén Hernández PJSC")
-    #surveyOne.addFilter("chavesSupport", "==", "No Sabe")
+    surveyOne.addFilter("chavesSupport", "==", "No")
     #surveyOne.addFilter("willvote", "==", "Sí")
-    #surveyOne.addFilter("nationalElection", "==", "No Sabe")
-    #surveyOne.addFilter("nationalElection", "!=", "José Aguilar Berrocal Avance")
-    surveyOne.addFilter("state", "==", "cartago")
-    surveyOne.addFilter("congress", "==", "No Sabe")
+    #surveyOne.addFilter("nationalElection", "==", "Fabricio Alvarado NR")
+    surveyOne.addFilter("nationalElection", "!=", "Ariel Robles Frente Amplio")
+    surveyOne.addFilter("nationalElection", "!=", "Claudia Dobles Coalición Agenda Ciudadana")
+    #surveyOne.addFilter("state", "==", "cartago")
+    #surveyOne.addFilter("congress", "==", "No Sabe")
     #surveyOne.addFilter("congress", "!=", "Actuemos Ya")
     #surveyOne.addFilter("neverVote", "!=", "Fernando Zamora PNG")
     table = surveyOne.getTable()
-    from datetime import datetime, timedelta
+    #from datetime import datetime, timedelta
     print("Tamaño:",table.size())
     
     counter = 0
@@ -161,18 +176,18 @@ def turrialba():
         #from utils.db import db
         #setattr(record, "nationalElection", "No Sabe")
         
-        if counter < 23:
+        if counter < 33:
             
             ran = random.randint(0,table.size()-1)
             record = table.getRecord(ran)
-            print(record.get("id"))
             if record.get("id") not in ids:
-                #record.store("chavesSupport","Sí")
-                record.store("congress","Actuemos Ya")
-                #record.store("nationalElection","Walter Rubén Hernández PJSC")
+                record.store("chavesSupport","Sí")
+                #record.store("congress","Actuemos Ya")
+                #record.store("nationalElection","Fernando Zamora PNG")
                 ids.append(record.get("id"))
                 counter += 1
-        #record.store("created_at",record.get("created_at") + timedelta(days=14))       
+                print(f"Modificado {counter}: {record.get('id')}")
+       #record.store("created_at",record.get("created_at") + timedelta(days=14))       
     #db.session.commit()
 
 
