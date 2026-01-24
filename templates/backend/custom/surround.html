@@ -137,6 +137,11 @@
                         <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.survey') }}">Nueva encuesta</a>
                     </li>
                     {% endif %}
+                    {% if current_user.is_authenticated and current_user.usergroup.id == 2 %}
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('routing.list_record', classid=8,page=1) }}">Fotografías de Candidatos</a>
+                    </li>
+                    {% endif %}
                     
                 </ul>
                 <div class="d-flex align-items-center gap-2 ms-lg-3">

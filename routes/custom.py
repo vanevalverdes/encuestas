@@ -715,7 +715,7 @@ def stat(classid):
         CLAVE_MUJERES = 'M'
 
         countUserDayQ = session.newQuery(classname)
-        countUserDayQ.addFilter("category", "==", "1")
+        #countUserDayQ.addFilter("county", "==", "siquirres")
         if user:
             user_id = int(user)
             countUserDayQ.addFilter("createdby_id", "==", user_id)
@@ -784,6 +784,7 @@ def stat(classid):
 
         query = session.newQuery(classname)
         query.addFilter("gender", "isnotnull")
+        #query.addFilter("county", "==", "siquirres")
         if state:
             query.addFilter("state", "==", state)
         if user:
@@ -791,6 +792,7 @@ def stat(classid):
             query.addFilter("createdby_id", "==", user_id)
         rawResults = query.getMultiFieldStats(fields,"gender")
         results = getResults(fieldsView,rawResults)
+        query.addFilter("county", "==", "siquirres")
 
         willvote = [
             "voteScale",
@@ -800,6 +802,7 @@ def stat(classid):
         query = session.newQuery(classname)
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
+        #query.addFilter("county", "==", "siquirres")
         #query.addFilter("voteScale", "==", "5")
         if state:
             query.addFilter("state", "==", state)

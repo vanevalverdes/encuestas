@@ -177,7 +177,8 @@ CARPETA_EXPORTACION <- "C:\\Users\\vanev\\Documents\\Opol\\Opol VIII EEN - ENE26
 # 4.2. BASE 2: Votantes Válidos (Solo Escala 5)
 # -----------------------------------------------------------------------------
 df_analisis_nacional <- df_analisis_total %>%
-  filter(votara == 'Sí' & escala_voto == '5') %>%
+  #filter(votara == 'Sí' & escala_voto == '5') %>%
+  filter(votara == 'Sí' & religion == 'Católico') %>%
   #filter(votara == 'Sí' & escala_voto %in% c('5','4')) %>%
   mutate(across(where(is.character), as.factor)) %>%
   droplevels()
@@ -361,7 +362,7 @@ resultados_formateados <- presidente_resultado_df %>%
   mutate(`Voto (%)` = MESS::round_percent(Proporcion, decimals = 2)) %>%
   arrange(desc(`Voto (%)`))
 
-categorias_especiales_limpias <- c("No Sabe", "NS/NR", "Nulo", "No Responde", "En blanco", "En Blanco")
+categorias_especiales_limpias <- c("No Sabe", "No Responde")
 
 resultados_candidatos <- resultados_formateados %>%
   mutate(tipo = ifelse(Candidato %in% categorias_especiales_limpias, "Ninguna persona definida", "Persona candidata")) %>%
@@ -391,7 +392,7 @@ resultados_nunca_votaria_formateados <- nunca_votaria_resultado_df %>%
   mutate(`Voto (%)` = MESS::round_percent(Proporcion, decimals = 2)) %>%
   arrange(desc(`Voto (%)`))
 
-categorias_especiales_limpias <- c("No Sabe", "NS/NR", "Nulo", "No Responde", "En blanco", "En Blanco")
+categorias_especiales_limpias <- c("No Sabe", "No Responde")
 
 resultados_nunca_candidatos <- resultados_nunca_votaria_formateados %>%
   mutate(tipo = ifelse(Candidato %in% categorias_especiales_limpias, "Ninguna persona definida", "Persona candidata")) %>%
