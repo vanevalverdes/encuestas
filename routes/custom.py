@@ -900,7 +900,6 @@ def stat(classid):
             "age",
             "county",
             "state",
-            "party",
             "willvote"
         ]
 
@@ -920,7 +919,7 @@ def stat(classid):
         willvote = [
             "voteScale",
             "nationalElection",
-            "presidentialScale",
+            "presidentScale",
             "congress"
         ]
         query = session.newQuery(classname)
