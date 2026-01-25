@@ -898,13 +898,10 @@ def stat(classid):
             "gender",
             "createdby_id",
             "age",
-            "religion",
-            "education",
             "county",
             "state",
             "party",
-            "willvote",
-            "chavesSupport"
+            "willvote"
         ]
 
         query = session.newQuery(classname)
@@ -924,7 +921,6 @@ def stat(classid):
             "voteScale",
             "nationalElection",
             "presidentialScale",
-            "neverVote",
             "congress"
         ]
         query = session.newQuery(classname)
