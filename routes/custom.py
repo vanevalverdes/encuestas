@@ -694,9 +694,9 @@ def stat_four(classid):
     else:
         return "Usted no está autorizado a acceder a esta página."
     
-@blueprintname.route(f'/{slug}/resultados/<int:classid>')
+@blueprintname.route(f'/{slug}/resultados-diputados/<int:classid>')
 @login_required
-def stat(classid):
+def stat_diputados(classid):
     if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
         from utils.view_class_container_fields import get_clazz_fields
         state = request.args.get('state', None)
@@ -816,9 +816,9 @@ def stat(classid):
     else:
         return "Usted no está autorizado a acceder a esta página."
     
-@blueprintname.route(f'/{slug}/resultados-origin/<int:classid>')
+@blueprintname.route(f'/{slug}/resultados/<int:classid>')
 @login_required
-def stat_origin(classid):
+def stat(classid):
     if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
         from utils.view_class_container_fields import get_clazz_fields
         state = request.args.get('state', None)
@@ -923,6 +923,7 @@ def stat_origin(classid):
         willvote = [
             "voteScale",
             "nationalElection",
+            "presidentialScale",
             "neverVote",
             "congress"
         ]
