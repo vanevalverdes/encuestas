@@ -114,7 +114,7 @@ function toggleDivOnRadioNotValue(name, divId, value) {
             <form method="post" enctype="multipart/form-data" id="form-record">
             <!-- Inputs ocultos -->
             <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
-            <h1>Cuarta Encuesta Electoral Nacional Opol - Diciembre 2025</h1>
+            <h1>Encuesta Electoral Nacional Opol - Enero 2026</h1>
             <div class="bg-white shadow-sm rounded-3 p-4">
                 <div class="card mb-4">
                     <div class="card-header bg-light fw-semibold">
@@ -290,10 +290,7 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                         </div>
                         <div class="row g-4">
                             <div class="col-md-12">
-                                {{ macros.fieldFormSurvey(fields["education"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["religion"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["party"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["chavesSupport"],record,editable)}}
+                                
                                 {{ macros.fieldFormSurvey(fields["willvote"],record,editable)}}
                             </div>
                             <script>
@@ -308,7 +305,8 @@ function toggleDivOnRadioNotValue(name, divId, value) {
                             <div class="col-md-12">
                                 {{ macros.fieldFormSurvey(fields["voteScale"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["nationalElection"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["neverVote"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidentScale"],record,editable)}}
+                                
                                 {{ macros.fieldFormSurvey(fields["congress"],record,editable)}}
                             </div>
                         </div>

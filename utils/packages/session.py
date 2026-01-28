@@ -773,6 +773,31 @@ class Query:
             
         return all_stats
     
+    def getTotals(self, fieldnames):
+        """
+        Suma los valores de múltiples campos en una sola consulta SQL.
+        
+        :param fieldnames: Lista de strings con los nombres de los campos a sumar.
+        :return: Un diccionario con el formato {fieldname: total}
+        """
+        from sqlalchemy import func
+        
+        if not fieldnames:
+            return {}
+
+        query_entities = [
+            func.coalesce(func.sum(getattr(self.model_class, f)), 0).label(f) 
+            for f in fieldnames
+        ]
+
+        result = self.query.with_entities(*query_entities).first()
+
+        if result:
+            return result._asdict()
+        
+        # Fallback en caso de que la consulta no devuelva nada
+        return {f: 0 for f in fieldnames}
+    
 class table:
     def __init__(self, model_class, records=None):
         self.model_class = model_class

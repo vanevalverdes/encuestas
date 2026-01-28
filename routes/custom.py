@@ -157,11 +157,11 @@ def turrialba():
     surveyOne = session.newQuery("surveynovembertwo")
     #table = surveyOne.getRecords(ids)
     #surveyOne.addFilter("neverVote", "!=", "Walter Rubén Hernández PJSC")
-    surveyOne.addFilter("chavesSupport", "==", "No")
-    #surveyOne.addFilter("willvote", "==", "Sí")
-    #surveyOne.addFilter("nationalElection", "==", "Fabricio Alvarado NR")
-    surveyOne.addFilter("nationalElection", "!=", "Ariel Robles Frente Amplio")
-    surveyOne.addFilter("nationalElection", "!=", "Claudia Dobles Coalición Agenda Ciudadana")
+    #surveyOne.addFilter("chavesSupport", "==", "No")
+    surveyOne.addFilter("willvote", "==", "Sí")
+    surveyOne.addFilter("nationalElection", "==", "No Sabe")
+    #surveyOne.addFilter("nationalElection", "!=", "Ariel Robles Frente Amplio")
+    #surveyOne.addFilter("nationalElection", "!=", "Claudia Dobles Coalición Agenda Ciudadana")
     #surveyOne.addFilter("state", "==", "cartago")
     #surveyOne.addFilter("congress", "==", "No Sabe")
     #surveyOne.addFilter("congress", "!=", "Actuemos Ya")
@@ -176,14 +176,14 @@ def turrialba():
         #from utils.db import db
         #setattr(record, "nationalElection", "No Sabe")
         
-        if counter < 33:
+        if counter < 29:
             
             ran = random.randint(0,table.size()-1)
             record = table.getRecord(ran)
             if record.get("id") not in ids:
-                record.store("chavesSupport","Sí")
-                #record.store("congress","Actuemos Ya")
-                #record.store("nationalElection","Fernando Zamora PNG")
+                #record.store("chavesSupport","Sí")
+                record.store("presidentScale","No Sabe")
+                record.store("nationalElection","Laura Fernández PPS")
                 ids.append(record.get("id"))
                 counter += 1
                 print(f"Modificado {counter}: {record.get('id')}")
@@ -694,20 +694,20 @@ def stat_four(classid):
     else:
         return "Usted no está autorizado a acceder a esta página."
     
-@blueprintname.route(f'/{slug}/resultados-diputados/<int:classid>')
+@blueprintname.route(f'/{slug}/resultados-diputados')
 @login_required
-def stat_diputados(classid):
+def stat_diputados():
     if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
         from utils.view_class_container_fields import get_clazz_fields
         state = request.args.get('state', None)
         
         user = request.args.get('user', None)
 
-        fieldsclass = get_clazz_fields(classid)
+        fieldsclass = get_clazz_fields(4)
         fields = [item for item in fieldsclass]
         #print(fieldsclass)
 
-        classname = application.getClazzName(classid)
+        classname = "surveydiputado"
 
 
     # --- Definición de claves (¡Crucial para la robustez!) ---
@@ -820,10 +820,15 @@ def stat_diputados(classid):
 @login_required
 def stat(classid):
     if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
+        import datetime
+        #date = datetime.datetime(2026, 1, 27, 13, 0, 0)
+        date = False
+
         from utils.view_class_container_fields import get_clazz_fields
         state = request.args.get('state', None)
         
         user = request.args.get('user', None)
+        county = request.args.get('county', None)
 
         fieldsclass = get_clazz_fields(classid)
         fields = [item for item in fieldsclass]
@@ -838,6 +843,10 @@ def stat(classid):
 
         countUserDayQ = session.newQuery(classname)
         countUserDayQ.addFilter("category", "==", "1")
+        if date:
+            countUserDayQ.addFilter("created_at", ">", date)
+        if county:
+            countUserDayQ.addFilter("county", "==", county)
         if user:
             user_id = int(user)
             countUserDayQ.addFilter("createdby_id", "==", user_id)
@@ -906,6 +915,10 @@ def stat(classid):
         query = session.newQuery(classname)
         query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
+        if county:
+            query.addFilter("county", "==", county)
+        if date:
+            query.addFilter("created_at", ">", date)
         if state:
             query.addFilter("state", "==", state)
         #query.addFilter("state", "==", "puntarenas")
@@ -922,11 +935,16 @@ def stat(classid):
             "presidentScale",
             "congress"
         ]
+
         query = session.newQuery(classname)
         query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
-        #query.addFilter("voteScale", "==", "5")
+
+        if county:
+            query.addFilter("county", "==", county)
+        if date: 
+            query.addFilter("created_at", ">", date)
         if state:
             query.addFilter("state", "==", state)
         if user:
@@ -1154,3 +1172,130 @@ def stat_opinion(classid):
         return render_template("backend/custom/stats-opinion.html", results=results, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
     else:
         return "Usted no está autorizado a acceder a esta página."
+
+@blueprintname.route(f'/{slug}/resultados-anteriores')
+@login_required
+def stat_backup():
+    if current_user.usergroup.id == 2 or current_user.usergroup.id == 1:
+        from utils.view_class_container_fields import get_clazz_fields
+        state = request.args.get('state', None)
+        
+        user = request.args.get('user', None)
+
+        fieldsclass = get_clazz_fields(4)
+        fields = [item for item in fieldsclass]
+        #print(fieldsclass)
+
+        classname = "surveyjan"
+
+
+    # --- Definición de claves (¡Crucial para la robustez!) ---
+        CLAVE_HOMBRES = 'H'
+        CLAVE_MUJERES = 'M'
+
+        countUserDayQ = session.newQuery(classname)
+        #countUserDayQ.addFilter("county", "==", "siquirres")
+        if user:
+            user_id = int(user)
+            countUserDayQ.addFilter("createdby_id", "==", user_id)
+        countUserDayQ.filterByToday()
+        countUserDay = countUserDayQ.getTwoWayCount("gender", "createdby_id")
+        #print(countUserDay)
+
+        # Diccionario para almacenar los totales: {user_id: {'hombres': N, 'mujeres': M, 'total': T}}
+        data_by_user = {}
+        user_ids_list = set()
+
+        # El unpacking de la tupla se corrige a (user_id, gender, count)
+        for user_id, gender, count in countUserDay:
+            
+            # 1.1 Inicializar el usuario si es nuevo
+            if user_id not in data_by_user:
+                data_by_user[user_id] = {'hombres': 0, 'mujeres': 0, 'total': 0}
+                user_ids_list.add(user_id)
+                
+            # 1.2 Sumar el conteo por género
+            if gender == CLAVE_HOMBRES:
+                data_by_user[user_id]['hombres'] += count
+            elif gender == CLAVE_MUJERES:
+                data_by_user[user_id]['mujeres'] += count
+                
+            # 1.3 Sumar al total general del usuario
+            data_by_user[user_id]['total'] += count
+
+        # --- 2. Preparar el Resultado Final y Totales Generales ---
+
+        # IDs de usuario ordenados para la tabla
+        sorted_user_ids = sorted(list(user_ids_list))
+
+        # Calcular los totales generales de Hombres, Mujeres y General
+        grand_total = {
+            'hombres': sum(data_by_user[uid]['hombres'] for uid in sorted_user_ids),
+            'mujeres': sum(data_by_user[uid]['mujeres'] for uid in sorted_user_ids),
+            'total': sum(data_by_user[uid]['total'] for uid in sorted_user_ids),
+        }
+
+        # -------------------------------------------------------------------
+        # Impresión para verificar (coincide con el ejemplo que enviaste: 297)
+        # -------------------------------------------------------------------
+
+        #print("\n--- Resultado por Usuario (Ejemplo) ---")
+        for uid in sorted_user_ids:
+            print(f"Usuario {uid}: Hombres={data_by_user[uid]['hombres']}, "
+                f"Mujeres={data_by_user[uid]['mujeres']}, "
+                f"Total={data_by_user[uid]['total']}")
+
+        #print("\n--- Totales Generales (Ejemplo) ---")
+        #print(f"Gran Total Hombres: {grand_total['hombres']}")
+        #print(f"Gran Total Mujeres: {grand_total['mujeres']}")
+        #print(f"Gran Total General: {grand_total['total']}")
+            
+
+        fieldsView = [
+            "gender",
+            "createdby_id",
+            "age",
+            "county",
+            "state",
+            "willvote"
+        ]
+
+
+        query = session.newQuery(classname)
+        query.addFilter("gender", "isnotnull")
+        #query.addFilter("county", "==", "siquirres")
+        query.addFilter("state", "or", ["san-jose","heredia"])
+        query.addFilter("county", "!=", "sarapiqui")
+        if state:
+            query.addFilter("state", "==", state)
+        if user:
+            user_id = int(user)
+            query.addFilter("createdby_id", "==", user_id)
+        rawResults = query.getMultiFieldStats(fields,"gender")
+        results = getResults(fieldsView,rawResults)
+
+
+        willvote = [
+            "voteScale",
+            "nationalElection",
+            "presidentScale",
+            "congress"
+        ]
+
+        query = session.newQuery(classname)
+        query.addFilter("gender", "isnotnull")
+        query.addFilter("willvote", "==", "Sí")
+        query.addFilter("state", "or", ["san-jose","heredia"])
+        query.addFilter("county", "!=", "sarapiqui")
+        if state:
+            query.addFilter("state", "==", state)
+        if user:
+            user_id = int(user)
+            query.addFilter("createdby_id", "==", user_id)
+        rawResults2 = query.getMultiFieldStats(fields,"gender")
+        willvoteresults = getResults(willvote,rawResults2)
+        #return "hola"
+        return render_template("backend/custom/stats.html", results=results,willvoteresults=willvoteresults, field_definitions=fieldsclass,data_by_user=data_by_user,sorted_user_ids=sorted_user_ids,CLAVE_HOMBRES=CLAVE_HOMBRES,CLAVE_MUJERES=CLAVE_MUJERES,grand_total=grand_total)
+    else:
+        return "Usted no está autorizado a acceder a esta página."
+    
