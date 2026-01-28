@@ -1264,8 +1264,8 @@ def stat_backup():
         query = session.newQuery(classname)
         query.addFilter("gender", "isnotnull")
         #query.addFilter("county", "==", "siquirres")
-        query.addFilter("state", "or", ["san-jose","heredia"])
-        query.addFilter("county", "!=", "sarapiqui")
+        #query.addFilter("state", "or", ["san-jose","heredia"])
+        query.addFilter("religion", "==", "Cristiano / Evangélico (todas las demás)")
         if state:
             query.addFilter("state", "==", state)
         if user:
@@ -1285,8 +1285,7 @@ def stat_backup():
         query = session.newQuery(classname)
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
-        query.addFilter("state", "or", ["san-jose","heredia"])
-        query.addFilter("county", "!=", "sarapiqui")
+        query.addFilter("religion", "==", "Cristiano / Evangélico (todas las demás)")
         if state:
             query.addFilter("state", "==", state)
         if user:
