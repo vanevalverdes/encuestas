@@ -884,7 +884,7 @@ def stat(classid):
         CLAVE_MUJERES = 'M'
 
         countUserDayQ = session.newQuery(classname)
-        countUserDayQ.addFilter("category", "==", "1")
+        #countUserDayQ.addFilter("category", "==", "1")
         if date:
             countUserDayQ.addFilter("created_at", ">", date)
         if county:
@@ -955,7 +955,7 @@ def stat(classid):
         ]
 
         query = session.newQuery(classname)
-        query.addFilter("category", "==", "1")
+        #query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
         if county:
             query.addFilter("county", "==", county)
