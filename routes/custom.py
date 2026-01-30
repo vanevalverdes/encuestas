@@ -977,7 +977,7 @@ def stat(classid):
         ]
 
         query = session.newQuery(classname)
-        query.addFilter("category", "==", "1")
+        #query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
 
