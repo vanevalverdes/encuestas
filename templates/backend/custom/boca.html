@@ -19,21 +19,28 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="bg-white shadow-sm rounded-3 p-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-light fw-semibold">
+                        Datos de votación presidencial
+                    </div>
                     <div class="card-body">
                         <div class="row g-4">
                             <div class="col-md-12">
                                 {{ macros.fieldFormSurvey(fields["presidente_PPSO"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["presidente_NR"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["presidente_PNG"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["presidente_PLN"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["presidente_UP"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["presidente_PLP"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["presidente_FA"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["presidente_CAC"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidente_FA"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidente_Avanza"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidente_NR"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidente_PUSC"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidente_UP"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidente_PNG"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["presidente_PLP"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["presidente_PEN"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["presidente_PSD"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["presidente_Avanza"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["presidente_PUSC"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["presidente_PIN"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["presidente_ACRM"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["presidente_CDS"],record,editable)}}
@@ -47,21 +54,28 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="bg-white shadow-sm rounded-3 p-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-light fw-semibold">
+                        Datos de votación a diputaciones
+                    </div>
                     <div class="card-body">
                         <div class="row g-4">
                             <div class="col-md-12">
                                 {{ macros.fieldFormSurvey(fields["diputado_PPSO"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_NR"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_PNG"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_PLN"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_UP"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_PLP"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_FA"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["diputado_CAC"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PLN"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_FA"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_Avanza"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_NR"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_UP"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PUSC"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PLP"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PNG"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["diputado_PEN"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["diputado_PSD"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_Avanza"],record,editable)}}
-                                {{ macros.fieldFormSurvey(fields["diputado_PUSC"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["diputado_PIN"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["diputado_ACRM"],record,editable)}}
                                 {{ macros.fieldFormSurvey(fields["diputado_CDS"],record,editable)}}
@@ -82,6 +96,6 @@
                     </div>
                 </div>
             </div>
-                <button type="submit" class="btn btn-sm btn-secondary" form="form-record"><span class="material-icons align-middle">save</span>Guardar</button>
+                <button type="submit" class="btn btn-sm btn-secondary mt-5" form="form-record"><span class="material-icons align-middle">save</span>Guardar</button>
             </form>
 {% endblock %}

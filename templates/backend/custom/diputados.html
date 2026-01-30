@@ -1,0 +1,50 @@
+{% import "backend/macros.html" as macros %}
+{% extends "backend/custom/surround.html" %}
+
+{% block content %}
+
+            <form method="post" enctype="multipart/form-data" id="form-record">
+            <!-- Inputs ocultos -->
+            <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
+            <h1>Control de diputados - Febrero 2026</h1>
+            <div class="bg-white shadow-sm rounded-3 p-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-light fw-semibold">
+                        Datos de diputaciones electas
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                {{ macros.fieldFormSurvey(fields["diputado_PPSO"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PLN"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_CAC"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_FA"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_Avanza"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_NR"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PUSC"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_UP"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PLP"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PNG"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PEN"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PSD"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PIN"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_ACRM"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_CDS"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_CR1"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PJSC"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_UCD"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PEL"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PT"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_PACO"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_CU"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_Compatriotas"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_ActuemosYa"],record,editable)}}
+                                {{ macros.fieldFormSurvey(fields["diputado_Otro"],record,editable)}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <button type="submit" class="btn btn-sm btn-secondary mt-5" form="form-record"><span class="material-icons align-middle">save</span>Guardar</button>
+            </form>
+{% endblock %}

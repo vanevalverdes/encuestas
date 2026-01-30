@@ -236,6 +236,48 @@ def create_user():
         db.session.commit()
     return "Custom URLs"
 """
+@blueprintname.route(f'/{slug}/boca-de-urna', methods=['GET', 'POST'])
+@login_required
+def survey_urna():
+    from utils.view_class_container_fields import get_clazz_fields
+    
+    fields = get_clazz_fields(6)
+    classname = application.getClazzName(6)
+
+    if request.method == "GET":
+        return render_template("backend/custom/boca.html", fields=fields)
+
+    elif request.method == "POST":
+        modelClass = session.getClazz(classname)
+        # Uso de la clase importada
+        Record = modelClass()
+        session.saveForm(Record,fields)
+        db.session.add(Record)
+        db.session.commit()
+        flash('Encuesta enviada exitosamente.', 'success')
+        return render_template("backend/custom/boca.html", fields=fields)
+
+@blueprintname.route(f'/{slug}/diputados-electos', methods=['GET', 'POST'])
+@login_required
+def survey_diputados():
+    from utils.view_class_container_fields import get_clazz_fields
+    
+    fields = get_clazz_fields(9)
+    classname = application.getClazzName(9)
+
+    if request.method == "GET":
+        return render_template("backend/custom/diputados.html", fields=fields)
+
+    elif request.method == "POST":
+        modelClass = session.getClazz(classname)
+        # Uso de la clase importada
+        Record = modelClass()
+        session.saveForm(Record,fields)
+        db.session.add(Record)
+        db.session.commit()
+        flash('Encuesta enviada exitosamente.', 'success')
+        return render_template("backend/custom/diputados.html", fields=fields)
+    
 @blueprintname.route(f'/{slug}/encuesta', methods=['GET', 'POST'])
 @login_required
 def survey():
@@ -930,10 +972,8 @@ def stat(classid):
         results = getResults(fieldsView,rawResults)
 
         willvote = [
-            "voteScale",
             "nationalElection",
-            "presidentScale",
-            "congress"
+            "brokeVote"
         ]
 
         query = session.newQuery(classname)
@@ -1285,7 +1325,7 @@ def stat_backup():
         query = session.newQuery(classname)
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
-        query.addFilter("religion", "==", "Cristiano / Evangélico (todas las demás)")
+        #query.addFilter("religion", "==", "Cristiano / Evangélico (todas las demás)")
         if state:
             query.addFilter("state", "==", state)
         if user:
