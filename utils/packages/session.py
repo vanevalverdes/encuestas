@@ -798,6 +798,28 @@ class Query:
         # Fallback en caso de que la consulta no devuelva nada
         return {f: 0 for f in fieldnames}
     
+    def sortByNumeric(self, fieldname, direction="asc"):
+        """
+        Ordena los resultados convirtiendo el campo a un tipo numérico (Integer).
+        Esto soluciona el problema donde '10' aparece antes que '2'.
+        """
+        from sqlalchemy import cast, Integer
+        
+        # Obtenemos la columna del modelo
+        column = getattr(self.model_class, fieldname)
+        
+        # Aplicamos el cast a Integer para que la DB ordene 1, 2, 3... 10
+        order_criterion = cast(column, Integer)
+        
+        if direction.lower() == "desc":
+            order_criterion = order_criterion.desc()
+        else:
+            order_criterion = order_criterion.asc()
+        
+        # Actualizamos la consulta original con el nuevo criterio
+        self.query = self.query.order_by(order_criterion)
+        return self
+    
 class table:
     def __init__(self, model_class, records=None):
         self.model_class = model_class

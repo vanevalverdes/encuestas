@@ -317,7 +317,10 @@ class Query:
         else:
             raise ValueError("direction must be 'asc' or 'desc'")
         return self
-    
+
+
+
+
     def groupBy(self, fieldname):
         from itertools import groupby
         from operator import attrgetter
@@ -336,6 +339,7 @@ class Query:
     def count(self):
         return self.query.count()
     
+
 class table:
     def __init__(self, classname, records=None):
         module_path = f'models.production.{classname.lower()}'

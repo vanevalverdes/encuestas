@@ -11,6 +11,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -112,7 +113,7 @@
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
                     </span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Última actualización: 15:00 hrs</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">La página se recargará automáticamente cada 5 minutos.</span>
                 </div>
             </div>
         </div>
@@ -134,9 +135,9 @@
         </div>
         <div class="p-4 border-t border-border-light space-y-2">
             <button
-                class="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-primary text-white text-sm font-bold">
+                class="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-primary text-white text-sm font-bold" onclick="hardRefresh()">
                 <span class="material-symbols-outlined text-[18px]">refresh</span>
-                <span>Update Dashboard</span>
+                <span>Recargar datos</span>
             </button>
         </div>
     </aside>
@@ -148,7 +149,7 @@
                     <p class="text-slate-500 text-sm font-medium">Composición de la Asamblea Legislativa 2026-2030</p>
                 </div>
                 <div class="px-4 py-2 bg-slate-100 rounded-full border border-slate-200">
-                    <span class="text-xs font-bold text-slate-600">Última actualización: 15:00 hrs</span>
+                    <p class="text-xs font-bold text-slate-600">Última actualización: <span id="last-update" class="font-mono font-bold text-blue-600">Cargando...</span></p>
                 </div>
             </div>
             <div class="flex flex-col items-center">
@@ -304,167 +305,747 @@
                 <span class="material-symbols-outlined text-primary text-xl">broadcast_on_home</span>
                 Live Results Feed
             </h3>
+            <form action="">
             <div class="grid grid-cols-2 gap-2">
-                <select class="block w-full text-xs font-bold rounded-lg border-slate-200 bg-white focus:ring-primary">
-                    <option>All Provinces</option>
-                    <option>San José</option>
-                    <option>Alajuela</option>
+                <select 
+                    name="state" 
+                    class="block w-full text-xs font-bold rounded-lg border-slate-200 bg-white focus:ring-primary cursor-pointer"
+                    onchange="this.form.submit()"
+                >
+                    <option value="">Todas las Provincias</option>
+                    {% set provinces = [
+                        ('San José', 'San José'),
+                        ('Alajuela', 'Alajuela'),
+                        ('Cartago', 'Cartago'),
+                        ('Heredia', 'Heredia'),
+                        ('Guanacaste', 'Guanacaste'),
+                        ('Puntarenas', 'Puntarenas'),
+                        ('Limón', 'Limón')
+                    ] %}
+                    
+                    {% for val, label in provinces %}
+                        <option value="{{ val }}" {% if request.args.state == val %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
                 </select>
-                <select class="block w-full text-xs font-bold rounded-lg border-slate-200 bg-white focus:ring-primary">
+                <select class="block w-full text-xs font-bold rounded-lg border-slate-200 bg-white focus:ring-primary" name="party" onchange="this.form.submit()">
                     <option>All Parties</option>
-                    <option>PLN</option>
-                    <option>PUSC</option>
+                    <option value="ppso" {% if request.args.party == 'ppso' %}selected{% endif %}>PPSO</option>
+                    <option value="pln" {% if request.args.party == 'pln' %}selected{% endif %}>PLN</option>
+                    <option value="fa" {% if request.args.party == 'fa' %}selected{% endif %}>FA</option>
+                    <option value="cac" {% if request.args.party == 'cac' %}selected{% endif %}>CAC</option>
+                    <option value="pusc" {% if request.args.party == 'pusc' %}selected{% endif %}>PUSC</option>
+                    <option value="avanza" {% if request.args.party == 'avanza' %}selected{% endif %}>Avanza</option>
+                    <option value="actuemos" {% if request.args.party == 'actuemos ya' %}selected{% endif %}>Actuemos Ya</option>
+                    <option value="up" {% if request.args.party == 'up' %}selected{% endif %}>UP</option>
+                    <option value="nr" {% if request.args.party == 'nr' %}selected{% endif %}>NR</option>
+                    <option value="plp" {% if request.args.party == 'plp' %}selected{% endif %}>PLP</option>
                 </select>
             </div>
+            </form>
         </div>
         <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-            <div
-                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD6JvE1ZhwdZZx0XLrYS-ORf9g17TqblvuttZodB_rEIYGKWt2HFuMJFgLw5gCoGnjPYfEjSw-uO2h2KlW8Uqa7YJ2xrrK2mGGc1epZuT6J3pep1lCwExn0zImvyeKwv5rZieFgNqrrtMqYyIK9kg9TetQ4cphJ7U0G9v2hl_Nebv-aqSrW5W4Jm6W5UEOGn93ZnMq80-og0gvGZGbtNqEmc44t9YxrxD_pM1BUriBTsuqodfMCa5x-ES56eGzD5WjEpNbJepUdR6Y');">
-                        </div>
-                        <div class="absolute -bottom-1 -right-1 bg-party-pln rounded-full p-0.5 border-2 border-white">
-                            <span class="block w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-sm font-bold text-slate-900 truncate">Rodrigo Arias</h4>
-                            <span class="text-[10px] font-black text-party-pln uppercase">Confirmed</span>
-                        </div>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-[11px] font-bold text-slate-400">PLN • San José</p>
-                            <p class="text-xs font-black text-slate-800">32.4%</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCU_Oikn9BKleF3rwudq7wvPKCgBoLjdsYZ3eCjTW7zfHTH9fmaeiAW1lyNhVLlPYjDtl9Iy-oo0mJtGb36fBT0UfPl9M95mGIioO4vY8NxdZNRjNu_5Hpc-8b9-wrd2hNxqJdcdfUJH5aquPRX5Vt0yEXr8OFkRP7P-tdtb1ljNZt5CLgh99iItgNmRbqB9uPSrP4Y1uhvAE6XGpkyHFIj4o7UaifSZMr2qeW2u3QBGGRwDrwXLwC2Kk4uza3vFdlwjkRdfFvL4xc');">
-                        </div>
-                        <div class="absolute -bottom-1 -right-1 bg-party-ppsd rounded-full p-0.5 border-2 border-white">
-                            <span class="block w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-sm font-bold text-slate-900 truncate">Pilar Cisneros</h4>
-                            <span class="text-[10px] font-black text-party-ppsd uppercase">Confirmed</span>
-                        </div>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-[11px] font-bold text-slate-400">PPSD • San José</p>
-                            <p class="text-xs font-black text-slate-800">28.1%</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCB4mVfRKg8rNWzbIjggMwncybHl6UAw6wi9KSmMiWze2b3xa2NnP2s5-2EMZHcFx_FMJywqUBc01XsB-kkqUsEE424IQauGV6R4dxuVknUsnRGGIvvHGfTUsuCYRhE8SsCwfw_N7Ts350MISslse7oR8Y3A0EvSgJX2Vsgj2FMMGZIqavrXl1-5UhKq1tErc8Oj4cIUlX1c97k-CAUNQexiVd0w9XCR2VV1aYDs16kvfr09XGNeKmF9sxD3fN7ZHtI-zKhk3hF1Ms');">
-                        </div>
-                        <div class="absolute -bottom-1 -right-1 bg-party-pusc rounded-full p-0.5 border-2 border-white">
-                            <span class="block w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-sm font-bold text-slate-900 truncate">Leslye Bojorges</h4>
-                            <span class="text-[10px] font-black text-party-pusc uppercase">Confirmed</span>
-                        </div>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-[11px] font-bold text-slate-400">PUSC • Alajuela</p>
-                            <p class="text-xs font-black text-slate-800">21.5%</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer border-l-4 border-l-slate-400">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCztaCKg9_tUTr_7OeQy_JAWj00g32J7kVGnZn6QvHyznq1qg09P0weMVlCUgE3m-bBBVz4_VzqLBK3VmtwhlZAuAQIe8iBBNUwl6ye_qod2bLgyb9zbs6NBe5vzyP6zaCoElR_-z78hmDj1qkUgZsHoVvCJ39gjn-9S1MtkYKUfzQTbmh6jibmjwbvVB_JbKsCHMO8FvQiR3MDptpETXJE39bpBHLsgjaBpj0-N6-tta0HWdeJjA4-9xh_av4m0aguHK8Zorhukg0');">
-                        </div>
-                        <div class="absolute -bottom-1 -right-1 bg-party-fa rounded-full p-0.5 border-2 border-white">
-                            <span class="block w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-sm font-bold text-slate-900 truncate">Sofía Guillén</h4>
-                            <span class="text-[10px] font-black text-slate-400 uppercase">Leading +1.2%</span>
-                        </div>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-[11px] font-bold text-slate-400">FA • San José</p>
-                            <p class="text-xs font-black text-slate-800">11.9%</p>
-                        </div>
-                        <div class="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-party-fa w-[45%]"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer border-l-4 border-l-slate-400">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAYZo7ntL_OM152zrp1wPNMLeXkHRwEOgpJQxGsa21A9V24_IcwPhPCJ-b7el1arwMmfJbF9fxcXUjVzyoyMCiOTn6GXdnhWKMUGZaDf6b_lBjj2bljpdczslEQo9mDPLHO2BmjVtfbf-HlcFokVwDDbDzEli5iohHqo_V0_O9NlfnlK-6lXfzEP_7GBpfczqocOlqVC8zxdfxq54mgTSxYT97U198PKwTTCCj4omDEOKJnIhpxi2J3HUPqW9A10QFm4i9udgxjfJs');">
-                        </div>
-                        <div class="absolute -bottom-1 -right-1 bg-party-nr rounded-full p-0.5 border-2 border-white">
-                            <span class="block w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-sm font-bold text-slate-900 truncate">Fabricio Alvarado</h4>
-                            <span class="text-[10px] font-black text-slate-400 uppercase">Leading +0.4%</span>
-                        </div>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-[11px] font-bold text-slate-400">NR • Heredia</p>
-                            <p class="text-xs font-black text-slate-800">18.2%</p>
-                        </div>
-                        <div class="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-party-nr w-[60%]"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
-                <div class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
-                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPQVDt6CwgtiFHicpHx_GPbkTu-Op_XPzPYgZH36M19AM6MsfSDzSoKXW5KSiWSQlrqV5MyFmFNZGVPrNHSt6bbHWKBdiR23lH25WkFyDFeVgYybT9NkxnkYkCmbNvYyUEL_NvC4WpK8pQ_8DYoyV_ja12nwrFsqrnCIrZ1Ha2xnK1hddJI-HX9RiQ_IeOe6mKspTLfjqOz5UGoa5N9nho1tlbTFbsxtEYp6HbgX1IaPBFrnPZtpylOKX74aq6wRclvAkfeOiDCbc');">
-                        </div>
-                        <div class="absolute -bottom-1 -right-1 bg-party-pln rounded-full p-0.5 border-2 border-white">
-                            <span class="block w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start">
-                            <h4 class="text-sm font-bold text-slate-900 truncate">Dinorah Barquero</h4>
-                            <span class="text-[10px] font-black text-party-pln uppercase">Confirmed</span>
-                        </div>
-                        <div class="flex justify-between items-end mt-1">
-                            <p class="text-[11px] font-bold text-slate-400">PLN • Alajuela</p>
-                            <p class="text-xs font-black text-slate-800">25.3%</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        {% if request.args.party %}
+        {% set party = request.args.party %}
+        {% set value = seats[party] %}
+        
+            {% if value.total > 0 and value.diputados %}
+                {% if value.sanjose > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de San José #}
+                        {% if record.state == 'San José' and ns.count < value.sanjose %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.alajuela > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Alajuela #}
+                        {% if record.state == 'Alajuela' and ns.count < value.alajuela %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.heredia > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Heredia #}
+                        {% if record.state == 'Heredia' and ns.count < value.heredia %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.cartago > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Cartago #}
+                        {% if record.state == 'Cartago' and ns.count < value.cartago %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.guanacaste > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Guanacaste #}
+                        {% if record.state == 'Guanacaste' and ns.count < value.guanacaste %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.puntarenas > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Puntarenas #}
+                        {% if record.state == 'Puntarenas' and ns.count < value.puntarenas %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.limon > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Limón #}
+                        {% if record.state == 'Limón' and ns.count < value.limon %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        {% else %}
+        {% for party, value in seats.items() %}
+            {% if value.total > 0 and value.diputados %}
+                {% if value.sanjose > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de San José #}
+                        {% if record.state == 'San José' and ns.count < value.sanjose %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.alajuela > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Alajuela #}
+                        {% if record.state == 'Alajuela' and ns.count < value.alajuela %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.heredia > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Heredia #}
+                        {% if record.state == 'Heredia' and ns.count < value.heredia %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.cartago > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Cartago #}
+                        {% if record.state == 'Cartago' and ns.count < value.cartago %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.guanacaste > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Guanacaste #}
+                        {% if record.state == 'Guanacaste' and ns.count < value.guanacaste %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.puntarenas > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Puntarenas #}
+                        {% if record.state == 'Puntarenas' and ns.count < value.puntarenas %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if value.limon > 0 %}
+                    {# Usamos namespace para que el contador sea persistente #}
+                    {% set ns = namespace(count=0) %}
+                    
+                    {% for record in value.diputados %}
+                        {% set record = record|toORM() %}
+                        
+                        {# Verificamos el estado y que no hayamos superado el límite de Limón #}
+                        {% if record.state == 'Limón' and ns.count < value.limon %}
+                            <div class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative">
+                                        {% if record.image_id %}
+                                            {% set url_image = url_for('application.get_blob', blob_id=record.image_id) %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                                                style="background-image: url('{{ url_image }}');">
+                                            </div>
+                                        {% else %}
+                                            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 flex items-center justify-center overflow-hidden">
+                                                <svg class="w-full h-full text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                        <div class="absolute -bottom-1 -right-1 bg-party-{{party}} rounded-full p-0.5 border-2 border-white">
+                                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start">
+                                            <h4 class="text-sm font-bold text-slate-900 truncate">{{ record.name }}</h4>
+                                            <span class="text-[10px] font-black text-party-{{party}} uppercase">Confirmado</span>
+                                        </div>
+                                        <div class="flex justify-between items-end mt-1">
+                                            <p class="text-[11px] font-bold text-slate-400">{{record.party}} • {{ record.state }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {# Incrementamos el contador del namespace #}
+                            {% set ns.count = ns.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% endif %}
         </div>
     </aside>
-
 </body>
+<script>
+        /**
+         * Función para formatear y mostrar la hora actual
+         */
+        function updateTimestamp() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0'); // Opcional
+            
+            const timeString = `${hours}:${minutes}:${seconds} hrs`;
+            
+            // Mostrar en el DOM
+            document.getElementById('last-update').textContent = timeString;
+        }
+        function hardRefresh() {
+            // window.location.origin + pathname elimina todo lo que esté después del '?'
+            window.location.href = window.location.origin + window.location.pathname;
+        }
+        /**
+         * Función para configurar la recarga automática
+         * @param {number} minutes - Intervalo en minutos
+         */
+        function setupAutoRefresh(minutes) {
+            const ms = minutes * 60 * 1000;
+            
+            setTimeout(() => {
+                // Si necesitas usar un refresh token antes de recargar,
+                // podrías llamar a tu lógica de validación aquí.
+                console.log("Recargando página...");
+                window.location.reload();
+            }, ms);
+        }
 
+        // Ejecutar al cargar la página
+        window.onload = () => {
+            // 1. Mostrar la hora en que se cargó/actualizó la página
+            updateTimestamp();
+
+            // 2. Iniciar cronómetro de 5 minutos para recarga
+            setupAutoRefresh(5);
+        };
+    </script>
 </html>

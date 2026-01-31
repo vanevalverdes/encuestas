@@ -1348,6 +1348,7 @@ def stat_backup():
 @login_required
 def final():
     query = session.newQuery(9)
+    state = request.args.get('state', None)
 
     sanjose = session.getRecord("diputadoelecto",1)
     alajuela = session.getRecord("diputadoelecto",2)
@@ -1358,31 +1359,31 @@ def final():
     limon = session.getRecord("diputadoelecto",7)
 
     partys = [
-    ["ppso","Pueblo Soberano","diputado_PPSO"],
-    ["pln","PLN","diputado_PLN"],
-    ["cac","Agenda Ciudadana","diputado_CAC"],
-    ["fa","FA","diputado_FA"],
-    ["actuemos","Actuemos Ya","diputado_ActuemosYa"],
-    ["avanza","Avanza","diputado_Avanza"],
-    ["plp","Liberal Progresista","diputado_PLP"],
-    ["nr","Nueva República","diputado_NR"],
-    ["acrm","Aquí CR manda","diputado_ACRM"],
-    ["cds","Centro Democrático Social","diputado_CDS"],
-    ["up","Unidos Podemos","diputado_UP"],
-    ["cr1","CR1","diputado_CR1"],
-    ["cu","Comunal Unido","diputado_CU"],
-    ["compatriotas","Compatriotas","diputado_Compatriotas"],
-    ["paco","Anticorrupción Costa.","diputado_PACO"],
-    ["pel","Esperanza y Libertad","diputado_PEL"],
-    ["pen","Esperanza Nacional","diputado_PEN"],
-    ["pin","PIN","diputado_PIN"],
-    ["pjsc","Justicia Social Cost.","diputado_PJSC"],
-    ["png","PNG","diputado_PNG"],
-    ["psd","Progreso Social Democ.","diputado_PSD"],
-    ["pt","De los Trabajadores","diputado_PT"],
-    ["pusc","PUSC","diputado_PUSC"],
-    ["ucd","UCD","diputado_UCD"],
-    ["others","En disputa","diputado_Otro"],
+        ["ppso","Pueblo Soberano","diputado_PPSO"],
+        ["pln","PLN","diputado_PLN"],
+        ["cac","Agenda Ciudadana","diputado_CAC"],
+        ["fa","FA","diputado_FA"],
+        ["actuemos","Actuemos Ya","diputado_ActuemosYa"],
+        ["avanza","Avanza","diputado_Avanza"],
+        ["plp","Liberal Progresista","diputado_PLP"],
+        ["nr","Nueva República","diputado_NR"],
+        ["acrm","Aquí CR manda","diputado_ACRM"],
+        ["cds","Centro Democrático Social","diputado_CDS"],
+        ["up","Unidos Podemos","diputado_UP"],
+        ["cr1","CR1","diputado_CR1"],
+        ["cu","Comunal Unido","diputado_CU"],
+        ["compatriotas","Compatriotas","diputado_Compatriotas"],
+        ["paco","Anticorrupción Costa.","diputado_PACO"],
+        ["pel","Esperanza y Libertad","diputado_PEL"],
+        ["pen","Esperanza Nacional","diputado_PEN"],
+        ["pin","PIN","diputado_PIN"],
+        ["pjsc","Justicia Social Cost.","diputado_PJSC"],
+        ["png","PNG","diputado_PNG"],
+        ["psd","Progreso Social Democ.","diputado_PSD"],
+        ["pt","De los Trabajadores","diputado_PT"],
+        ["pusc","PUSC","diputado_PUSC"],
+        ["ucd","UCD","diputado_UCD"],
+        ["others","En disputa","diputado_Otro"],
     ]
 
     seats = {}
@@ -1400,5 +1401,81 @@ def final():
             "guanacaste":int(guanacaste.get(party[2])) if guanacaste.get(party[2]) else 0
         }
 
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 20)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["pln"]["diputados"] = diputados.getTable()._records
+    
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 16)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["ppso"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 25)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["pusc"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 9)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["actuemos"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 17)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["avanza"]["diputados"] = diputados.getTable()._records
+    
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 8)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["compatriotas"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 24)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["fa"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 13)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["nr"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 5)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["up"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 15)
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["plp"]["diputados"] = diputados.getTable()._records
+
+    diputados = session.newQuery("candidate")
+    diputados.addFilter("party", "==", 12)   
+    diputados.sortByNumeric("order")
+    if state:
+        diputados.addFilter("state", "==", state)
+    seats["cac"]["diputados"] = diputados.getTable()._records
 
     return render_template("backend/custom/panel.html", seats=seats)

@@ -21,7 +21,10 @@ def setup_jinja2(app):
         elif hasattr(s, 'to_dict'):
             return urlencode(s.to_dict(flat=False))
         return s
-    env.filters['urlencode_filter'] = urlencode_filter
+
+    def toORM(s):
+        return (s.getORMRecord() if hasattr(s, 'getORMRecord') else s)
+    env.filters['toORM'] = toORM
 
     def from_json_filter(s):
         import json
