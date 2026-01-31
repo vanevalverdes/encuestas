@@ -71,27 +71,27 @@
         }
     </style>
     <style>
-    .bg-party-pln { background-color: #009c3b; }
+    .bg-party-pln, .bg-party-presidente_PLN { background-color: #009c3b !important; }
     .border-l-party-pln { border-color: #009c3b !important; }
-    .bg-party-pusc { background-color: #105ba5; }
+    .bg-party-pusc, .bg-party-presidente_PUSC { background-color: #105ba5 !important; }
     .border-l-party-pusc { border-color: #105ba5 !important; }
-    .bg-party-ppso { background-color: #00bfa5; }
+    .bg-party-ppso, .bg-party-presidente_PPSO { background-color: #00bfa5 !important; }
     .border-l-party-ppso { border-color: #00bfa5 !important; }
-    .bg-party-fa { background-color: #facc15; }
+    .bg-party-fa, .bg-party-presidente_FA { background-color: #facc15 !important; }
     .border-l-party-fa { border-color: #facc15 !important; }
-    .bg-party-nr { background-color: #8b5cf6; }
+    .bg-party-nr, .bg-party-presidente_NR { background-color: #8b5cf6 !important; }
     .border-l-party-nr { border-color: #8b5cf6 !important; }
-    .bg-party-avanza { background-color:hsl(5, 100%, 35%); }
+    .bg-party-avanza, .bg-party-presidente_Avanza { background-color:hsl(5, 100%, 35%) !important; }
     .border-l-party-avanza { border-color: hsl(5, 100%, 35%) !important; }
-    .bg-party-plp { background-color: #ffb400; }
+    .bg-party-plp, .bg-party-presidente_PLP { background-color: #ffb400 !important; }
     .border-l-party-plp { border-color: #ffb400 !important; }
-    .bg-party-actuemos { background-color: #7c3aed; }
+    .bg-party-actuemos, .bg-party-presidente_Actuemos { background-color: #7c3aed !important; }
     .border-l-party-actuemos { border-color: #7c3aed !important; }
-    .bg-party-upc { background-color: #ff5722; }
-    .border-l-party-upc { border-color: #ff5722 !important; }
-    .bg-party-cac { background-color: hsl(7, 74%, 56%); }
+    .bg-party-up, .bg-party-presidente_UP { background-color: #ff5722 !important; }
+    .border-l-party-up { border-color: #ff5722 !important; }
+    .bg-party-cac, .bg-party-presidente_CAC { background-color: hsl(7, 74%, 56%) !important; }
     .border-l-party-cac { border-color: hsl(7, 74%, 56%) !important; }
-    .bg-party-others { background-color: #cbd5e1; }
+    .bg-party-others, .bg-party-presidente_Otros { background-color: #cbd5e1 ; }
     .border-l-party-others { border-color: #cbd5e1 !important; }
     </style>
 </head>
@@ -179,131 +179,56 @@
                 </div>
             </div>
         </section>
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <div class="bg-card-light border border-border-light rounded-2xl p-6 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">map</span>
-                    Distribución por Provincia
-                </h3>
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-                            <span>San José</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                            {% for seat,value in seats.items() %}
-                            {% if value.sanjose and value.sanjose > 0 %}
-                            {% set percent = (value.sanjose / 18 * 100) if value.total > 0 else 0 %}
-                            {% set percent = percent|round(2) %}
-                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-                            <span>Alajuela</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                            {% for seat,value in seats.items() %}
-                            {% if value.alajuela and value.alajuela > 0 %}
-                            {% set percent = (value.alajuela / 12 * 100) if value.total > 0 else 0 %}
-                            {% set percent = percent|round(2) %}
-                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-                            <span>Cartago</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                            {% for seat,value in seats.items() %}
-                            {% if value.cartago and value.cartago > 0 %}
-                            {% set percent = (value.cartago / 6 * 100) if value.total > 0 else 0 %}
-                            {% set percent = percent|round(2) %}
-                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-
-
+        <section class="bg-card-light border border-border-light rounded-2xl p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-10">
+                <div>
+                    <p class="text-slate-500 text-sm font-medium">Votos a la Presidencia de la República</p>
                 </div>
             </div>
-            <div class="bg-card-light border border-border-light rounded-2xl p-6 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                    
-                </h3>
-                <div class="space-y-6">
-                    <div>
-                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-                            <span>Heredia</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                            {% for seat,value in seats.items() %}
-                            {% if value.heredia and value.heredia > 0 %}
-                            {% set percent = (value.heredia / 5 * 100) if value.total > 0 else 0 %}
-                            {% set percent = percent|round(2) %}
-                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-                            <span>Guanacaste</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                            {% for seat,value in seats.items() %}
-                            {% if value.guanacaste and value.guanacaste > 0 %}
-                            {% set percent = (value.guanacaste / 5 * 100) if value.total > 0 else 0 %}
-                            {% set percent = percent|round(2) %}
-                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-                            <span>Puntarenas</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                            {% for seat,value in seats.items() %}
-                            {% if value.puntarenas and value.puntarenas > 0 %}
-                            {% set percent = (value.puntarenas / 6 * 100) if value.total > 0 else 0 %}
-                            {% set percent = percent|round(2) %}
-                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
-                            <span>Limón</span>
-                        </div>
-                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
-                            {% for seat,value in seats.items() %}
-                            {% if value.limon and value.limon > 0 %}
-                            {% set percent = (value.limon / 5 * 100) if value.total > 0 else 0 %}
-                            {% set percent = percent|round(2) %}
-                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
+            <div class="flex flex-col items-center">
+                <div class="w-full">
+                    <!-- Barra de Progreso Acumulada -->
+                    <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                        {% for party_key, data in seats["presidencia"]["partys"].items() %}
+                            {% if data.total > 0 %}
+                                {% set percent = (data.total / seats["presidencia"]["totalPresidencia"] * 100) if seats["presidencia"]["totalPresidencia"] > 0 else 0 %}
+                                <!-- Usamos style para el ancho dinámico y reemplazamos 'presidente_' para la clase de color si es necesario -->
 
+                                <div class="h-full bg-party-presidente_Otros bg-party-{{ party_key }} w-[{{ percent|round(2) }}%]"></div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Leyenda con Porcentajes -->
+                <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 border-t border-slate-100 w-full">
+                    {% for party_key, data in seats["presidencia"]["partys"].items() %}
+                        {% if data.total > 0 %}
+                            {% set percent = (data.total / seats["presidencia"]["totalPresidencia"] * 100) if seats["presidencia"]["totalPresidencia"] > 0 else 0 %}
+                            <div class="flex flex-col items-start px-2">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="w-3 h-3 rounded-full bg-party-{{ party_key.replace('presidente_', '') }}"></span>
+                                    <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">
+                                        {{ party_key.replace('presidente_', '') }}
+                                    </span>
+                                </div>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-lg font-bold text-slate-700">{{ percent|round(2) }}%</span>
+                                    <span class="text-[10px] text-slate-400">({{ data.total }})</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
+        </section>
 
-        </div>
     </main>
     <aside class="w-96 h-full flex flex-col bg-card-light border-l border-border-light shadow-2xl relative z-10">
         <div class="p-6 border-b border-border-light bg-slate-50/50">
             <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2 mb-4">
                 <span class="material-symbols-outlined text-primary text-xl">broadcast_on_home</span>
-                Live Results Feed
+                Diputados Electos
             </h3>
             <form action="">
             <div class="grid grid-cols-2 gap-2">
@@ -330,7 +255,7 @@
                     {% endfor %}
                 </select>
                 <select class="block w-full text-xs font-bold rounded-lg border-slate-200 bg-white focus:ring-primary" name="party" onchange="this.form.submit()">
-                    <option>All Parties</option>
+                    <option value="">Todos los partidos</option>
                     <option value="ppso" {% if request.args.party == 'ppso' %}selected{% endif %}>PPSO</option>
                     <option value="pln" {% if request.args.party == 'pln' %}selected{% endif %}>PLN</option>
                     <option value="fa" {% if request.args.party == 'fa' %}selected{% endif %}>FA</option>
@@ -1002,6 +927,13 @@
             {% endif %}
         {% endfor %}
         {% endif %}
+        </div>
+        <div class="p-4 border-t border-border-light space-y-2">
+            <a href="{{ url_for('application.logout') }}"
+                class="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-primary text-white text-sm font-bold">
+                <span class="material-symbols-outlined text-[18px]">exit_to_app</span>
+                <span>Salir</span>
+        </a>
         </div>
     </aside>
 </body>

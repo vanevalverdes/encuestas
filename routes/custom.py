@@ -1347,17 +1347,57 @@ def stat_backup():
 @blueprintname.route(f'/final/resultados')
 @login_required
 def final():
-    query = session.newQuery(9)
-    state = request.args.get('state', None)
+    fieldnames = [
+    "presidente_PPSO",
+    "presidente_PLN",
+    "presidente_Avanza",
+    "presidente_CAC",
+    "presidente_PUSC",
+    "presidente_UP",
+    "presidente_FA",
+    "presidente_NR",
+    "presidente_PLP",
+    "presidente_PNG",
+    "presidente_PSD",
+    "presidente_PEL",
+    "presidente_PEN",
+    "presidente_PIN",
+    "presidente_CDS",
+    "presidente_ACRM",
+    "presidente_PJSC",
+    "presidente_CR1",
+    "presidente_PT",
+    "presidente_UCD",
+    "presidente_Nulo",
+    "presidente_Blanco"
+    ]
 
-    sanjose = session.getRecord("diputadoelecto",1)
-    alajuela = session.getRecord("diputadoelecto",2)
-    heredia = session.getRecord("diputadoelecto",3)
-    cartago = session.getRecord("diputadoelecto",4)
-    guanacaste = session.getRecord("diputadoelecto",5)
-    puntarenas = session.getRecord("diputadoelecto",6)
-    limon = session.getRecord("diputadoelecto",7)
+    partyDict = {
+        "presidente_PPSO":16,
+        "presidente_PLN":20,
+        "presidente_Avanza":17,
+        "presidente_PUSC":25,
+        "presidente_CAC":12,
+        "presidente_PLP":15,
+        "presidente_NR":13,
+        "presidente_FA":24,
+        "presidente_UP":5,
+        "presidente_PNG":6,
+        "presidente_PSD":3,
+        "presidente_PIN":23,
+        "presidente_PEN":18,
+        "presidente_CR1":22,
+        "presidente_PJSC":2,
+        "presidente_PEL":7,
+        "presidente_ACRM":14,
+        "presidente_CDS":11,
+        "presidente_PT":10,
+        "presidente_UCD":4,
+        "presidente_Blanco":27,
+        "presidente_Nulo":26
+    }
 
+    # 1. Definición de partidos
     partys = [
         ["ppso","Pueblo Soberano","diputado_PPSO"],
         ["pln","PLN","diputado_PLN"],
@@ -1386,20 +1426,72 @@ def final():
         ["others","En disputa","diputado_Otro"],
     ]
 
+    # 2. Carga inicial de registros (una sola vez por provincia)
+    # Mapeamos ID de provincia a una clave legible
+    provincias_docs = {
+        "San José": session.getRecord("diputadoelecto", 1),
+        "Alajuela": session.getRecord("diputadoelecto", 2),
+        "Heredia": session.getRecord("diputadoelecto", 3),
+        "Cartago": session.getRecord("diputadoelecto", 4),
+        "Guanacaste": session.getRecord("diputadoelecto", 5),
+        "Puntarenas": session.getRecord("diputadoelecto", 6),
+        "Limón": session.getRecord("diputadoelecto", 7)
+    }
+
+    query = session.newQuery(9)
+    state = request.args.get('state', None)
     seats = {}
 
-    for party in partys:
-        seats[party[0]] = {
-            "name": party[1],
-            "total": int(query.getSum(party[2])),
-            "sanjose":int(sanjose.get(party[2])) if sanjose.get(party[2]) else 0,
-            "alajuela":int(alajuela.get(party[2])) if alajuela.get(party[2]) else 0,
-            "cartago":int(cartago.get(party[2])) if cartago.get(party[2]) else 0,
-            "heredia":int(heredia.get(party[2])) if heredia.get(party[2]) else 0,
-            "limon":int(limon.get(party[2])) if limon.get(party[2]) else 0,
-            "puntarenas":int(puntarenas.get(party[2])) if puntarenas.get(party[2]) else 0,
-            "guanacaste":int(guanacaste.get(party[2])) if guanacaste.get(party[2]) else 0
+    # Helper para obtener entero de forma segura
+    def get_val(doc, key):
+        if not doc: return 0
+        val = doc.get(key)
+        return int(val) if val else 0
+
+    # 3. Procesamiento de datos
+    for p_id, p_name, p_field in partys:
+        
+        # Extraemos valores de cada provincia para este partido
+        vals = {
+            "sanjose": get_val(provincias_docs["San José"], p_field),
+            "alajuela": get_val(provincias_docs["Alajuela"], p_field),
+            "heredia": get_val(provincias_docs["Heredia"], p_field),
+            "cartago": get_val(provincias_docs["Cartago"], p_field),
+            "guanacaste": get_val(provincias_docs["Guanacaste"], p_field),
+            "puntarenas": get_val(provincias_docs["Puntarenas"], p_field),
+            "limon": get_val(provincias_docs["Limón"], p_field)
         }
+
+        # Determinamos el total
+        if state and state in provincias_docs:
+            # Si hay un estado seleccionado, el total es solo lo de ese estado
+            current_total = vals[state.lower().replace("ó", "o").replace("é", "e").replace(" ", "")]
+        else:
+            # Si no hay estado, usamos la suma global de la query (o sumamos vals)
+            current_total = int(query.getSum(p_field)) if not state else 0
+
+        seats[p_id] = {
+            "name": p_name,
+            "total": current_total,
+            **vals # Incluye automáticamente sanjose, alajuela, etc.
+        }
+    
+    bocaQuery = session.newQuery(6)
+    if state:
+        bocaQuery.addFilter("state", "==", state)
+    bocaResults = bocaQuery.getTotals(fieldnames)
+    bocaTotal = 0
+
+    dictPresidencia = {"partys": {}, "total": 0}
+
+    for field in bocaResults:
+        bocaTotal += bocaResults[field]
+        record = session.getRecord("party", partyDict[field])
+        dictPresidencia["partys"][field] = {"party": record,
+                                  "total": int(bocaResults[field])}
+    dictPresidencia["totalPresidencia"] = int(bocaTotal)
+    seats["presidencia"] = dictPresidencia
+    
 
     diputados = session.newQuery("candidate")
     diputados.addFilter("party", "==", 20)
@@ -1478,4 +1570,6 @@ def final():
         diputados.addFilter("state", "==", state)
     seats["cac"]["diputados"] = diputados.getTable()._records
 
+    print(seats.items())
+    #return ""
     return render_template("backend/custom/panel.html", seats=seats)

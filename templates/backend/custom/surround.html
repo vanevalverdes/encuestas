@@ -131,15 +131,21 @@
                             <li><a class="dropdown-item" href="{{ url_for('custom.stat', classid=4,state="guanacaste") }}">Guanacaste</a></li>
                         </ul>
                     </li>            
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.final') }}">Panel Boca de Urna</a>
+                    </li>
                     {% endif %}
                     {% if current_user.is_authenticated%}
                     <li class="nav-item">
-                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.survey') }}">Nueva encuesta</a>
+                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.survey_urna') }}">Formulario de Boca de Urna</a>
                     </li>
                     {% endif %}
                     {% if current_user.is_authenticated and current_user.usergroup.id == 4 %}
                     <li class="nav-item">
                         <a class="nav-link text-danger fw-semibold" href="{{ url_for('routing.list_record', classid=8,page=1) }}">Fotografías de Candidatos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fw-semibold" href="{{ url_for('custom.final') }}">Panel Boca de Urna</a>
                     </li>
                     {% endif %}
                     
