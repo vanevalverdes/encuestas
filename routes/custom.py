@@ -871,6 +871,7 @@ def stat(classid):
         
         user = request.args.get('user', None)
         county = request.args.get('county', None)
+        nationalElection = request.args.get('nationalElection', None)
 
         fieldsclass = get_clazz_fields(classid)
         fields = [item for item in fieldsclass]
@@ -889,6 +890,8 @@ def stat(classid):
             countUserDayQ.addFilter("created_at", ">", date)
         if county:
             countUserDayQ.addFilter("county", "==", county)
+        if nationalElection:
+            countUserDayQ.addFilter("nationalElection", "==", nationalElection)
         if user:
             user_id = int(user)
             countUserDayQ.addFilter("createdby_id", "==", user_id)
@@ -963,6 +966,8 @@ def stat(classid):
             query.addFilter("created_at", ">", date)
         if state:
             query.addFilter("state", "==", state)
+        if nationalElection:
+            query.addFilter("nationalElection", "==", nationalElection)
         #query.addFilter("state", "==", "puntarenas")
         #query.addFilter("congress", "==", "Social Democrático")
         if user:
@@ -980,7 +985,8 @@ def stat(classid):
         #query.addFilter("category", "==", "1")
         query.addFilter("gender", "isnotnull")
         query.addFilter("willvote", "==", "Sí")
-
+        if nationalElection:
+            query.addFilter("nationalElection", "==", nationalElection)
         if county:
             query.addFilter("county", "==", county)
         if date: 
@@ -1338,3 +1344,61 @@ def stat_backup():
     else:
         return "Usted no está autorizado a acceder a esta página."
     
+@blueprintname.route(f'/final/resultados')
+@login_required
+def final():
+    query = session.newQuery(9)
+
+    sanjose = session.getRecord("diputadoelecto",1)
+    alajuela = session.getRecord("diputadoelecto",2)
+    heredia = session.getRecord("diputadoelecto",3)
+    cartago = session.getRecord("diputadoelecto",4)
+    guanacaste = session.getRecord("diputadoelecto",5)
+    puntarenas = session.getRecord("diputadoelecto",6)
+    limon = session.getRecord("diputadoelecto",7)
+
+    partys = [
+    ["ppso","Pueblo Soberano","diputado_PPSO"],
+    ["pln","PLN","diputado_PLN"],
+    ["cac","Agenda Ciudadana","diputado_CAC"],
+    ["fa","FA","diputado_FA"],
+    ["actuemos","Actuemos Ya","diputado_ActuemosYa"],
+    ["avanza","Avanza","diputado_Avanza"],
+    ["plp","Liberal Progresista","diputado_PLP"],
+    ["nr","Nueva República","diputado_NR"],
+    ["acrm","Aquí CR manda","diputado_ACRM"],
+    ["cds","Centro Democrático Social","diputado_CDS"],
+    ["up","Unidos Podemos","diputado_UP"],
+    ["cr1","CR1","diputado_CR1"],
+    ["cu","Comunal Unido","diputado_CU"],
+    ["compatriotas","Compatriotas","diputado_Compatriotas"],
+    ["paco","Anticorrupción Costa.","diputado_PACO"],
+    ["pel","Esperanza y Libertad","diputado_PEL"],
+    ["pen","Esperanza Nacional","diputado_PEN"],
+    ["pin","PIN","diputado_PIN"],
+    ["pjsc","Justicia Social Cost.","diputado_PJSC"],
+    ["png","PNG","diputado_PNG"],
+    ["psd","Progreso Social Democ.","diputado_PSD"],
+    ["pt","De los Trabajadores","diputado_PT"],
+    ["pusc","PUSC","diputado_PUSC"],
+    ["ucd","UCD","diputado_UCD"],
+    ["others","En disputa","diputado_Otro"],
+    ]
+
+    seats = {}
+
+    for party in partys:
+        seats[party[0]] = {
+            "name": party[1],
+            "total": int(query.getSum(party[2])),
+            "sanjose":int(sanjose.get(party[2])) if sanjose.get(party[2]) else 0,
+            "alajuela":int(alajuela.get(party[2])) if alajuela.get(party[2]) else 0,
+            "cartago":int(cartago.get(party[2])) if cartago.get(party[2]) else 0,
+            "heredia":int(heredia.get(party[2])) if heredia.get(party[2]) else 0,
+            "limon":int(limon.get(party[2])) if limon.get(party[2]) else 0,
+            "puntarenas":int(puntarenas.get(party[2])) if puntarenas.get(party[2]) else 0,
+            "guanacaste":int(guanacaste.get(party[2])) if guanacaste.get(party[2]) else 0
+        }
+
+
+    return render_template("backend/custom/panel.html", seats=seats)

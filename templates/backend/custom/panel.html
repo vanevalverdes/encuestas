@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Newsroom Central: Costa Rica Election Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b6cee",
+                        "background-light": "#f8fafc",
+                        "card-light": "#ffffff",
+                        "border-light": "#e2e8f0"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "2xl": "1.5rem" },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #f1f5f9; 
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #cbd5e1; 
+                border-radius: 10px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8; 
+            }
+        }
+        .hemicircle-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            gap: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .seat {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .seat:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+    </style>
+    <style>
+    .bg-party-pln { background-color: #009c3b; }
+    .border-l-party-pln { border-color: #009c3b !important; }
+    .bg-party-pusc { background-color: #105ba5; }
+    .border-l-party-pusc { border-color: #105ba5 !important; }
+    .bg-party-ppso { background-color: #00bfa5; }
+    .border-l-party-ppso { border-color: #00bfa5 !important; }
+    .bg-party-fa { background-color: #facc15; }
+    .border-l-party-fa { border-color: #facc15 !important; }
+    .bg-party-nr { background-color: #8b5cf6; }
+    .border-l-party-nr { border-color: #8b5cf6 !important; }
+    .bg-party-avanza { background-color:hsl(5, 100%, 35%); }
+    .border-l-party-avanza { border-color: hsl(5, 100%, 35%) !important; }
+    .bg-party-plp { background-color: #ffb400; }
+    .border-l-party-plp { border-color: #ffb400 !important; }
+    .bg-party-actuemos { background-color: #7c3aed; }
+    .border-l-party-actuemos { border-color: #7c3aed !important; }
+    .bg-party-upc { background-color: #ff5722; }
+    .border-l-party-upc { border-color: #ff5722 !important; }
+    .bg-party-cac { background-color: hsl(7, 74%, 56%); }
+    .border-l-party-cac { border-color: hsl(7, 74%, 56%) !important; }
+    .bg-party-others { background-color: #cbd5e1; }
+    .border-l-party-others { border-color: #cbd5e1 !important; }
+    </style>
+</head>
+
+<body class="bg-background-light text-slate-900 font-display h-screen flex overflow-hidden">
+    <aside class="w-80 h-full flex flex-col border-r border-border-light bg-card-light sticky top-0 shrink-0">
+        <div class="p-6 border-b border-border-light">
+            <div class="flex items-center gap-3 mb-6">
+                <div>
+                    <h1 class="text-sm font-extrabold uppercase tracking-tight text-slate-800 leading-none"><img src="{{ url_for('static', filename='opol1.webp') }}" style="height: 50px; margin-right: 20px;">
+                    </h1>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <h2 class="text-xl font-black text-slate-900 leading-tight">Asamblea Legislativa: Boca de Urna</h2>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="flex h-2 w-2 relative">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                    </span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Última actualización: 15:00 hrs</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-3">
+            <p class="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Distribución total</p>
+            <div class="flex flex-col gap-2">
+                {% for key, value in seats.items() %}
+                {% if value.total > 0 %}
+                <div
+                    class="flex items-center justify-between p-3 rounded-lg border border-border-light bg-slate-50 border-l-4 border-l-party-{{ key }}">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase">{{ value.name }}</p>
+                        <p class="text-lg font-bold">{{ value.total }} Diputados</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="p-4 border-t border-border-light space-y-2">
+            <button
+                class="w-full flex items-center justify-center gap-2 h-10 rounded-lg bg-primary text-white text-sm font-bold">
+                <span class="material-symbols-outlined text-[18px]">refresh</span>
+                <span>Update Dashboard</span>
+            </button>
+        </div>
+    </aside>
+    <main class="flex-1 h-full overflow-y-auto bg-slate-50/50 p-8 space-y-8">
+        <section class="bg-card-light border border-border-light rounded-2xl p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-10">
+                <div>
+                    <h3 class="text-2xl font-black text-slate-900 tracking-tight">Proyección de resultados</h3>
+                    <p class="text-slate-500 text-sm font-medium">Composición de la Asamblea Legislativa 2026-2030</p>
+                </div>
+                <div class="px-4 py-2 bg-slate-100 rounded-full border border-slate-200">
+                    <span class="text-xs font-bold text-slate-600">Última actualización: 15:00 hrs</span>
+                </div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="hemicircle-container">
+                    
+                    {% for seat,value in seats.items() %}
+                    {% for i in range(value.total) %}
+                    <div class="seat bg-party-{{ seat }}"></div>
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="mt-12 flex flex-col items-center">
+                    <div class="h-1 bg-slate-200 w-48 rounded-full mb-2"></div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        Asamblea Legislativa</span>
+                </div>
+                <div
+                    class="mt-10 grid grid-cols-3 md:grid-cols-4 gap-6 pt-8 border-t border-slate-100 w-full max-w-2xl mx-auto">
+                    {% for seat,value in seats.items() %}
+                    {% if value.total > 0 %}
+                    <div class="flex items-center gap-2 justify-center">
+                        <span class="w-3 h-3 rounded-full bg-party-{{ seat }}"></span>
+                        <span class="text-[11px] font-bold text-slate-600">{{ value.name }} ({{ value.total }})</span>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div class="bg-card-light border border-border-light rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">map</span>
+                    Distribución por Provincia
+                </h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
+                            <span>San José</span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            {% for seat,value in seats.items() %}
+                            {% if value.sanjose and value.sanjose > 0 %}
+                            {% set percent = (value.sanjose / 18 * 100) if value.total > 0 else 0 %}
+                            {% set percent = percent|round(2) %}
+                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
+                            <span>Alajuela</span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            {% for seat,value in seats.items() %}
+                            {% if value.alajuela and value.alajuela > 0 %}
+                            {% set percent = (value.alajuela / 12 * 100) if value.total > 0 else 0 %}
+                            {% set percent = percent|round(2) %}
+                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
+                            <span>Cartago</span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            {% for seat,value in seats.items() %}
+                            {% if value.cartago and value.cartago > 0 %}
+                            {% set percent = (value.cartago / 6 * 100) if value.total > 0 else 0 %}
+                            {% set percent = percent|round(2) %}
+                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="bg-card-light border border-border-light rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    
+                </h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
+                            <span>Heredia</span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            {% for seat,value in seats.items() %}
+                            {% if value.heredia and value.heredia > 0 %}
+                            {% set percent = (value.heredia / 5 * 100) if value.total > 0 else 0 %}
+                            {% set percent = percent|round(2) %}
+                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
+                            <span>Guanacaste</span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            {% for seat,value in seats.items() %}
+                            {% if value.guanacaste and value.guanacaste > 0 %}
+                            {% set percent = (value.guanacaste / 5 * 100) if value.total > 0 else 0 %}
+                            {% set percent = percent|round(2) %}
+                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
+                            <span>Puntarenas</span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            {% for seat,value in seats.items() %}
+                            {% if value.puntarenas and value.puntarenas > 0 %}
+                            {% set percent = (value.puntarenas / 6 * 100) if value.total > 0 else 0 %}
+                            {% set percent = percent|round(2) %}
+                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-500 mb-2">
+                            <span>Limón</span>
+                        </div>
+                        <div class="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            {% for seat,value in seats.items() %}
+                            {% if value.limon and value.limon > 0 %}
+                            {% set percent = (value.limon / 5 * 100) if value.total > 0 else 0 %}
+                            {% set percent = percent|round(2) %}
+                            <div class="h-full bg-party-{{ seat }} w-[{{ percent }}%]"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+    <aside class="w-96 h-full flex flex-col bg-card-light border-l border-border-light shadow-2xl relative z-10">
+        <div class="p-6 border-b border-border-light bg-slate-50/50">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-primary text-xl">broadcast_on_home</span>
+                Live Results Feed
+            </h3>
+            <div class="grid grid-cols-2 gap-2">
+                <select class="block w-full text-xs font-bold rounded-lg border-slate-200 bg-white focus:ring-primary">
+                    <option>All Provinces</option>
+                    <option>San José</option>
+                    <option>Alajuela</option>
+                </select>
+                <select class="block w-full text-xs font-bold rounded-lg border-slate-200 bg-white focus:ring-primary">
+                    <option>All Parties</option>
+                    <option>PLN</option>
+                    <option>PUSC</option>
+                </select>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+            <div
+                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD6JvE1ZhwdZZx0XLrYS-ORf9g17TqblvuttZodB_rEIYGKWt2HFuMJFgLw5gCoGnjPYfEjSw-uO2h2KlW8Uqa7YJ2xrrK2mGGc1epZuT6J3pep1lCwExn0zImvyeKwv5rZieFgNqrrtMqYyIK9kg9TetQ4cphJ7U0G9v2hl_Nebv-aqSrW5W4Jm6W5UEOGn93ZnMq80-og0gvGZGbtNqEmc44t9YxrxD_pM1BUriBTsuqodfMCa5x-ES56eGzD5WjEpNbJepUdR6Y');">
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 bg-party-pln rounded-full p-0.5 border-2 border-white">
+                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">Rodrigo Arias</h4>
+                            <span class="text-[10px] font-black text-party-pln uppercase">Confirmed</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-[11px] font-bold text-slate-400">PLN • San José</p>
+                            <p class="text-xs font-black text-slate-800">32.4%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCU_Oikn9BKleF3rwudq7wvPKCgBoLjdsYZ3eCjTW7zfHTH9fmaeiAW1lyNhVLlPYjDtl9Iy-oo0mJtGb36fBT0UfPl9M95mGIioO4vY8NxdZNRjNu_5Hpc-8b9-wrd2hNxqJdcdfUJH5aquPRX5Vt0yEXr8OFkRP7P-tdtb1ljNZt5CLgh99iItgNmRbqB9uPSrP4Y1uhvAE6XGpkyHFIj4o7UaifSZMr2qeW2u3QBGGRwDrwXLwC2Kk4uza3vFdlwjkRdfFvL4xc');">
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 bg-party-ppsd rounded-full p-0.5 border-2 border-white">
+                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">Pilar Cisneros</h4>
+                            <span class="text-[10px] font-black text-party-ppsd uppercase">Confirmed</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-[11px] font-bold text-slate-400">PPSD • San José</p>
+                            <p class="text-xs font-black text-slate-800">28.1%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCB4mVfRKg8rNWzbIjggMwncybHl6UAw6wi9KSmMiWze2b3xa2NnP2s5-2EMZHcFx_FMJywqUBc01XsB-kkqUsEE424IQauGV6R4dxuVknUsnRGGIvvHGfTUsuCYRhE8SsCwfw_N7Ts350MISslse7oR8Y3A0EvSgJX2Vsgj2FMMGZIqavrXl1-5UhKq1tErc8Oj4cIUlX1c97k-CAUNQexiVd0w9XCR2VV1aYDs16kvfr09XGNeKmF9sxD3fN7ZHtI-zKhk3hF1Ms');">
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 bg-party-pusc rounded-full p-0.5 border-2 border-white">
+                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">Leslye Bojorges</h4>
+                            <span class="text-[10px] font-black text-party-pusc uppercase">Confirmed</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-[11px] font-bold text-slate-400">PUSC • Alajuela</p>
+                            <p class="text-xs font-black text-slate-800">21.5%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer border-l-4 border-l-slate-400">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCztaCKg9_tUTr_7OeQy_JAWj00g32J7kVGnZn6QvHyznq1qg09P0weMVlCUgE3m-bBBVz4_VzqLBK3VmtwhlZAuAQIe8iBBNUwl6ye_qod2bLgyb9zbs6NBe5vzyP6zaCoElR_-z78hmDj1qkUgZsHoVvCJ39gjn-9S1MtkYKUfzQTbmh6jibmjwbvVB_JbKsCHMO8FvQiR3MDptpETXJE39bpBHLsgjaBpj0-N6-tta0HWdeJjA4-9xh_av4m0aguHK8Zorhukg0');">
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 bg-party-fa rounded-full p-0.5 border-2 border-white">
+                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">Sofía Guillén</h4>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Leading +1.2%</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-[11px] font-bold text-slate-400">FA • San José</p>
+                            <p class="text-xs font-black text-slate-800">11.9%</p>
+                        </div>
+                        <div class="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-party-fa w-[45%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer border-l-4 border-l-slate-400">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAYZo7ntL_OM152zrp1wPNMLeXkHRwEOgpJQxGsa21A9V24_IcwPhPCJ-b7el1arwMmfJbF9fxcXUjVzyoyMCiOTn6GXdnhWKMUGZaDf6b_lBjj2bljpdczslEQo9mDPLHO2BmjVtfbf-HlcFokVwDDbDzEli5iohHqo_V0_O9NlfnlK-6lXfzEP_7GBpfczqocOlqVC8zxdfxq54mgTSxYT97U198PKwTTCCj4omDEOKJnIhpxi2J3HUPqW9A10QFm4i9udgxjfJs');">
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 bg-party-nr rounded-full p-0.5 border-2 border-white">
+                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">Fabricio Alvarado</h4>
+                            <span class="text-[10px] font-black text-slate-400 uppercase">Leading +0.4%</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-[11px] font-bold text-slate-400">NR • Heredia</p>
+                            <p class="text-xs font-black text-slate-800">18.2%</p>
+                        </div>
+                        <div class="mt-2 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-party-nr w-[60%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="group p-4 rounded-xl border border-border-light hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm bg-slate-200 bg-center bg-cover"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPQVDt6CwgtiFHicpHx_GPbkTu-Op_XPzPYgZH36M19AM6MsfSDzSoKXW5KSiWSQlrqV5MyFmFNZGVPrNHSt6bbHWKBdiR23lH25WkFyDFeVgYybT9NkxnkYkCmbNvYyUEL_NvC4WpK8pQ_8DYoyV_ja12nwrFsqrnCIrZ1Ha2xnK1hddJI-HX9RiQ_IeOe6mKspTLfjqOz5UGoa5N9nho1tlbTFbsxtEYp6HbgX1IaPBFrnPZtpylOKX74aq6wRclvAkfeOiDCbc');">
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 bg-party-pln rounded-full p-0.5 border-2 border-white">
+                            <span class="block w-2 h-2 rounded-full bg-white"></span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-sm font-bold text-slate-900 truncate">Dinorah Barquero</h4>
+                            <span class="text-[10px] font-black text-party-pln uppercase">Confirmed</span>
+                        </div>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-[11px] font-bold text-slate-400">PLN • Alajuela</p>
+                            <p class="text-xs font-black text-slate-800">25.3%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+</body>
+
+</html>

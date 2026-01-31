@@ -248,6 +248,33 @@ class Query:
         result = self.query.with_entities(func.sum(getattr(self.model_class, fieldname)), getattr(self.model_class, groupby)).group_by(getattr(self.model_class, groupby)).all()
         return result or 0
     
+    def getSumFields(self, fieldnames):
+        """
+        Suma los valores de múltiples campos en una sola consulta SQL.
+        
+        :param fieldnames: Lista de strings con los nombres de los campos a sumar.
+        :return: Un diccionario con el formato {fieldname: total}
+        """
+        from sqlalchemy import func
+        
+        if not fieldnames:
+            return {}
+
+        query_entities = [
+            func.coalesce(func.sum(getattr(self.model_class, f)), 0).label(f) 
+            for f in fieldnames
+        ]
+
+        # Ejecutamos la consulta sobre la query actual (respetando filtros previos como 'filterByToday')
+        result = self.query.with_entities(*query_entities).first()
+
+        # Convertimos el objeto de resultado (Row) en un diccionario manejable
+        if result:
+            return result._asdict()
+        
+        # Fallback en caso de que la consulta no devuelva nada
+        return {f: 0 for f in fieldnames}
+
     def getCountBy(self, fieldname, groupby):
         from sqlalchemy import func
         result = self.query.with_entities(
