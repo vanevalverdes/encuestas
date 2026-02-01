@@ -94,9 +94,23 @@
     .bg-party-others, .bg-party-presidente_Otros { background-color: #cbd5e1 ; }
     .border-l-party-others { border-color: #cbd5e1 !important; }
     </style>
+    <style>
+        /* Estilos para cuando el elemento está en modo pantalla completa */
+        #data-panel:fullscreen {
+            background-color: #1a202c; /* Fondo oscuro (slate-900) */
+            padding: 2rem;
+            width: 100vw;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        /* Compatibilidad con navegadores antiguos */
+        #data-panel:-webkit-full-screen { background-color: #1a202c; padding: 2rem; }
+        #data-panel:-ms-fullscreen { background-color: #1a202c; padding: 2rem; }
+    </style>
 </head>
 
-<body class="bg-background-light text-slate-900 font-display h-screen flex overflow-hidden">
+<body id="data-panel" class="bg-background-light text-slate-900 font-display h-screen flex overflow-hidden">
     <aside class="w-80 h-full flex flex-col border-r border-border-light bg-card-light sticky top-0 shrink-0">
         <div class="p-6 border-b border-border-light">
             <div class="flex items-center gap-3 mb-6">
@@ -139,6 +153,7 @@
                 <span class="material-symbols-outlined text-[18px]">refresh</span>
                 <span>Recargar datos</span>
             </button>
+            
         </div>
     </aside>
     <main class="flex-1 h-full overflow-y-auto bg-slate-50/50 p-8 space-y-8">
@@ -226,6 +241,11 @@
     </main>
     <aside class="w-96 h-full flex flex-col bg-card-light border-l border-border-light shadow-2xl relative z-10">
         <div class="p-6 border-b border-border-light bg-slate-50/50">
+            <!-- Botón de Pantalla Completa -->
+            <button id="fullscreen-btn" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm">
+                <svg id="expand-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                <span id="btn-text">Pantalla Completa</span>
+            </button>
             <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2 mb-4">
                 <span class="material-symbols-outlined text-primary text-xl">broadcast_on_home</span>
                 Diputados Electos
@@ -979,5 +999,67 @@
             // 2. Iniciar cronómetro de 5 minutos para recarga
             setupAutoRefresh(5);
         };
+    </script>
+    <script>
+        const dataPanel = document.getElementById('data-panel');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const btnText = document.getElementById('btn-text');
+        const expandIcon = document.getElementById('expand-icon');
+
+        /**
+         * Función para alternar el modo pantalla completa
+         */
+        function toggleFullscreen() {
+            if (!document.fullscreenElement &&    // Standard
+                !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) { 
+                
+                // Entrar en pantalla completa
+                if (dataPanel.requestFullscreen) {
+                    dataPanel.requestFullscreen();
+                } else if (dataPanel.msRequestFullscreen) {
+                    dataPanel.msRequestFullscreen();
+                } else if (dataPanel.mozRequestFullScreen) {
+                    dataPanel.mozRequestFullScreen();
+                } else if (dataPanel.webkitRequestFullscreen) {
+                    dataPanel.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                }
+            } else {
+                // Salir de pantalla completa
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+
+        // Event listener para el botón
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Actualizar UI dependiendo del estado
+        const updateUI = () => {
+            if (document.fullscreenElement) {
+                btnText.textContent = "Salir de Pantalla Completa";
+                // Cambiar icono a contraer
+                expandIcon.innerHTML = '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>';
+                dataPanel.classList.add('p-10'); // Padding extra en fullscreen
+            } else {
+                btnText.textContent = "Pantalla Completa";
+                // Cambiar icono a expandir
+                expandIcon.innerHTML = '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>';
+                dataPanel.classList.remove('p-10');
+            }
+        };
+
+        // Escuchar cambios de estado de pantalla completa (por si usan la tecla ESC)
+        document.addEventListener('fullscreenchange', updateUI);
+        document.addEventListener('webkitfullscreenchange', updateUI);
+        document.addEventListener('mozfullscreenchange', updateUI);
+        document.addEventListener('MSFullscreenChange', updateUI);
+
     </script>
 </html>

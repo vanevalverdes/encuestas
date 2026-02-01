@@ -1621,6 +1621,7 @@ def final_presidencia():
             bocaQuery.addFilter("state", "==", state)
         if user:
             bocaQuery.addFilter("createdby_id", "==", user)
+        #bocaQuery.addFilter("createdby_id", "or", [41, 58, 32, 27, 28, 39, 30, 54, 42, 9])
         
         results = bocaQuery.getTotals(fieldnames)
         total_votos = sum(results.values())
