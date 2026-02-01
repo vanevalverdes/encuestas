@@ -15,18 +15,51 @@
         .bg-party-PLP { background-color: #ec4899 !important; }
         .bg-party-Otros { background-color: #94a3b8 !important; }
         
-        /* Estilos personalizados para emular el diseño anterior */
+        /* Estilos generales */
         .rounded-3xl { border-radius: 1.5rem !important; }
         .progress-custom { height: 1.5rem; border-radius: 50px; overflow: hidden; background-color: #f1f5f9; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-        .stat-card { transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #e2e8f0; border-radius: 1rem; }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        
+        /* Card de Diputados (Emulando la imagen) */
+        .stat-card { 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            border: 1px solid #eef2f6; 
+            border-radius: 1.25rem; 
+            background: #ffffff;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        
+        /* Badge de votos estilo cápsula azul de la imagen */
+        .vote-badge {
+            background-color: #0d6efd;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            min-width: 45px;
+            text-align: center;
+        }
+        .vote-badge-zero {
+            background-color: #e9ecef;
+            color: #adb5bd;
+        }
+
         .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; }
-        .text-xs-caps { font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
+        .text-xs-caps { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; color: #1e293b; }
+        
+        /* Estilo para el contenedor del Total */
+        .total-box {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            min-width: 200px;
+        }
     </style>
 
     <div class="row g-4">
         
-        <!-- SECCIÓN 1: PRESIDENCIA -->
+        <!-- SECCIÓN 1: PRESIDENCIA (Mantiene porcentajes y barra) -->
         {% set presi_data = seats.get("presidencia", {}) %}
         {% set total_presi = presi_data.get("totalPresidencia", 0) %}
         
@@ -41,43 +74,36 @@
                         <p class="text-muted small mb-0 font-medium">Corte en tiempo real de resultados nacionales</p>
                     </div>
                     <div class="bg-light border rounded-4 px-4 py-2 text-center text-md-end">
-                        <span class="text-xs-caps d-block mb-1">Total Escrutado</span>
+                        <span class="text-xs-caps d-block mb-1" style="color: #64748b;">Total Escrutado</span>
                         <span class="h3 fw-black text-dark mb-0">
                             {{ "{:,}".format(total_presi|default(0)|int) }}
                         </span>
                     </div>
                 </div>
 
-                <!-- Barra Proporcional Acumulada -->
                 <div class="progress progress-custom mb-5 border">
                     {% for party_key, data in presi_data.get("partys", {}).items() %}
                         {% if data.total and data.total > 0 and total_presi > 0 %}
                             {% set percent = (data.total / total_presi * 100) %}
                             <div class="progress-bar bg-party-{{ party_key.replace('presidente_', '') }}" 
-                                 role="progressbar" 
-                                 style="width: {{ percent }}%" 
-                                 aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">
+                                 style="width: {{ percent }}%">
                             </div>
                         {% endif %}
                     {% endfor %}
                 </div>
 
-                <!-- Grid de Candidatos -->
                 <div class="row g-3 pt-4 border-top">
                     {% for party_key, data in presi_data.get("partys", {}).items() %}
                         {% if data.total and data.total > 0 %}
                             {% set percent = (data.total / total_presi * 100) if total_presi > 0 else 0 %}
                             <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                                <div class="p-3 rounded-4 hover-bg-light transition">
-                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="p-2">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
                                         <span class="dot bg-party-{{ party_key.replace('presidente_', '') }}"></span>
-                                        <span class="text-xs-caps text-truncate d-inline-block w-100">{{ data.name }}</span>
+                                        <span class="text-xs-caps text-truncate">{{ data.name }}</span>
                                     </div>
-                                    <div class="h4 fw-bold mb-0 text-dark">
-                                        {{ percent|round(1) }}<span class="small text-muted fw-normal">%</span>
-                                    </div>
-                                    <div class="text-xs-caps mt-1 text-muted">
-                                        {{ "{:,}".format(data.total|int) }} votos
+                                    <div class="h5 fw-bold mb-0 text-dark">
+                                        {{ percent|round(1) }}%
                                     </div>
                                 </div>
                             </div>
@@ -87,57 +113,59 @@
             </div>
         </div>
 
-        <!-- SECCIÓN 2: DIPUTADOS -->
+        <!-- SECCIÓN 2: DIPUTADOS (Ajustada a la imagen) -->
         {% set dipu_data = seats.get("diputados", {}) %}
-        {% set total_dipu = dipu_data.get("total", 0) %}
-
-        <div class="col-12 mt-5">
+        {% set total_presi = dipu_data.get("totalDiputados", 0) %}
+        <div class="col-12">
             <div class="card border-0 shadow-sm rounded-3xl p-4 p-md-5">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                     <div>
-                        <h2 class="h4 fw-bold text-dark mb-0">Asamblea Legislativa</h2>
-                        <p class="text-muted small mb-0 font-medium">Distribución de votos por partido para Diputaciones</p>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="spinner-grow spinner-grow-sm text-danger" role="status"></span>
+                            <h2 class="h4 fw-bold text-dark mb-0">Votos a diputaciones</h2>
+                        </div>
+                        <p class="text-muted small mb-0 font-medium">Corte en tiempo real de resultados nacionales</p>
                     </div>
-                    <div class="bg-primary-subtle border border-primary-subtle rounded-4 px-4 py-2 text-center text-md-end">
-                        <span class="text-xs-caps text-primary d-block mb-1">Total Votos Diputados</span>
-                        <span class="h3 fw-black text-primary mb-0">
-                            {{ "{:,}".format(total_dipu|default(0)|int) }}
+                    <div class="bg-light border rounded-4 px-4 py-2 text-center text-md-end">
+                        <span class="text-xs-caps d-block mb-1" style="color: #64748b;">Total Escrutado</span>
+                        <span class="h3 fw-black text-dark mb-0">
+                            {{ "{:,}".format(total_presi|default(0)|int) }}
                         </span>
                     </div>
                 </div>
 
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3">
-                    {% for key, data in dipu_data.get("partys", {}).items() %}
-                    <div class="col">
-                        <div class="card h-100 stat-card p-3 bg-white">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h3 class="text-xs-caps text-dark mb-0 text-truncate" style="max-width: 70%;" title="{{ data.name }}">
-                                    {{ data.name }}
-                                </h3>
-                                <span class="badge rounded-pill {% if data.total and data.total > 0 %}bg-primary{% else %}bg-secondary-subtle text-muted{% endif %}">
-                                    {{ "{:,}".format(data.total|default(0)|int) }}
-                                </span>
+                <div class="progress progress-custom mb-5 border">
+                    {% for party_key, data in presi_data.get("partys", {}).items() %}
+                        {% if data.total and data.total > 0 and total_presi > 0 %}
+                            {% set percent = (data.total / total_presi * 100) %}
+                            <div class="progress-bar bg-party-{{ party_key.replace('presidente_', '') }}" 
+                                 style="width: {{ percent }}%">
                             </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
 
-                            {% if total_dipu and total_dipu > 0 %}
-                            {% set percentage = (data.total / total_dipu) * 100 %}
-                            <div class="mt-auto">
-                                <div class="progress mb-1" style="height: 6px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ percentage }}%"></div>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="text-xs-caps">Votos</span>
-                                    <span class="text-xs-caps text-dark">{{ "%.2f"|format(percentage) }}%</span>
+                <div class="row g-3 pt-4 border-top">
+                    {% for party_key, data in presi_data.get("partys", {}).items() %}
+                        {% if data.total and data.total > 0 %}
+                            {% set percent = (data.total / total_presi * 100) if total_presi > 0 else 0 %}
+                            <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                                <div class="p-2">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="dot bg-party-{{ party_key.replace('presidente_', '') }}"></span>
+                                        <span class="text-xs-caps text-truncate">{{ data.name }}</span>
+                                    </div>
+                                    <div class="h5 fw-bold mb-0 text-dark">
+                                        {{ percent|round(1) }}%
+                                    </div>
+                                    <span class="text-muted small">{{ data.total }}</span>
                                 </div>
                             </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 {% endblock %}

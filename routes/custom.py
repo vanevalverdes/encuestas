@@ -1599,6 +1599,7 @@ def final_presidencia():
     }
 
     state = request.args.get('state')
+    user = request.args.get('user', None)
     seats = {}
 
     def process_votes(party_dict, total_key):
@@ -1608,6 +1609,8 @@ def final_presidencia():
         
         if state:
             bocaQuery.addFilter("state", "==", state)
+        if user:
+            bocaQuery.addFilter("createdby_id", "==", user)
         
         results = bocaQuery.getTotals(fieldnames)
         total_votos = sum(results.values())
