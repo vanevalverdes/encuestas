@@ -203,16 +203,8 @@ def create_user():
     
     
     list = [
-        "encuestador51@opolconsultores.com",
-        "encuestador52@opolconsultores.com",
-        "encuestador53@opolconsultores.com",
-        "encuestador54@opolconsultores.com",
-        "encuestador55@opolconsultores.com",
-        "encuestador56@opolconsultores.com",
-        "encuestador57@opolconsultores.com",
-        "encuestador58@opolconsultores.com",
-        "encuestador59@opolconsultores.com",
-        "encuestador60@opolconsultores.com"
+        "encuestador61@opolconsultores.com",
+        "encuestador62@opolconsultores.com"
         ]
     for item in list:
         password = engine.random(6)
@@ -1344,6 +1336,7 @@ def stat_backup():
     else:
         return "Usted no está autorizado a acceder a esta página."
     
+
 @blueprintname.route(f'/final/resultados')
 @login_required
 def final():
@@ -1573,3 +1566,79 @@ def final():
     print(seats.items())
     #return ""
     return render_template("backend/custom/panel.html", seats=seats)
+
+@blueprintname.route('/final/presidencia')
+@login_required
+def final_presidencia():
+    # Mapeo de campos de base de datos a IDs de la tabla 'party'
+    party_map_pres = {
+        "presidente_PPSO": "PPSO_ID", "presidente_PLN": "PLN_ID",
+        "presidente_Avanza": "AVANZA_ID", "presidente_CAC": "CAC_ID",
+        "presidente_PUSC": "PUSC_ID", "presidente_UP": "UP_ID",
+        "presidente_FA": "FA_ID", "presidente_NR": "NR_ID",
+        "presidente_PLP": "PLP_ID", "presidente_PNG": "PNG_ID",
+        "presidente_PSD": "PSD_ID", "presidente_PEL": "PEL_ID",
+        "presidente_PEN": "PEN_ID", "presidente_PIN": "PIN_ID",
+        "presidente_CDS": "CDS_ID", "presidente_ACRM": "ACRM_ID",
+        "presidente_PJSC": "PJSC_ID", "presidente_CR1": "CR1_ID",
+        "presidente_PT": "PT_ID", "presidente_UCD": "UCD_ID",
+        "presidente_Nulo": "NULO_ID", "presidente_Blanco": "BLANCO_ID"
+    }
+
+    party_map_dip = {
+        "diputado_PPSO": "PPSO_ID", "diputado_NR": "NR_ID", "diputado_PNG": "PNG_ID",
+        "diputado_PLN": "PLN_ID", "diputado_UP": "UP_ID", "diputado_PLP": "PLP_ID",
+        "diputado_FA": "FA_ID", "diputado_CAC": "CAC_ID", "diputado_PEN": "PEN_ID",
+        "diputado_PSD": "PSD_ID", "diputado_Avanza": "AVANZA_ID", "diputado_PUSC": "PUSC_ID",
+        "diputado_PIN": "PIN_ID", "diputado_ACRM": "ACRM_ID", "diputado_CDS": "CDS_ID",
+        "diputado_CR1": "CR1_ID", "diputado_PJSC": "PJSC_ID", "diputado_UCD": "UCD_ID",
+        "diputado_PEL": "PEL_ID", "diputado_PT": "PT_ID", "diputado_PACO": "PACO_ID",
+        "diputado_CU": "CU_ID", "diputado_Compatriotas": "COMPATRIOTAS_ID",
+        "diputado_ActuemosYa": "ACTUEMOSYA_ID", "diputado_Otro": "OTRO_ID",
+        "diputado_Nulo": "NULO_ID", "diputado_Blanco": "BLANCO_ID"
+    }
+
+    state = request.args.get('state')
+    seats = {}
+
+    def process_votes(party_dict, total_key):
+        fieldnames = list(party_dict.keys())
+        # Query ID 6 para boca de urna
+        bocaQuery = session.newQuery(6)
+        
+        if state:
+            bocaQuery.addFilter("state", "==", state)
+        
+        results = bocaQuery.getTotals(fieldnames)
+        total_votos = sum(results.values())
+
+        data = {
+            "partys": {},
+            total_key: int(total_votos)
+        }
+
+        for field, p_id in party_dict.items():
+            count = int(results.get(field, 0))
+            # Obtener nombre legible del partido
+            try:
+                record = session.getRecord("party", p_id)
+                name = record.name if record else field.split('_')[1]
+            except:
+                name = field.split('_')[1]
+
+            data["partys"][field] = {
+                "name": name,
+                "total": count
+            }
+
+        # Ordenar partidos por votos de mayor a menor
+        data["partys"] = dict(
+            sorted(data["partys"].items(), key=lambda x: x[1]['total'], reverse=True)
+        )
+        return data
+
+    # Generamos los dos bloques de datos con las llaves que espera tu HTML
+    seats["presidencia"] = process_votes(party_map_pres, "totalPresidencia")
+    seats["diputados"] = process_votes(party_map_dip, "totalDiputados")
+
+    return render_template("backend/custom/presidencia.html", seats=seats)

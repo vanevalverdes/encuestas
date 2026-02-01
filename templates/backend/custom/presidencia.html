@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados Electorales Consolidados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .bg-party-PLN { background-color: #22c55e; }
+        .bg-party-PUSC { background-color: #3b82f6; }
+        .bg-party-PSD { background-color: #f59e0b; }
+        .bg-party-FA { background-color: #ef4444; }
+        .bg-party-NR { background-color: #6366f1; }
+        .bg-party-PLP { background-color: #ec4899; }
+        .bg-party-Otros { background-color: #94a3b8; }
+        .transition-width { transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-slate-50 p-4 md:p-8">
+
+<div class="max-w-7xl mx-auto space-y-10">
+    
+    <!-- SECCIÓN 1: PRESIDENCIA -->
+    {% set presi_data = seats.get("presidencia", {}) %}
+    {% set total_presi = presi_data.get("totalPresidencia", 0) %}
+    
+    <section class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Votos a la Presidencia</h2>
+                </div>
+                <p class="text-slate-500 text-sm font-medium">Corte en tiempo real de resultados nacionales</p>
+            </div>
+            <div class="bg-slate-100 px-6 py-3 rounded-2xl border border-slate-200">
+                <span class="text-[10px] text-slate-500 block uppercase font-black tracking-widest mb-1">Total Escrutado</span>
+                <span class="text-2xl font-black text-slate-700">
+                    {{ "{:,}".format(total_presi|int) }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Barra Proporcional -->
+        <div class="h-8 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner border border-slate-200 mb-12">
+            {% for party_key, data in presi_data.get("partys", {}).items() %}
+                {% if data.total and data.total > 0 and total_presi > 0 %}
+                    {% set percent = (data.total / total_presi * 100) %}
+                    <div 
+                        class="h-full transition-width bg-party-{{ party_key.replace('presidente_', '') }} border-r border-white/20 last:border-0" 
+                        style="width: {{ percent }}%;">
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Grid de Candidatos -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 pt-8 border-t border-slate-100">
+            {% for party_key, data in presi_data.get("partys", {}).items() %}
+                {% if data.total and data.total > 0 %}
+                    {% set percent = (data.total / total_presi * 100) if total_presi > 0 else 0 %}
+                    <div class="group flex flex-col p-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-2.5 h-2.5 rounded-full bg-party-{{ party_key.replace('presidente_', '') }}"></span>
+                            <span class="text-[10px] uppercase font-black text-slate-400 truncate">{{ data.name }}</span>
+                        </div>
+                        <span class="text-2xl font-black text-slate-800">{{ percent|round(1) }}<span class="text-sm font-bold text-slate-400 ml-0.5">%</span></span>
+                        <span class="text-[11px] font-bold text-slate-400 mt-1">{{ "{:,}".format(data.total|int) }} votos</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: DIPUTADOS -->
+    {% set dipu_data = seats.get("diputados", {}) %}
+    {% set total_dipu = dipu_data.get("total", 0) %}
+
+    <section class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Asamblea Legislativa</h2>
+                <p class="text-slate-500 text-sm font-medium">Distribución de votos por partido para Diputaciones</p>
+            </div>
+            <div class="bg-blue-50 px-6 py-3 rounded-2xl border border-blue-100">
+                <span class="text-[10px] text-blue-400 block uppercase font-black tracking-widest mb-1">Total Votos Diputados</span>
+                <span class="text-2xl font-black text-blue-600">
+                    {{ "{:,}".format(total_dipu|default(0)|int) }}
+                </span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {% for key, data in dipu_data.get("partys", {}).items() %}
+            <div class="bg-white border-l-4 {% if data.total and data.total > 0 %}border-blue-500 shadow-sm{% else %}border-slate-200{% endif %} rounded-xl border border-y-slate-200 border-r-slate-200 p-4 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-xs font-black text-slate-600 uppercase truncate pr-2 w-full" title="{{ data.name }}">
+                        {{ data.name }}
+                    </h3>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold {% if data.total and data.total > 0 %}bg-blue-100 text-blue-700{% else %}bg-slate-100 text-slate-400{% endif %}">
+                        {{ "{:,}".format(data.total|default(0)|int) }}
+                    </span>
+                </div>
+
+                {% if total_dipu and total_dipu > 0 %}
+                {% set percentage = (data.total / total_dipu) * 100 %}
+                <div class="space-y-1.5">
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div class="bg-blue-500 h-full rounded-full transition-width" style="width: {{ percentage }}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Presencia</span>
+                        <span class="text-[10px] font-black text-slate-600">{{ "%.2f"|format(percentage) }}%</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>
