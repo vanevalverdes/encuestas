@@ -2,7 +2,74 @@
 {% extends "backend/custom/surround.html" %}
 
 {% block content %}
+    <style>
+        /* Estilo base para todos los labels que tienen un círculo */
+        .row.mb-3 label {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: #334155;
+        }
 
+        /* El círculo usando ::before */
+        .row.mb-3 label::before {
+            content: "";
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background-color: #cbd5e1; /* Color gris por defecto para todos */
+            flex-shrink: 0;
+        }
+
+        /* Colores específicos basados en el atributo 'for' del label (que coincide con el ID del input) */
+        
+        /* 1. Laura Fernández PPSO - Verde */
+        label[for="presidente_PPSO"]::before, label[for="diputado_PPSO"]::before { background-color: #22b6c5 !important; }
+
+        /* 2. Álvaro Ramos PLN - Verde/Blanco (ajustado a verde para distinción) */
+        label[for="presidente_PLN"]::before, label[for="diputado_PLN"]::before { background-color: #16a34a !important; }
+
+        /* 3. Claudia Dobles CAC - Azul */
+        label[for="presidente_CAC"]::before, label[for="diputado_CAC"]::before { background-color: #f6573b !important; }
+
+        /* 4. Ariel Robles FA - Rojo */
+        label[for="presidente_FA"]::before, label[for="diputado_FA"]::before { background-color: #ecef44 !important; }
+
+        /* 5. José Aguilar Berrocal Avanza - Naranja */
+        label[for="presidente_Avanza"]::before, label[for="diputado_Avanza"]::before { background-color: #f50b0b !important; }
+
+        /* 5. José Aguilar Berrocal Avanza - Naranja */
+        label[for="presidente_NR"]::before, label[for="diputado_NR"]::before { background-color: #2e0bf5 !important; }
+        label[for="presidente_PUSC"]::before, label[for="diputado_PUSC"]::before { background-color: #f50b0b !important; }
+
+        /* Estilos extras para los campos de control */
+        label[for="presidente_Nulo"]::before, label[for="diputado_Nulo"]::before { background-color: #1e293b  !important; }
+        label[for="presidente_Blanco"]::before, label[for="diputado_Blanco"]::before { 
+            background-color: #ffffff; 
+            border: 1px solid #94a3b8;
+        }
+
+        /* Mejora visual de los inputs */
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .form-control:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.1);
+        }
+
+        .card-ingreso {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+    </style>
             <form method="post" enctype="multipart/form-data" id="form-record">
             <!-- Inputs ocultos -->
             <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}">
