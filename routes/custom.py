@@ -1480,8 +1480,18 @@ def final():
     for field in bocaResults:
         bocaTotal += bocaResults[field]
         record = session.getRecord("party", partyDict[field])
-        dictPresidencia["partys"][field] = {"party": record,
-                                  "total": int(bocaResults[field])}
+        dictPresidencia["partys"][field] = {
+                                    "party": record,
+                                    "total": int(bocaResults[field])
+                                    }# Convertimos el diccionario a una lista de tuplas, ordenamos por el valor de 'total' dentro del dict
+    sorted_partys = sorted(
+        dictPresidencia["partys"].items(), 
+        key=lambda item: item[1]["total"], 
+        reverse=True
+    )
+
+
+    dictPresidencia["partys"] = dict(sorted_partys)        
     dictPresidencia["totalPresidencia"] = int(bocaTotal)
     seats["presidencia"] = dictPresidencia
     
