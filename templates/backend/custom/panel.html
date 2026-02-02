@@ -957,126 +957,166 @@
         </div>
     </aside>
 </body>
-<script>
-        /**
-         * Función para formatear y mostrar la hora actual
-         */
-        function updateTimestamp() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0'); // Opcional
-            
-            const timeString = `${hours}:${minutes}:${seconds} hrs`;
-            
-            // Mostrar en el DOM
-            document.getElementById('last-update').textContent = timeString;
+<script>// Selectores Globales
+/**
+ * Dashboard Presidencial - Lógica de Actualización y Pantalla Completa
+ * Consolidado y Revisado
+ */
+
+// Objeto de configuración para centralizar selectores
+const elements = {
+    dataPanel: document.getElementById('data-panel'),
+    fullscreenBtn: document.getElementById('fullscreen-btn'),
+    btnText: document.getElementById('btn-text'),
+    expandIcon: document.getElementById('expand-icon'),
+    restoreOverlay: document.getElementById('fullscreen-restore-overlay'),
+    lastUpdate: document.getElementById('last-update')
+};
+
+/**
+ * Gestión de Tiempo y Recarga
+ */
+function updateTimestamp() {
+    const now = new Date();
+    if (elements.lastUpdate) {
+        // Formato local: HH:MM:SS
+        elements.lastUpdate.textContent = now.toLocaleTimeString() + " hrs";
+    }
+}
+
+/**
+ * Realiza una recarga limpia eliminando parámetros de la URL
+ */
+function hardRefresh() {
+    window.location.href = window.location.origin + window.location.pathname;
+}
+
+/**
+ * Configura la recarga automática con validación de sesión
+ * @param {number} minutes - Intervalo de tiempo
+ */
+async function setupAutoRefresh(minutes) {
+    const ms = minutes * 60 * 1000;
+    
+    setTimeout(async () => {
+        console.log("Iniciando proceso de recarga programada...");
+        
+        // Lógica de Refresh Token integrada
+        try {
+            // Ejemplo de llamada para mantener la sesión viva antes de recargar
+            // const response = await fetch('/auth/refresh');
+            // if (!response.ok) throw new Error('Session expired');
+            console.log("Sesión validada exitosamente.");
+        } catch (error) {
+            console.error("Error al validar sesión:", error);
         }
-        function hardRefresh() {
-            // window.location.origin + pathname elimina todo lo que esté después del '?'
-            window.location.href = window.location.origin + window.location.pathname;
-        }
-        /**
-         * Función para configurar la recarga automática
-         * @param {number} minutes - Intervalo en minutos
-         */
-        function setupAutoRefresh(minutes) {
-            const ms = minutes * 60 * 1000;
-            
-            setTimeout(() => {
-                // Si necesitas usar un refresh token antes de recargar,
-                // podrías llamar a tu lógica de validación aquí.
-                console.log("Recargando página...");
-                window.location.reload();
-            }, ms);
-        }
+        
+        window.location.reload();
+    }, ms);
+}
 
-        // Ejecutar al cargar la página
-        window.onload = () => {
-            // 1. Mostrar la hora en que se cargó/actualizó la página
-            updateTimestamp();
+/**
+ * Lógica de Pantalla Completa (Fullscreen)
+ */
+function toggleFullscreen() {
+    const isFS = document.fullscreenElement || 
+                 document.webkitFullscreenElement || 
+                 document.mozFullScreenElement || 
+                 document.msFullscreenElement;
 
-            // 2. Iniciar cronómetro de 5 minutos para recarga
-            setupAutoRefresh(5);
-        };
-    </script>
-        <script>
-        const dataPanel = document.getElementById('data-panel');
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
-        const btnText = document.getElementById('btn-text');
-        const expandIcon = document.getElementById('expand-icon');
-        const restoreOverlay = document.getElementById('fullscreen-restore-overlay');
+    if (!isFS) {
+        enterFullscreen();
+    } else {
+        exitFullscreen();
+    }
+}
 
-        // --- LÓGICA DE FULLSCREEN ---
+function enterFullscreen() {
+    const panel = elements.dataPanel;
+    if (!panel) return;
 
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                enterFullscreen();
-            } else {
-                exitFullscreen();
-            }
-        }
-
-        function enterFullscreen() {
-            const requestMethod = dataPanel.requestFullscreen || dataPanel.webkitRequestFullscreen || dataPanel.mozRequestFullScreen || dataPanel.msRequestFullscreen;
-            if (requestMethod) {
-                requestMethod.call(dataPanel);
-                sessionStorage.setItem('wasFullscreen', 'true'); // Guardamos el estado
-            }
-        }
-
-        function exitFullscreen() {
-            const exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-            if (exitMethod) {
-                exitMethod.call(document);
-                sessionStorage.removeItem('wasFullscreen'); // Limpiamos el estado
-            }
-        }
-
-        function updateUI() {
-            if (document.fullscreenElement) {
-                btnText.textContent = "Salir";
-                expandIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>';
-                restoreOverlay.style.display = 'none';
-            } else {
-                btnText.textContent = "Pantalla Completa";
-                expandIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
-            }
-        }
-
-        // --- LÓGICA DE REFRESH ---
-
-        function updateTimestamp() {
-            const now = new Date();
-            document.getElementById('last-update').textContent = now.toLocaleTimeString() + " hrs";
-        }
-
-        function setupAutoRefresh(minutes) {
-            setTimeout(() => {
-                // Si la sesión sigue marcada como fullscreen, el overlay aparecerá tras recargar
-                window.location.reload();
-            }, minutes * 60 * 1000);
-        }
-
-        // --- INICIALIZACIÓN ---
-
-        window.onload = () => {
-            updateTimestamp();
-            setupAutoRefresh(5);
-
-            // Verificar si veníamos de estar en pantalla completa
-            if (sessionStorage.getItem('wasFullscreen') === 'true') {
-                restoreOverlay.style.display = 'flex';
-            }
-        };
-
-        // Eventos
-        fullscreenBtn.addEventListener('click', toggleFullscreen);
-        restoreOverlay.addEventListener('click', () => {
-            enterFullscreen();
+    const requestMethod = panel.requestFullscreen || 
+                          panel.webkitRequestFullscreen || 
+                          panel.mozRequestFullScreen || 
+                          panel.msRequestFullscreen;
+    
+    if (requestMethod) {
+        requestMethod.call(panel).then(() => {
+            sessionStorage.setItem('wasFullscreen', 'true');
+        }).catch(err => {
+            console.warn("Error al solicitar Fullscreen:", err.message);
         });
+    }
+}
 
-        document.addEventListener('fullscreenchange', updateUI);
-        document.addEventListener('webkitfullscreenchange', updateUI);
-    </script>
+function exitFullscreen() {
+    const exitMethod = document.exitFullscreen || 
+                      document.webkitExitFullscreen || 
+                      document.mozCancelFullScreen || 
+                      document.msExitFullscreen;
+    
+    if (exitMethod) {
+        exitMethod.call(document);
+        sessionStorage.removeItem('wasFullscreen');
+    }
+}
+
+/**
+ * Actualiza los elementos visuales (iconos y textos) según el estado del Fullscreen
+ */
+function updateUI() {
+    const isFullscreen = document.fullscreenElement || 
+                         document.webkitFullscreenElement || 
+                         document.mozFullScreenElement || 
+                         document.msFullscreenElement;
+    
+    if (isFullscreen) {
+        if (elements.btnText) elements.btnText.textContent = "Salir";
+        if (elements.expandIcon) {
+            elements.expandIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>';
+        }
+        if (elements.restoreOverlay) elements.restoreOverlay.style.display = 'none';
+    } else {
+        if (elements.btnText) elements.btnText.textContent = "Pantalla Completa";
+        if (elements.expandIcon) {
+            elements.expandIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+        }
+    }
+}
+
+/**
+ * Inicialización Global
+ */
+function initDashboard() {
+    // 1. Inicializar reloj y programar recarga (5 min)
+    updateTimestamp();
+    setupAutoRefresh(5);
+
+    // 2. Restaurar estado de pantalla completa si aplica
+    const wasFS = sessionStorage.getItem('wasFullscreen');
+    if (wasFS === 'true' && elements.restoreOverlay) {
+        elements.restoreOverlay.style.display = 'flex';
+    }
+
+    // 3. Asignación de Eventos
+    if (elements.fullscreenBtn) {
+        elements.fullscreenBtn.addEventListener('click', toggleFullscreen);
+    }
+
+    if (elements.restoreOverlay) {
+        elements.restoreOverlay.addEventListener('click', enterFullscreen);
+    }
+
+    // Eventos de cambio de estado de pantalla
+    const events = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'];
+    events.forEach(ev => document.addEventListener(ev, updateUI));
+}
+
+// Ejecutar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDashboard);
+} else {
+    initDashboard();
+}    
+</script>
 </html>

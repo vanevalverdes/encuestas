@@ -1469,9 +1469,20 @@ def final():
             **vals # Incluye automáticamente sanjose, alajuela, etc.
         }
     
+    provincias_state = {
+        "San José": "san-jose",
+        "Alajuela": "alajuela",
+        "Heredia": "heredia",
+        "Cartago": "cartago",
+        "Guanacaste": "guanacaste",
+        "Puntarenas": "puntarenas",
+        "Limón": "limon"
+    }
+
     bocaQuery = session.newQuery(6)
     if state:
-        bocaQuery.addFilter("state", "==", state)
+        stateP = provincias_state[state]
+        bocaQuery.addFilter("state", "==", stateP)
     bocaResults = bocaQuery.getTotals(fieldnames)
     bocaTotal = 0
 
@@ -1580,6 +1591,10 @@ def final():
 @blueprintname.route('/final/presidencia')
 @login_required
 def final_presidencia():
+    #import datetime
+    #date = datetime.datetime(2026, 2, 1, 19, 20, 0)
+    date = False
+
     # Mapeo de campos de base de datos a IDs de la tabla 'party'
     party_map_pres = {
         "presidente_PPSO": "PPSO_ID", "presidente_PLN": "PLN_ID",
@@ -1621,7 +1636,9 @@ def final_presidencia():
             bocaQuery.addFilter("state", "==", state)
         if user:
             bocaQuery.addFilter("createdby_id", "==", user)
-        #bocaQuery.addFilter("createdby_id", "or", [41, 58, 32, 27, 28, 39, 30, 54, 42, 9])
+        if date:
+            bocaQuery.addFilter("created_at", "<", date)
+        #bocaQuery.addFilter("createdby_id", "or", [41, 58, 12, 8, 27, 28, 39, 30, 54, 42, 9])
         
         results = bocaQuery.getTotals(fieldnames)
         total_votos = sum(results.values())
@@ -1656,3 +1673,134 @@ def final_presidencia():
     seats["diputados"] = process_votes(party_map_dip, "totalDiputados")
 
     return render_template("backend/custom/presidencia.html", seats=seats)
+
+@blueprintname.route('/final/test')
+@login_required
+def final_presidencia_test():
+    # Asignación de escaños por provincia (TSE Costa Rica 2026)
+    PROVINCIAL_SEATS = {
+        "san-jose": 18,
+        "alajuela": 12,
+        "cartago": 6,
+        "heredia": 5,
+        "puntarenas": 6,
+        "limon": 5,
+        "guanacaste": 5
+    }
+
+    party_map_pres = {
+        "presidente_PPSO": "PPSO_ID", "presidente_PLN": "PLN_ID",
+        "presidente_Avanza": "AVANZA_ID", "presidente_CAC": "CAC_ID",
+        "presidente_PUSC": "PUSC_ID", "presidente_UP": "UP_ID",
+        "presidente_FA": "FA_ID", "presidente_NR": "NR_ID",
+        "presidente_PLP": "PLP_ID", "presidente_PNG": "PNG_ID",
+        "presidente_PSD": "PSD_ID", "presidente_PEL": "PEL_ID",
+        "presidente_PEN": "PEN_ID", "presidente_PIN": "PIN_ID",
+        "presidente_CDS": "CDS_ID", "presidente_ACRM": "ACRM_ID",
+        "presidente_PJSC": "PJSC_ID", "presidente_CR1": "CR1_ID",
+        "presidente_PT": "PT_ID", "presidente_UCD": "UCD_ID",
+        "presidente_Nulo": "NULO_ID", "presidente_Blanco": "BLANCO_ID"
+    }
+
+    party_map_dip = {
+        "diputado_PPSO": "PPSO_ID", "diputado_NR": "NR_ID", "diputado_PNG": "PNG_ID",
+        "diputado_PLN": "PLN_ID", "diputado_UP": "UP_ID", "diputado_PLP": "PLP_ID",
+        "diputado_FA": "FA_ID", "diputado_CAC": "CAC_ID", "diputado_PEN": "PEN_ID",
+        "diputado_PSD": "PSD_ID", "diputado_Avanza": "AVANZA_ID", "diputado_PUSC": "PUSC_ID",
+        "diputado_PIN": "PIN_ID", "diputado_ACRM": "ACRM_ID", "diputado_CDS": "CDS_ID",
+        "diputado_CR1": "CR1_ID", "diputado_PJSC": "PJSC_ID", "diputado_UCD": "UCD_ID",
+        "diputado_PEL": "PEL_ID", "diputado_PT": "PT_ID", "diputado_PACO": "PACO_ID",
+        "diputado_CU": "CU_ID", "diputado_Compatriotas": "COMPATRIOTAS_ID",
+        "diputado_ActuemosYa": "ACTUEMOSYA_ID", "diputado_Otro": "OTRO_ID",
+        "diputado_Nulo": "NULO_ID", "diputado_Blanco": "BLANCO_ID"
+    }
+
+    state = request.args.get('state')
+    user = request.args.get('user', None)
+    seats = {}
+
+    def calculate_seats(votos_partidos, num_plazas):
+        """
+        Calcula escaños usando Cociente, Subcociente y Residuo Mayor (TSE CR)
+        """
+        if num_plazas == 0 or not votos_partidos: return {}
+        
+        # 1. Quitar votos nulos/blancos para el cálculo de escaños
+        votos_validos = {k: v for k, v in votos_partidos.items() if "Nulo" not in k and "Blanco" not in k}
+        total_validos = sum(votos_validos.values())
+        if total_validos == 0: return {}
+
+        cociente = total_validos / num_plazas
+        subcociente = cociente / 2
+        
+        asignados = {}
+        residuos = {}
+        plazas_restantes = num_plazas
+
+        # 2. Primera ronda: Cociente y filtrado por Subcociente
+        for partido, votos in votos_validos.items():
+            if votos >= subcociente:
+                escanios = int(votos // cociente)
+                asignados[partido] = escanios
+                plazas_restantes -= escanios
+                residuos[partido] = votos % cociente
+            else:
+                asignados[partido] = 0
+                residuos[partido] = 0 # No participan por residuo si no alcanzan subcociente
+
+        # 3. Segunda ronda: Residuos mayores
+        if plazas_restantes > 0:
+            partidos_ordenados_residuo = sorted(residuos.items(), key=lambda x: x[1], reverse=True)
+            for i in range(int(plazas_restantes)):
+                p_name = partidos_ordenados_residuo[i][0]
+                asignados[p_name] += 1
+        
+        return asignados
+
+    def process_votes(party_dict, total_key, is_diputados=False):
+        fieldnames = list(party_dict.keys())
+        bocaQuery = session.newQuery(6)
+        
+        if state:
+            bocaQuery.addFilter("state", "==", state)
+        if user:
+            bocaQuery.addFilter("createdby_id", "==", user)
+        
+        results = bocaQuery.getTotals(fieldnames)
+        total_votos = sum(results.values())
+
+        # Cálculo de escaños si es para diputados
+        plazas_provincia = PROVINCIAL_SEATS.get(state, 57) if is_diputados else 0
+        escaños_calculados = calculate_seats(results, plazas_provincia) if is_diputados else {}
+
+        data = {
+            "partys": {},
+            total_key: int(total_votos),
+            "total_plazas": plazas_provincia
+        }
+
+        for field, p_id in party_dict.items():
+            count = int(results.get(field, 0))
+            try:
+                record = session.getRecord("party", p_id)
+                name = record.name if record else field.split('_')[1]
+            except:
+                name = field.split('_')[1]
+
+            data["partys"][field] = {
+                "name": name,
+                "total": count,
+                "percentage": round((count / total_votos * 100), 2) if total_votos > 0 else 0,
+                "seats": escaños_calculados.get(field, 0)
+            }
+
+        # Ordenar por votos
+        data["partys"] = dict(
+            sorted(data["partys"].items(), key=lambda x: x[1]['total'], reverse=True)
+        )
+        return data
+
+    seats["presidencia"] = process_votes(party_map_pres, "totalPresidencia")
+    seats["diputados"] = process_votes(party_map_dip, "totalDiputados", is_diputados=True)
+
+    return render_template("backend/custom/presidencia-test.html", seats=seats)
